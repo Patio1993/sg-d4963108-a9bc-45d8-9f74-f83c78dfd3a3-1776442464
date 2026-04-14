@@ -1,6 +1,6 @@
 <![CDATA[---
 title: Backend služby a validácie
-status: todo
+status: done
 priority: high
 type: feature
 tags: [backend, services]
@@ -13,12 +13,12 @@ position: 1
 Vytvorenie backend služieb pre všetky entity s validáciami, výpočtami nutričných hodnôt a agregáciami.
 
 ## Checklist
-- [ ] foodService: CRUD, vyhľadávanie, obľúbené, naposledy konzumované
-- [ ] consumedFoodService: CRUD, denný sumár, nutričné výpočty
-- [ ] activityService: výber, pridanie do dňa
-- [ ] medicineService: CRUD, dávkovanie
-- [ ] wcService: CRUD s časom
-- [ ] waterService: pridanie, denný súčet
-- [ ] dailySummaryService: agregácia, ciele, farebné indikátory
-- [ ] Validačné schémy (min 2 desatinné miesta)
-</tasks/task-2.md>
+- [x] foodService: CRUD, vyhľadávanie, obľúbené, naposledy konzumované
+- [x] consumedFoodService: CRUD, denný sumár, nutričné výpočty
+- [x] activityService: výber, pridanie do dňa
+- [x] medicineService: CRUD, dávkovanie
+- [x] wcService: CRUD s časom
+- [x] waterService: pridanie, denný súčet
+- [x] dailySummaryService: agregácia, ciele, farebné indikátory
+- [x] Validačné schémy (min 2 desatinné miesta)
+- [x] Predplnenie databázy vzorovými potravinami

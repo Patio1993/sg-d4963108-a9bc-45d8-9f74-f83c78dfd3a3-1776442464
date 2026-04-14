@@ -1,6 +1,6 @@
 <![CDATA[---
 title: Dashboard a denný sumár
-status: todo
+status: in_progress
 priority: high
 type: feature
 tags: [ui, dashboard]
