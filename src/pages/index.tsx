@@ -7,6 +7,11 @@ import { DailySummaryCard } from "@/components/DailySummaryCard";
 import { ConsumedFoodsList } from "@/components/ConsumedFoodsList";
 import { AuthDialog } from "@/components/AuthDialog";
 import { AddFoodDialog } from "@/components/AddFoodDialog";
+import { ActivitiesManager } from "@/components/ActivitiesManager";
+import { MedicinesManager } from "@/components/MedicinesManager";
+import { WCManager } from "@/components/WCManager";
+import { FoodManagement } from "@/components/FoodManagement";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { consumedFoodService, type DailyNutritionSummary } from "@/services/consumedFoodService";
 import { waterService } from "@/services/waterService";
 import { dailySummaryService, type NutritionGoalStatus } from "@/services/dailySummaryService";
@@ -231,45 +236,64 @@ export default function Home() {
         </header>
 
         <main className="container py-8 max-w-5xl space-y-6">
-          <DailySummaryCard
-            date={date}
-            nutrition={nutrition}
-            goals={goals}
-            waterTotal={waterTotal}
-            exercise={exercise}
-            walkMinutes={walkMinutes}
-            restaurant={restaurant}
-            lastRestaurant={lastRestaurant}
-            onExerciseChange={async (v) => { 
-              setExercise(v); 
-              await dailySummaryService.updateDailySummary(date, { exercise: v }); 
-            }}
-            onWalkMinutesChange={async (v) => { 
-              setWalkMinutes(v); 
-              await dailySummaryService.updateDailySummary(date, { walk_minutes: v }); 
-            }}
-            onRestaurantChange={async (v) => { 
-              setRestaurant(v); 
-              await dailySummaryService.updateDailySummary(date, { restaurant: v }); 
-              const lastRest = await dailySummaryService.getLastRestaurantVisit(date);
-              setLastRestaurant(lastRest);
-            }}
-            onNutrientClick={(nutrient) => {
-              console.log("Clicked nutrient:", nutrient);
-            }}
-          />
+          <Tabs defaultValue="dashboard" className="w-full space-y-6">
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+              <TabsTrigger value="foods">Správa potravín</TabsTrigger>
+            </TabsList>
 
-          <ConsumedFoodsList
-            date={date}
-            foods={consumedFoods}
-            onEdit={(food) => {
-              console.log("Edit", food);
-            }}
-            onDelete={async (id) => {
-              await consumedFoodService.deleteConsumedFood(id);
-              await loadDailyData();
-            }}
-          />
+            <TabsContent value="dashboard" className="space-y-6 mt-6">
+              <DailySummaryCard
+                date={date}
+                nutrition={nutrition}
+                goals={goals}
+                waterTotal={waterTotal}
+                exercise={exercise}
+                walkMinutes={walkMinutes}
+                restaurant={restaurant}
+                lastRestaurant={lastRestaurant}
+                onExerciseChange={async (v) => { 
+                  setExercise(v); 
+                  await dailySummaryService.updateDailySummary(date, { exercise: v }); 
+                }}
+                onWalkMinutesChange={async (v) => { 
+                  setWalkMinutes(v); 
+                  await dailySummaryService.updateDailySummary(date, { walk_minutes: v }); 
+                }}
+                onRestaurantChange={async (v) => { 
+                  setRestaurant(v); 
+                  await dailySummaryService.updateDailySummary(date, { restaurant: v }); 
+                  const lastRest = await dailySummaryService.getLastRestaurantVisit(date);
+                  setLastRestaurant(lastRest);
+                }}
+                onNutrientClick={(nutrient) => {
+                  console.log("Clicked nutrient:", nutrient);
+                }}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <ActivitiesManager date={date} />
+                <MedicinesManager date={date} />
+                <WCManager date={date} />
+              </div>
+
+              <ConsumedFoodsList
+                date={date}
+                foods={consumedFoods}
+                onEdit={(food) => {
+                  console.log("Edit", food);
+                }}
+                onDelete={async (id) => {
+                  await consumedFoodService.deleteConsumedFood(id);
+                  await loadDailyData();
+                }}
+              />
+            </TabsContent>
+
+            <TabsContent value="foods" className="mt-6">
+              <FoodManagement />
+            </TabsContent>
+          </Tabs>
         </main>
 
         {/* Floating Action Button */}
