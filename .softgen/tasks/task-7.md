@@ -1,22 +1,26 @@
 <![CDATA[---
 title: Aktivity, lieky, WC záznamy
-status: todo
+status: done
 priority: medium
 type: feature
-tags: [ui, tracking]
+tags: [ui, activities, medicines, wc]
 created_by: agent
 created_at: 2026-04-14T08:37:27Z
 position: 6
 ---
 
 ## Notes
-Rýchle pridanie aktivít, liekov a WC záznamov s možnosťou editácie a odstránenia.
+Správa aktivít, liekov a WC záznamov nad zoznamom potravín na hlavnej obrazovke.
 
 ## Checklist
-- [ ] ActivitySelector: výber z predplnených aktivít
-- [ ] MedicineForm: názov, diagnóza, dávkovanie
-- [ ] WCEntry form: čas, poznámka
-- [ ] Zobrazenie v zozname nad potravinami
-- [ ] Editácia a odstránenie
-- [ ] WaterIntake: zadanie ml, čas, denný súčet
-</tasks/task-7.md>
+- [x] ActivitiesManager: predplnené aktivity, výber, badge zobrazenie
+- [x] Zobrazenie nad zoznamom potravín
+- [x] Odstránenie aktivity
+- [x] MedicinesManager: vlastné lieky (názov, diagnóza, dávkovanie)
+- [x] Výber lieku, pridanie do dňa s časom
+- [x] Detail s diagnózou a dávkovaním
+- [x] Odstránenie záznamu lieku
+- [x] WCManager: čas, poznámka
+- [x] Editácia a odstránenie
+- [x] WaterIntake: zadanie ml, čas, denný súčet
+]]></update>
