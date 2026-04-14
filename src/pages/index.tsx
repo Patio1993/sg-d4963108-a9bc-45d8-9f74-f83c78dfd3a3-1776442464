@@ -17,7 +17,7 @@ import { waterService } from "@/services/waterService";
 import { dailySummaryService, type NutritionGoalStatus } from "@/services/dailySummaryService";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User, Plus, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { format, addDays, subDays, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
 
 export default function Home() {
@@ -49,21 +49,21 @@ export default function Home() {
   });
 
   const formatDateDisplay = (dateStr: string) => {
-    const d = new Date(dateStr + "T00:00:00");
+    const d = parseISO(dateStr);
     return format(d, "EEEE, d. MMMM yyyy", { locale: sk });
   };
 
   const changeDate = (days: number) => {
-    const current = new Date(date + "T00:00:00");
-    current.setDate(current.getDate() + days);
-    setDate(current.toISOString().split("T")[0]);
+    const current = parseISO(date);
+    const newDate = days > 0 ? addDays(current, days) : subDays(current, Math.abs(days));
+    setDate(format(newDate, "yyyy-MM-dd"));
   };
 
   const goToToday = () => {
-    setDate(new Date().toISOString().split("T")[0]);
+    setDate(format(new Date(), "yyyy-MM-dd"));
   };
 
-  const isToday = date === new Date().toISOString().split("T")[0];
+  const isToday = date === format(new Date(), "yyyy-MM-dd");
 
   useEffect(() => {
     checkAuth();
@@ -202,10 +202,10 @@ export default function Home() {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={new Date(date + "T00:00:00")}
+                      selected={parseISO(date)}
                       onSelect={(d) => {
                         if (d) {
-                          setDate(d.toISOString().split("T")[0]);
+                          setDate(format(d, "yyyy-MM-dd"));
                         }
                       }}
                       initialFocus
