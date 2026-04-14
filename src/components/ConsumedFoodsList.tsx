@@ -4,13 +4,14 @@ import { Trash2, Edit } from "lucide-react";
 import type { ConsumedFoodWithDetails } from "@/services/consumedFoodService";
 
 interface ConsumedFoodsListProps {
+  date: string;
   foods: ConsumedFoodWithDetails[];
-  sortedBy: string;
-  onDelete: (id: string) => void;
+  sortedBy?: string;
+  onDelete: (id: string) => Promise<void>;
   onEdit: (food: ConsumedFoodWithDetails) => void;
 }
 
-export function ConsumedFoodsList({ foods, sortedBy, onDelete, onEdit }: ConsumedFoodsListProps) {
+export function ConsumedFoodsList({ date, foods, sortedBy, onDelete, onEdit }: ConsumedFoodsListProps) {
   const mealTypeLabels = {
     breakfast: "Raňajky",
     snack: "Desiata",

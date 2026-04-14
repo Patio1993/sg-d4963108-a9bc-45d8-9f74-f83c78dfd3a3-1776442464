@@ -6,6 +6,7 @@ import type { DailyNutritionSummary } from "@/services/consumedFoodService";
 import type { NutritionGoalStatus } from "@/services/dailySummaryService";
 
 interface DailySummaryCardProps {
+  date: string;
   nutrition: DailyNutritionSummary;
   goals: NutritionGoalStatus;
   exercise: boolean;
@@ -20,6 +21,7 @@ interface DailySummaryCardProps {
 }
 
 export function DailySummaryCard({
+  date,
   nutrition,
   goals,
   exercise,

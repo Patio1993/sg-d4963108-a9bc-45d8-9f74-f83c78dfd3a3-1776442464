@@ -24,6 +24,7 @@ export default function Home() {
   const [showAddFoodDialog, setShowAddFoodDialog] = useState(false);
   
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [consumedFoods, setConsumedFoods] = useState<any[]>([]);
   const [nutrition, setNutrition] = useState<DailyNutritionSummary>({
     total_kcal: 0,
     total_fiber: 0,
@@ -62,6 +63,10 @@ export default function Home() {
 
   const loadDailyData = async () => {
     try {
+      // Load consumed foods list
+      const fetchedFoods = await consumedFoodService.getDailyConsumedFoods(date);
+      setConsumedFoods(fetchedFoods);
+
       // Nutrition
       const fetchedNutrition = await consumedFoodService.getDailyNutritionSummary(date);
       setNutrition(fetchedNutrition);
@@ -187,10 +192,12 @@ export default function Home() {
 
           <ConsumedFoodsList
             date={date}
+            foods={consumedFoods}
             onEdit={(food) => {
               console.log("Edit", food);
             }}
-            onDelete={async () => {
+            onDelete={async (id) => {
+              await consumedFoodService.deleteConsumedFood(id);
               await loadDailyData();
             }}
           />
