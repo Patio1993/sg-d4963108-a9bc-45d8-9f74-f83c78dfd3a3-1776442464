@@ -1,6 +1,6 @@
 ---
 title: Food entry form and daily view
-status: in_progress
+status: done
 priority: high
 type: feature
 tags: [ui, forms]
@@ -13,8 +13,8 @@ position: 1
 Build the main interface: a form to add food entries and a daily view showing all meals grouped by type (Breakfast, Lunch, Dinner, Snacks). Include calorie totals.
 
 ## Checklist
-- [ ] Create FoodEntryForm component: meal type selector, food name input, portion input, calorie input
-- [ ] Create DailyFoodLog component: displays entries grouped by meal with totals
-- [ ] Create FoodEntryCard component: shows individual food item with edit/delete actions
-- [ ] Create foodService.ts with CRUD operations for food_entries
-- [ ] Update index.tsx with full layout: header, form, and daily log
+- [x] Create FoodEntryForm component: meal type selector, food name input, portion input, calorie input
+- [x] Create DailyFoodLog component: displays entries grouped by meal with totals
+- [x] Create FoodEntryCard component: shows individual food item with edit/delete actions
+- [x] Create foodService.ts with CRUD operations for food_entries
+- [x] Update index.tsx with full layout: header, form, and daily log

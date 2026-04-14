@@ -3,6 +3,7 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { FoodEntryForm } from "@/components/FoodEntryForm";
 import { DailyFoodLog } from "@/components/DailyFoodLog";
+import { AuthDialog } from "@/components/AuthDialog";
 import { foodService, type FoodEntry } from "@/services/foodService";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User } from "lucide-react";
@@ -11,6 +12,7 @@ export default function Home() {
   const [entries, setEntries] = useState<FoodEntry[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -73,10 +75,17 @@ export default function Home() {
             </div>
             <div className="p-6 bg-card rounded-lg shadow-md space-y-4">
               <p className="text-sm text-muted-foreground">Sign in to start tracking your food</p>
-              <Button className="w-full">Sign In / Sign Up</Button>
+              <Button className="w-full" onClick={() => setShowAuthDialog(true)}>
+                Sign In / Sign Up
+              </Button>
             </div>
           </div>
         </div>
+        <AuthDialog 
+          open={showAuthDialog} 
+          onOpenChange={setShowAuthDialog}
+          onSuccess={checkAuth}
+        />
       </>
     );
   }

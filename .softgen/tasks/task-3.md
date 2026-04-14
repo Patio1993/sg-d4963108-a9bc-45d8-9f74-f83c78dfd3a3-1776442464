@@ -1,6 +1,6 @@
 ---
 title: Authentication and user profiles
-status: todo
+status: done
 priority: medium
 type: feature
 tags: [auth]
@@ -13,7 +13,7 @@ position: 2
 Add simple email/password authentication so users can save their food entries across sessions. Use existing authService.ts.
 
 ## Checklist
-- [ ] Create AuthDialog component with login/signup tabs
-- [ ] Add authentication check to index.tsx
-- [ ] Show user email in header when logged in
-- [ ] Add sign out button
+- [x] Create AuthDialog component with login/signup tabs
+- [x] Add authentication check to index.tsx
+- [x] Show user email in header when logged in
+- [x] Add sign out button
