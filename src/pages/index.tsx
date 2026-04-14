@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DailySummaryCard } from "@/components/DailySummaryCard";
 import { ConsumedFoodsList } from "@/components/ConsumedFoodsList";
 import { AuthDialog } from "@/components/AuthDialog";
@@ -9,7 +11,9 @@ import { consumedFoodService, type DailyNutritionSummary } from "@/services/cons
 import { waterService } from "@/services/waterService";
 import { dailySummaryService, type NutritionGoalStatus } from "@/services/dailySummaryService";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, User, Plus } from "lucide-react";
+import { LogOut, User, Plus, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { sk } from "date-fns/locale";
 
 export default function Home() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -38,6 +42,23 @@ export default function Home() {
     sugar: "good",
     fats: "good",
   });
+
+  const formatDateDisplay = (dateStr: string) => {
+    const d = new Date(dateStr + "T00:00:00");
+    return format(d, "EEEE, d. MMMM yyyy", { locale: sk });
+  };
+
+  const changeDate = (days: number) => {
+    const current = new Date(date + "T00:00:00");
+    current.setDate(current.getDate() + days);
+    setDate(current.toISOString().split("T")[0]);
+  };
+
+  const goToToday = () => {
+    setDate(new Date().toISOString().split("T")[0]);
+  };
+
+  const isToday = date === new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     checkAuth();
@@ -140,17 +161,71 @@ export default function Home() {
       />
       <div className="min-h-screen bg-background pb-20">
         <header className="border-b bg-card shadow-sm sticky top-0 z-10">
-          <div className="container py-4 flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Food Tracker</h1>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <User className="h-4 w-4" />
-                {userEmail}
+          <div className="container py-4">
+            <div className="flex items-center justify-between mb-3">
+              <h1 className="text-2xl font-bold">Food Tracker</h1>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <User className="h-4 w-4" />
+                  {userEmail}
+                </div>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Odhlásiť
+                </Button>
               </div>
-              <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Odhlásiť
-              </Button>
+            </div>
+            
+            {/* Date Navigation */}
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => changeDate(-1)}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="min-w-[280px] justify-start text-left font-normal">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formatDateDisplay(date)}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={new Date(date + "T00:00:00")}
+                      onSelect={(d) => {
+                        if (d) {
+                          setDate(d.toISOString().split("T")[0]);
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => changeDate(1)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {!isToday && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={goToToday}
+                >
+                  Dnes
+                </Button>
+              )}
             </div>
           </div>
         </header>
