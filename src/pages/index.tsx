@@ -12,7 +12,7 @@ import { MedicinesManager } from "@/components/MedicinesManager";
 import { WCManager } from "@/components/WCManager";
 import { FoodManagement } from "@/components/FoodManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { consumedFoodService, type DailyNutritionSummary } from "@/services/consumedFoodService";
+import { consumedFoodService, type DailyNutritionSummary, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
 import { waterService } from "@/services/waterService";
 import { dailySummaryService, type NutritionGoalStatus } from "@/services/dailySummaryService";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,9 +25,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAddFoodDialog, setShowAddFoodDialog] = useState(false);
+  const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null);
   
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [consumedFoods, setConsumedFoods] = useState<any[]>([]);
+  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [consumedFoods, setConsumedFoods] = useState<ConsumedFoodWithDetails[]>([]);
   const [nutrition, setNutrition] = useState<DailyNutritionSummary>({
     total_kcal: 0,
     total_fiber: 0,
@@ -118,6 +119,16 @@ export default function Home() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setUserEmail(null);
+  };
+
+  const handleEditFood = (food: ConsumedFoodWithDetails) => {
+    setEditingFood(food);
+    setShowAddFoodDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setShowAddFoodDialog(false);
+    setEditingFood(null);
   };
 
   if (loading) {
@@ -280,9 +291,7 @@ export default function Home() {
               <ConsumedFoodsList
                 date={date}
                 foods={consumedFoods}
-                onEdit={(food) => {
-                  console.log("Edit", food);
-                }}
+                onEdit={handleEditFood}
                 onDelete={async (id) => {
                   await consumedFoodService.deleteConsumedFood(id);
                   await loadDailyData();
@@ -301,7 +310,10 @@ export default function Home() {
           <Button
             size="lg"
             className="h-14 w-14 rounded-full shadow-lg"
-            onClick={() => setShowAddFoodDialog(true)}
+            onClick={() => {
+              setEditingFood(null);
+              setShowAddFoodDialog(true);
+            }}
           >
             <Plus className="h-6 w-6" />
           </Button>
@@ -309,8 +321,9 @@ export default function Home() {
 
         <AddFoodDialog
           open={showAddFoodDialog}
-          onOpenChange={setShowAddFoodDialog}
+          onOpenChange={handleCloseDialog}
           date={date}
+          editingFood={editingFood}
           onSuccess={loadDailyData}
         />
       </div>

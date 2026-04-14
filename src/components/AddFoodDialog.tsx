@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, Star, Clock, Plus } from "lucide-react";
 import { foodService, type Food, type FoodWithLastConsumed } from "@/services/foodService";
-import { consumedFoodService, type CreateConsumedFoodData } from "@/services/consumedFoodService";
+import { consumedFoodService, type CreateConsumedFoodData, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
 import { useToast } from "@/hooks/use-toast";
 
 type MealType = "Raňajky" | "Desiata" | "Obed" | "Olovrant" | "Večera" | "Káva";
@@ -25,10 +25,11 @@ interface AddFoodDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   date: string;
+  editingFood?: ConsumedFoodWithDetails | null;
   onSuccess: () => void;
 }
 
-export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDialogProps) {
+export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess }: AddFoodDialogProps) {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [foods, setFoods] = useState<FoodWithLastConsumed[]>([]);
@@ -38,18 +39,59 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
   // Form state
   const [amount, setAmount] = useState("");
   const [time, setTime] = useState("");
-  const [mealType, setMealType] = useState<MealType>("Raňajky");
-  const [reaction, setReaction] = useState<Reaction>("Neutrálne");
+  const [mealType, setMealType] = useState("Raňajky");
+  const [reaction, setReaction] = useState("Neutrálne");
   const [coffeeNumber, setCoffeeNumber] = useState(1);
 
   useEffect(() => {
     if (open) {
       loadFoods();
-      // Set current time as default
+      if (!editingFood) {
+        const now = new Date();
+        setTime(now.toTimeString().slice(0, 5));
+      }
+    }
+  }, [open, editingFood]);
+
+  useEffect(() => {
+    if (editingFood) {
+      // Populate form with editing data
+      setSelectedFood(editingFood.food as FoodWithLastConsumed);
+      setAmount(editingFood.amount.toString());
+      setTime(editingFood.time);
+      
+      // Map DB values to display values
+      const mealTypeMap: Record<string, string> = {
+        breakfast: "Raňajky",
+        snack: "Desiata",
+        lunch: "Obed",
+        afternoon_snack: "Olovrant",
+        dinner: "Večera",
+        coffee: "Káva",
+      };
+      setMealType(mealTypeMap[editingFood.meal_type] || "Raňajky");
+      
+      const reactionMap: Record<string, string> = {
+        good: "Dobré",
+        neutral: "Neutrálne",
+        bad: "Zlé",
+      };
+      setReaction(reactionMap[editingFood.reaction] || "Neutrálne");
+      
+      if (editingFood.coffee_count) {
+        setCoffeeNumber(editingFood.coffee_count);
+      }
+    } else {
+      // Reset form for new entry
+      setSelectedFood(null);
+      setAmount("");
       const now = new Date();
       setTime(now.toTimeString().slice(0, 5));
+      setMealType("Raňajky");
+      setReaction("Neutrálne");
+      setCoffeeNumber(1);
     }
-  }, [open]);
+  }, [editingFood]);
 
   const loadFoods = async () => {
     try {
@@ -97,21 +139,13 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!selectedFood) {
-      toast({
-        title: "Chyba",
-        description: "Vyberte potravinu",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!selectedFood) return;
 
     const amountNum = parseFloat(amount);
     if (isNaN(amountNum) || amountNum <= 0) {
       toast({
         title: "Chyba",
-        description: "Zadajte platné množstvo (> 0)",
+        description: "Zadajte platné množstvo väčšie ako 0",
         variant: "destructive",
       });
       return;
@@ -119,34 +153,45 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
 
     setLoading(true);
     try {
-      const dayNumber = await consumedFoodService.getNextDayNumber();
-      await consumedFoodService.createConsumedFood({
+      const data = {
         food_id: selectedFood.id,
         date,
         time,
-        amount: Math.round(amountNum * 100) / 100, // 2 decimal places
+        amount: Math.round(amountNum * 100) / 100,
         meal_type: mapMealTypeToDb(mealType),
         reaction: mapReactionToDb(reaction),
-        day_number: dayNumber,
+        day_number: editingFood?.day_number || await consumedFoodService.getNextDayNumber(),
         coffee_count: mealType === "Káva" ? coffeeNumber : undefined,
-      });
+      };
 
-      toast({
-        title: "Úspech",
-        description: "Potravina pridaná",
-      });
+      if (editingFood) {
+        // Update existing entry
+        await consumedFoodService.updateConsumedFood(editingFood.id, data);
+        toast({
+          title: "Úspech",
+          description: "Potravina aktualizovaná",
+        });
+      } else {
+        // Create new entry
+        await consumedFoodService.createConsumedFood(data);
+        toast({
+          title: "Úspech",
+          description: "Potravina pridaná",
+        });
+      }
 
+      onOpenChange(false);
+      onSuccess();
+      
       // Reset form
       setSelectedFood(null);
       setAmount("");
-      setReaction("Neutrálne");
-      
-      onSuccess();
-      onOpenChange(false);
-    } catch (error: any) {
+      setSearchQuery("");
+    } catch (error) {
+      console.error("Failed to save consumed food:", error);
       toast({
         title: "Chyba",
-        description: error.message || "Nepodarilo sa pridať potravinu",
+        description: "Nepodarilo sa uložiť potravinu",
         variant: "destructive",
       });
     } finally {
@@ -159,11 +204,11 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh]">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Pridať potravinu</DialogTitle>
+          <DialogTitle>{editingFood ? "Upraviť potravinu" : "Pridať potravinu"}</DialogTitle>
           <DialogDescription>
-            Vyhľadajte a pridajte konzumovanú potravinu
+            {editingFood ? "Upravte detaily konzumovanej potraviny" : "Vyhľadajte a pridajte potravinu do denného záznamu"}
           </DialogDescription>
         </DialogHeader>
 
@@ -369,9 +414,8 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    {loading ? "Pridávam..." : "Pridať"}
+                  <Button type="submit" disabled={!selectedFood || loading} className="w-full">
+                    {loading ? "Ukladám..." : editingFood ? "Uložiť zmeny" : "Pridať"}
                   </Button>
                 </form>
               </>
