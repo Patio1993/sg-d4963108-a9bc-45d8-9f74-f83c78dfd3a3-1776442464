@@ -47,7 +47,7 @@ export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
     setIsLoading(true);
 
     try {
-      await authService.signInWithPassword(email, password);
+      await authService.signIn(email, password);
       toast({
         title: "Welcome back!",
         description: "You've successfully signed in.",
