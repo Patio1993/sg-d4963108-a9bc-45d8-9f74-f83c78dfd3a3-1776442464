@@ -1,6 +1,6 @@
 ---
 title: Food entry form and daily view
-status: todo
+status: in_progress
 priority: high
 type: feature
 tags: [ui, forms]
