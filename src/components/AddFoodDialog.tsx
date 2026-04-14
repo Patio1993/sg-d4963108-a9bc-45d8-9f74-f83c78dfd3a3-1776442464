@@ -10,6 +10,8 @@ import { Search, Star, Clock, Plus } from "lucide-react";
 import { foodService, type Food, type FoodWithLastConsumed } from "@/services/foodService";
 import { consumedFoodService, type CreateConsumedFoodData, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { sk } from "date-fns/locale";
 
 type MealType = "Raňajky" | "Desiata" | "Obed" | "Olovrant" | "Večera" | "Káva";
 type Reaction = "Dobré" | "Neutrálne" | "Zlé";
@@ -42,6 +44,20 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   const [mealType, setMealType] = useState("Raňajky");
   const [reaction, setReaction] = useState("Neutrálne");
   const [coffeeNumber, setCoffeeNumber] = useState(1);
+
+  const formatLastConsumed = (daysAgo: number | null | undefined) => {
+    if (daysAgo === null || daysAgo === undefined) return null;
+
+    const lastDate = new Date();
+    lastDate.setDate(lastDate.getDate() - daysAgo);
+    const dateStr = format(lastDate, "d.MM.yyyy", { locale: sk });
+    const dayName = format(lastDate, "EEEE", { locale: sk });
+
+    if (daysAgo === 0) return "Dnes";
+    if (daysAgo === 1) return `Včera - ${dayName} (${dateStr})`;
+    if (daysAgo === 2) return `Predvčerom - ${dayName} (${dateStr})`;
+    return `Pred ${daysAgo} dňami - ${dayName} (${dateStr})`;
+  };
 
   useEffect(() => {
     if (open) {
@@ -242,26 +258,25 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                         }`}
                         onClick={() => handleSelectFood(food)}
                       >
-                        <CardContent className="p-3">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p className="font-medium">{food.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {food.kcal} kcal / 100{food.unit}
-                              </p>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                {food.is_favorite && <Star className="h-4 w-4 fill-accent text-accent flex-shrink-0" />}
+                                <span className="font-medium truncate">{food.name}</span>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {food.kcal} kcal/100{food.unit}
+                                </Badge>
+                                {food.days_ago !== null && food.days_ago !== undefined && (
+                                  <Badge variant="outline" className="text-xs bg-muted">
+                                    <Clock className="h-3 w-3 mr-1" />
+                                    {formatLastConsumed(food.days_ago)}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
-                            {food.days_ago !== null && food.days_ago !== undefined && (
-                              <Badge variant="outline" className="text-xs">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {food.days_ago === 0
-                                  ? "Dnes"
-                                  : food.days_ago === 1
-                                  ? "Včera"
-                                  : food.days_ago === 2
-                                  ? "Predvčerom"
-                                  : `Pred ${food.days_ago} dňami`}
-                              </Badge>
-                            )}
                           </div>
                         </CardContent>
                       </Card>
@@ -281,26 +296,25 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                         }`}
                         onClick={() => handleSelectFood(food)}
                       >
-                        <CardContent className="p-3">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p className="font-medium">{food.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {food.kcal} kcal / 100{food.unit}
-                              </p>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Star className="h-4 w-4 fill-accent text-accent flex-shrink-0" />
+                                <span className="font-medium truncate">{food.name}</span>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {food.kcal} kcal/100{food.unit}
+                                </Badge>
+                                {food.days_ago !== null && food.days_ago !== undefined && (
+                                  <Badge variant="outline" className="text-xs bg-muted">
+                                    <Clock className="h-3 w-3 mr-1" />
+                                    {formatLastConsumed(food.days_ago)}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
-                            {food.days_ago !== null && food.days_ago !== undefined && (
-                              <Badge variant="outline" className="text-xs">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {food.days_ago === 0
-                                  ? "Dnes"
-                                  : food.days_ago === 1
-                                  ? "Včera"
-                                  : food.days_ago === 2
-                                  ? "Predvčerom"
-                                  : `Pred ${food.days_ago} dňami`}
-                              </Badge>
-                            )}
                           </div>
                         </CardContent>
                       </Card>
