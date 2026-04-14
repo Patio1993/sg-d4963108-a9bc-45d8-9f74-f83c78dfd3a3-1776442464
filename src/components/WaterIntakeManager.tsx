@@ -142,7 +142,7 @@ export function WaterIntakeManager({ date, onWaterAdded }: WaterIntakeManagerPro
                 <div className="flex items-center gap-3">
                   <Droplet className="h-4 w-4 text-blue-500" />
                   <div>
-                    <span className="font-medium">{intake.amount}ml</span>
+                    <span className="font-medium">{intake.amount_ml}ml</span>
                     <span className="text-sm text-muted-foreground ml-2">{intake.time}</span>
                   </div>
                 </div>

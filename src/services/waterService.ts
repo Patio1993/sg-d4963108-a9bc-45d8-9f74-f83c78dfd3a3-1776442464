@@ -25,17 +25,17 @@ export const waterService = {
 
     const { data, error } = await supabase
       .from("water_intake")
-      .select("amount")
+      .select("amount_ml")
       .eq("user_id", user.id)
       .eq("date", date);
 
     if (error) throw error;
 
-    const total = data?.reduce((sum, intake) => sum + intake.amount, 0) || 0;
+    const total = data?.reduce((sum, intake) => sum + intake.amount_ml, 0) || 0;
     return total;
   },
 
-  async addWaterIntake(date: string, amount: number, time: string): Promise<void> {
+  async addWaterIntake(date: string, amount_ml: number, time: string): Promise<void> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
@@ -44,7 +44,7 @@ export const waterService = {
       .insert({
         user_id: user.id,
         date,
-        amount,
+        amount_ml,
         time,
       });
 
