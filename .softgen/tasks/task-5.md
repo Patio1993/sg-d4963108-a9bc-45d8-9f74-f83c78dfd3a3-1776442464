@@ -1,22 +1,23 @@
 <![CDATA[---
 title: Pridanie a vyhľadávanie potravín
-status: todo
+status: done
 priority: high
 type: feature
-tags: [ui, foods]
+tags: [ui, search]
 created_by: agent
 created_at: 2026-04-14T08:37:27Z
 position: 4
 ---
 
 ## Notes
-Vyhľadávanie potravín v databáze s triedením podľa obľúbených a "naposledy konzumované" informáciou.
+Modálne okno na vyhľadávanie a pridanie konzumovaných potravín s výberom množstva, času, typu jedla a reakcie.
 
 ## Checklist
-- [ ] FoodSearch komponenta: textové vyhľadávanie
-- [ ] Triedenie: obľúbené (A-Z), všetky (A-Z, Z-A)
-- [ ] Zobrazenie "naposledy konzumované" (predvčerom, pred 3 dňami...)
-- [ ] Výber potraviny → AddConsumedFood formulár
-- [ ] Množstvo, typ jedla, reakcia
-- [ ] Validácia (množstvo > 0, 2 desatinné miesta)
-</tasks/task-5.md>
+- [x] Modálne okno s vyhľadávaním (textový input)
+- [x] Obľúbené potraviny (hviezdička, A-Z)
+- [x] Všetky potraviny (A-Z, Z-A)
+- [x] "Naposledy konzumované" badge: dnes/včera/predvčerom/pred X dňami
+- [x] Detail vybranej potraviny s nutričnými hodnotami
+- [x] Formulár: Množstvo, typ jedla, reakcia
+- [x] Validácia (množstvo > 0, 2 desatinné miesta)
+]]></update>

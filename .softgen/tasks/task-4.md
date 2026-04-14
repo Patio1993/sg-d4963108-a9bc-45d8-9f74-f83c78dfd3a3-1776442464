@@ -1,6 +1,6 @@
 <![CDATA[---
 title: Zoznam a detail konzumovaných potravín
-status: todo
+status: done
 priority: high
 type: feature
 tags: [ui, foods]
@@ -10,13 +10,13 @@ position: 3
 ---
 
 ## Notes
-Detail zoznam skonzumovaných potravín s časom, množstvom, prepočítanými nutričnými hodnotami a editáciou.
+Zobrazenie zoznamu skonzumovaných potravín za deň, zoskupených podľa typu jedla, s možnosťou editácie a zmazania.
 
 ## Checklist
-- [ ] ConsumedFoodList komponenta: čas, názov, množstvo
-- [ ] Prepočítané nutričné hodnoty (modré > 0, sivé = 0)
-- [ ] Editácia položky (množstvo, čas, typ jedla, reakcia)
-- [ ] Odstránenie položky
-- [ ] Zoradenie podľa kliknutej nutričnej hodnoty
-- [ ] Zobrazenie typu jedla a reakcie (emoji)
-</tasks/task-4.md>
+- [x] Zoznam zoskupený podľa typu jedla (Raňajky, Desiata, Obed...)
+- [x] Čas, názov, množstvo, prepočítané nutričné hodnoty
+- [x] Hodnoty > 0 modré, hodnoty = 0 sivé
+- [x] Editácia a zmazanie záznamu
+- [x] Kliknutie na nutričnú hodnotu → zoradenie podľa kliknutej nutričnej hodnoty
+- [x] Zobrazenie typu jedla a reakcie (emoji)
+]]></update>
