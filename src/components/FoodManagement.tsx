@@ -20,7 +20,7 @@ export function FoodManagement() {
 
   // Form state
   const [name, setName] = useState("");
-  const [unit, setUnit] = useState<"grams" | "ml">("grams");
+  const [unit, setUnit] = useState<"g" | "ml">("g");
   const [kcal, setKcal] = useState("");
   const [fiber, setFiber] = useState("");
   const [sugar, setSugar] = useState("");
@@ -48,7 +48,7 @@ export function FoodManagement() {
 
   const resetForm = () => {
     setName("");
-    setUnit("grams");
+    setUnit("g");
     setKcal("");
     setFiber("");
     setSugar("");
@@ -224,7 +224,7 @@ export function FoodManagement() {
                       </Button>
                     </div>
                     <Badge variant="outline" className="text-xs">
-                      na 100{food.unit === "grams" ? "g" : "ml"}
+                      na 100{food.unit === "g" ? "g" : "ml"}
                     </Badge>
                   </div>
                   <div className="flex gap-2">
@@ -298,10 +298,10 @@ export function FoodManagement() {
 
             <div className="space-y-2">
               <Label>Jednotka *</Label>
-              <RadioGroup value={unit} onValueChange={(v) => setUnit(v as "grams" | "ml")}>
+              <RadioGroup value={unit} onValueChange={(v) => setUnit(v as "g" | "ml")}>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="grams" id="grams" />
-                  <Label htmlFor="grams" className="font-normal cursor-pointer">
+                  <RadioGroupItem value="g" id="g" />
+                  <Label htmlFor="g" className="font-normal cursor-pointer">
                     Gramy (g)
                   </Label>
                 </div>

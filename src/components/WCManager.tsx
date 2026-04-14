@@ -31,7 +31,7 @@ export function WCManager({ date, onWCAdded }: WCManagerProps) {
   const loadEntries = async () => {
     setLoading(true);
     try {
-      const data = await wcService.getEntriesForDate(date);
+      const data = await wcService.getDailyEntries(date);
       setEntries(data);
     } catch (error) {
       console.error("Failed to load WC entries:", error);
