@@ -7,15 +7,9 @@ import { AuthDialog } from "@/components/AuthDialog";
 import { AddFoodDialog } from "@/components/AddFoodDialog";
 import { consumedFoodService, type DailyNutritionSummary } from "@/services/consumedFoodService";
 import { waterService } from "@/services/waterService";
-import { dailySummaryService } from "@/services/dailySummaryService";
+import { dailySummaryService, type NutritionGoalStatus } from "@/services/dailySummaryService";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User, Plus } from "lucide-react";
-
-export interface NutritionGoals {
-  fiber: { status: "neutral" | "good" | "warning" | "danger"; min: number; max: number };
-  sugar: { status: "neutral" | "good" | "warning" | "danger"; min: number; max: number };
-  fats: { status: "neutral" | "good" | "warning" | "danger"; min: number; max: number };
-}
 
 export default function Home() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -31,7 +25,7 @@ export default function Home() {
     total_sugar: 0,
     total_carbs: 0,
     total_fats: 0,
-    total_proteins: 0,
+    total_protein: 0,
     total_salt: 0,
   });
   const [waterTotal, setWaterTotal] = useState(0);
@@ -39,10 +33,10 @@ export default function Home() {
   const [walkMinutes, setWalkMinutes] = useState(0);
   const [restaurant, setRestaurant] = useState(false);
   const [lastRestaurant, setLastRestaurant] = useState<{ date: string; days_ago: number } | null>(null);
-  const [goals, setGoals] = useState<NutritionGoals>({
-    fiber: { status: "neutral", min: 25, max: 30 },
-    sugar: { status: "neutral", min: 30, max: 50 },
-    fats: { status: "neutral", min: 50, max: 60 },
+  const [goals, setGoals] = useState<NutritionGoalStatus>({
+    fiber: "good",
+    sugar: "good",
+    fats: "good",
   });
 
   useEffect(() => {
