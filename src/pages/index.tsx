@@ -12,6 +12,7 @@ import { MedicinesManager } from "@/components/MedicinesManager";
 import { WCManager } from "@/components/WCManager";
 import { WaterIntakeManager } from "@/components/WaterIntakeManager";
 import { FoodManagement } from "@/components/FoodManagement";
+import { NutrientDetailDialog } from "@/components/NutrientDetailDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { consumedFoodService, type DailyNutritionSummary, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
 import { waterService } from "@/services/waterService";
@@ -27,6 +28,8 @@ export default function Home() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAddFoodDialog, setShowAddFoodDialog] = useState(false);
   const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null);
+  const [showNutrientDialog, setShowNutrientDialog] = useState(false);
+  const [selectedNutrient, setSelectedNutrient] = useState<"fiber" | "sugar" | "fats" | null>(null);
   
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [consumedFoods, setConsumedFoods] = useState<ConsumedFoodWithDetails[]>([]);
@@ -45,9 +48,9 @@ export default function Home() {
   const [restaurant, setRestaurant] = useState(false);
   const [lastRestaurant, setLastRestaurant] = useState<{ date: string; days_ago: number } | null>(null);
   const [goals, setGoals] = useState<NutritionGoalStatus>({
-    fiber: "good",
-    sugar: "good",
-    fats: "good",
+    fiber: "neutral",
+    sugar: "neutral",
+    fats: "neutral",
   });
 
   const formatDateDisplay = (dateStr: string) => {
@@ -130,6 +133,13 @@ export default function Home() {
   const handleCloseDialog = () => {
     setShowAddFoodDialog(false);
     setEditingFood(null);
+  };
+
+  const handleNutrientClick = (nutrient: string) => {
+    if (nutrient === "fiber" || nutrient === "sugar" || nutrient === "fats") {
+      setSelectedNutrient(nutrient);
+      setShowNutrientDialog(true);
+    }
   };
 
   if (loading) {
@@ -278,9 +288,7 @@ export default function Home() {
                   const lastRest = await dailySummaryService.getLastRestaurantVisit();
                   setLastRestaurant(lastRest);
                 }}
-                onNutrientClick={(nutrient) => {
-                  console.log("Clicked nutrient:", nutrient);
-                }}
+                onNutrientClick={handleNutrientClick}
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -327,6 +335,13 @@ export default function Home() {
           date={date}
           editingFood={editingFood}
           onSuccess={loadDailyData}
+        />
+
+        <NutrientDetailDialog
+          open={showNutrientDialog}
+          onOpenChange={setShowNutrientDialog}
+          nutrientType={selectedNutrient}
+          foods={consumedFoods}
         />
       </div>
     </>
