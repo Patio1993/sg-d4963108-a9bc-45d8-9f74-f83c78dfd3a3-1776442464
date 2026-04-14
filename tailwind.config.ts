@@ -10,6 +10,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        heading: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+        body: ["Work Sans", "system-ui", "sans-serif"],
+        sans: ["Work Sans", "system-ui", "sans-serif"],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
