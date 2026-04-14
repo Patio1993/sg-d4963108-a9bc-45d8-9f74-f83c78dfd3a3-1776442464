@@ -1,32 +1,42 @@
 import { useEffect, useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
-import { AuthDialog } from "@/components/AuthDialog";
-import { supabase } from "@/integrations/supabase/client";
-import { LogOut, User } from "lucide-react";
 import { DailySummaryCard } from "@/components/DailySummaryCard";
 import { ConsumedFoodsList } from "@/components/ConsumedFoodsList";
-import { consumedFoodService, type ConsumedFoodWithDetails, type DailyNutritionSummary } from "@/services/consumedFoodService";
-import { dailySummaryService, type NutritionGoalStatus } from "@/services/dailySummaryService";
+import { AuthDialog } from "@/components/AuthDialog";
+import { AddFoodDialog } from "@/components/AddFoodDialog";
+import { consumedFoodService, type DailyNutrition } from "@/services/consumedFoodService";
 import { waterService } from "@/services/waterService";
+import { dailySummaryService, type NutritionGoals } from "@/services/dailySummaryService";
+import { supabase } from "@/integrations/supabase/client";
+import { LogOut, User, Plus } from "lucide-react";
 
 export default function Home() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-
-  const [foods, setFoods] = useState<ConsumedFoodWithDetails[]>([]);
-  const [nutrition, setNutrition] = useState<DailyNutritionSummary>({
-    total_kcal: 0, total_fiber: 0, total_sugar: 0, total_carbs: 0,
-    total_fats: 0, total_protein: 0, total_salt: 0
+  const [showAddFoodDialog, setShowAddFoodDialog] = useState(false);
+  
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [nutrition, setNutrition] = useState<DailyNutrition>({
+    total_kcal: 0,
+    total_fiber: 0,
+    total_sugar: 0,
+    total_carbs: 0,
+    total_fats: 0,
+    total_proteins: 0,
+    total_salt: 0,
   });
-  const [goals, setGoals] = useState<NutritionGoalStatus>({ fiber: "low", sugar: "good", fats: "good" });
+  const [waterTotal, setWaterTotal] = useState(0);
   const [exercise, setExercise] = useState(false);
   const [walkMinutes, setWalkMinutes] = useState(0);
   const [restaurant, setRestaurant] = useState(false);
-  const [waterTotal, setWaterTotal] = useState(0);
-  const [lastRestaurant, setLastRestaurant] = useState<{date: string, days_ago: number} | null>(null);
+  const [lastRestaurant, setLastRestaurant] = useState<{ date: string; days_ago: number } | null>(null);
+  const [goals, setGoals] = useState<NutritionGoals>({
+    fiber: { status: "neutral", min: 25, max: 30 },
+    sugar: { status: "neutral", min: 30, max: 50 },
+    fats: { status: "neutral", min: 50, max: 60 },
+  });
 
   useEffect(() => {
     checkAuth();
@@ -36,7 +46,7 @@ export default function Home() {
     if (userEmail) {
       loadDailyData();
     }
-  }, [userEmail, date]);
+  }, [date, userEmail]);
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -46,10 +56,6 @@ export default function Home() {
 
   const loadDailyData = async () => {
     try {
-      // Foods
-      const fetchedFoods = await consumedFoodService.getDailyConsumedFoods(date);
-      setFoods(fetchedFoods);
-      
       // Nutrition
       const fetchedNutrition = await consumedFoodService.getDailyNutritionSummary(date);
       setNutrition(fetchedNutrition);
@@ -83,54 +89,76 @@ export default function Home() {
     setUserEmail(null);
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Načítavam...</p></div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Načítavam...</p>
+      </div>
+    );
+  }
 
   if (!userEmail) {
     return (
       <>
-        <SEO title="Food Tracker - Prihlásenie" />
-        <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <SEO 
+          title="Food Tracker - Sledujte výživu"
+          description="Komplexná aplikácia pre sledovanie dennej konzumácie potravín s nutričnými hodnotami"
+        />
+        <div className="min-h-screen flex items-center justify-center p-4">
           <div className="w-full max-w-md text-center space-y-6">
-            <h1 className="text-4xl font-bold text-primary">Food Tracker</h1>
-            <p className="text-muted-foreground">Komplexná nutričná aplikácia pre sledovanie dennej spotreby a cieľov.</p>
-            <div className="p-6 bg-card rounded-lg shadow-sm border space-y-4">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold">Food Tracker</h1>
+              <p className="text-muted-foreground">Sledujte svoje jedlá a nutričné ciele</p>
+            </div>
+            <div className="p-6 bg-card rounded-lg shadow-md space-y-4">
+              <p className="text-sm text-muted-foreground">Prihláste sa pre začatie sledovania</p>
               <Button className="w-full" onClick={() => setShowAuthDialog(true)}>
-                Prihlásiť sa / Registrovať
+                Prihlásiť / Registrovať
               </Button>
             </div>
           </div>
         </div>
-        <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} onSuccess={checkAuth} />
+        <AuthDialog 
+          open={showAuthDialog} 
+          onOpenChange={setShowAuthDialog}
+          onSuccess={checkAuth}
+        />
       </>
     );
   }
 
   return (
     <>
-      <SEO title="Food Tracker - Dashboard" />
+      <SEO 
+        title="Food Tracker - Sledujte výživu"
+        description="Komplexná aplikácia pre sledovanie dennej konzumácie potravín s nutričnými hodnotami"
+      />
       <div className="min-h-screen bg-background pb-20">
         <header className="border-b bg-card shadow-sm sticky top-0 z-10">
           <div className="container py-4 flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-primary">Food Tracker</h1>
+            <h1 className="text-2xl font-bold">Food Tracker</h1>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground hidden sm:flex items-center gap-2">
-                <User className="h-4 w-4"/> {userEmail}
-              </span>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                {userEmail}
+              </div>
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" /> Odhlásiť sa
+                <LogOut className="h-4 w-4 mr-2" />
+                Odhlásiť
               </Button>
             </div>
           </div>
         </header>
 
-        <main className="container py-8 max-w-4xl space-y-8">
+        <main className="container py-8 max-w-5xl space-y-6">
           <DailySummaryCard
+            date={date}
             nutrition={nutrition}
             goals={goals}
+            waterTotal={waterTotal}
             exercise={exercise}
             walkMinutes={walkMinutes}
             restaurant={restaurant}
-            waterTotal={waterTotal}
             lastRestaurant={lastRestaurant}
             onExerciseChange={async (v) => { 
               setExercise(v); 
@@ -147,27 +175,38 @@ export default function Home() {
               setLastRestaurant(lastRest);
             }}
             onNutrientClick={(nutrient) => {
-              console.log("Sort by", nutrient);
+              console.log("Clicked nutrient:", nutrient);
             }}
           />
-          
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Skonzumované jedlá</h2>
-            <Button>Pridať jedlo</Button>
-          </div>
 
           <ConsumedFoodsList
-            foods={foods}
-            sortedBy=""
-            onDelete={async (id) => { 
-              await consumedFoodService.deleteConsumedFood(id); 
-              loadDailyData(); 
-            }}
+            date={date}
             onEdit={(food) => {
               console.log("Edit", food);
             }}
+            onDelete={async () => {
+              await loadDailyData();
+            }}
           />
         </main>
+
+        {/* Floating Action Button */}
+        <div className="fixed bottom-6 right-6">
+          <Button
+            size="lg"
+            className="h-14 w-14 rounded-full shadow-lg"
+            onClick={() => setShowAddFoodDialog(true)}
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
+        </div>
+
+        <AddFoodDialog
+          open={showAddFoodDialog}
+          onOpenChange={setShowAddFoodDialog}
+          date={date}
+          onSuccess={loadDailyData}
+        />
       </div>
     </>
   );
