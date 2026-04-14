@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Trash2, Plus } from "lucide-react";
-import { activityService, type Activity, type UserActivity } from "@/services/activityService";
+import { activityService, type Activity, type UserActivityWithDetails } from "@/services/activityService";
 import { useToast } from "@/hooks/use-toast";
 
 interface ActivitiesManagerProps {
@@ -15,7 +15,7 @@ interface ActivitiesManagerProps {
 export function ActivitiesManager({ date, onActivityAdded }: ActivitiesManagerProps) {
   const { toast } = useToast();
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [userActivities, setUserActivities] = useState<UserActivity[]>([]);
+  const [userActivities, setUserActivities] = useState<UserActivityWithDetails[]>([]);
   const [showSelectDialog, setShowSelectDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +36,7 @@ export function ActivitiesManager({ date, onActivityAdded }: ActivitiesManagerPr
   const loadUserActivities = async () => {
     setLoading(true);
     try {
-      const data = await activityService.getUserActivitiesForDate(date);
+      const data = await activityService.getDailyActivities(date);
       setUserActivities(data);
     } catch (error) {
       console.error("Failed to load user activities:", error);
@@ -47,7 +47,8 @@ export function ActivitiesManager({ date, onActivityAdded }: ActivitiesManagerPr
 
   const handleAddActivity = async (activityId: string) => {
     try {
-      await activityService.addActivityToDay(activityId, date);
+      const time = new Date().toTimeString().slice(0, 5);
+      await activityService.addUserActivity(activityId, date, time);
       toast({
         title: "Úspech",
         description: "Aktivita pridaná",
@@ -102,7 +103,7 @@ export function ActivitiesManager({ date, onActivityAdded }: ActivitiesManagerPr
           <div className="flex flex-wrap gap-2">
             {userActivities.map((ua) => (
               <Badge key={ua.id} variant="secondary" className="px-3 py-1">
-                {ua.activities?.name}
+                {ua.activity?.name}
                 <Button
                   variant="ghost"
                   size="icon"

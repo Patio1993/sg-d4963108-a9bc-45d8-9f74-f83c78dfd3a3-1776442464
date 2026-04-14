@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Plus, Edit, Pill } from "lucide-react";
-import { medicineService, type Medicine, type UserMedicine } from "@/services/medicineService";
+import { medicineService, type Medicine, type MedicineLogWithDetails } from "@/services/medicineService";
 import { useToast } from "@/hooks/use-toast";
 
 interface MedicinesManagerProps {
@@ -18,7 +18,7 @@ interface MedicinesManagerProps {
 export function MedicinesManager({ date, onMedicineAdded }: MedicinesManagerProps) {
   const { toast } = useToast();
   const [medicines, setMedicines] = useState<Medicine[]>([]);
-  const [userMedicines, setUserMedicines] = useState<UserMedicine[]>([]);
+  const [userMedicines, setUserMedicines] = useState<MedicineLogWithDetails[]>([]);
   const [showSelectDialog, setShowSelectDialog] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export function MedicinesManager({ date, onMedicineAdded }: MedicinesManagerProp
   const loadUserMedicines = async () => {
     setLoading(true);
     try {
-      const data = await medicineService.getUserMedicinesForDate(date);
+      const data = await medicineService.getDailyMedicineLogs(date);
       setUserMedicines(data);
     } catch (error) {
       console.error("Failed to load user medicines:", error);
@@ -96,7 +96,8 @@ export function MedicinesManager({ date, onMedicineAdded }: MedicinesManagerProp
 
   const handleAddMedicine = async (medicineId: string) => {
     try {
-      await medicineService.addMedicineToDay(medicineId, date);
+      const time = new Date().toTimeString().slice(0, 5);
+      await medicineService.logMedicine(medicineId, date, time);
       toast({
         title: "Úspech",
         description: "Liek pridaný",
@@ -115,7 +116,7 @@ export function MedicinesManager({ date, onMedicineAdded }: MedicinesManagerProp
 
   const handleDelete = async (id: string) => {
     try {
-      await medicineService.deleteUserMedicine(id);
+      await medicineService.deleteMedicineLog(id);
       toast({
         title: "Úspech",
         description: "Liek odstránený",
@@ -154,14 +155,14 @@ export function MedicinesManager({ date, onMedicineAdded }: MedicinesManagerProp
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <Pill className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{um.medicines?.name}</span>
+                    <span className="font-medium">{um.medicine?.name}</span>
                   </div>
-                  {um.medicines?.diagnosis && (
-                    <p className="text-sm text-muted-foreground">{um.medicines.diagnosis}</p>
+                  {um.medicine?.diagnosis && (
+                    <p className="text-sm text-muted-foreground">{um.medicine.diagnosis}</p>
                   )}
-                  {um.medicines?.dosage && (
+                  {um.medicine?.dosage && (
                     <Badge variant="outline" className="text-xs mt-1">
-                      {um.medicines.dosage}
+                      {um.medicine.dosage}
                     </Badge>
                   )}
                 </div>
