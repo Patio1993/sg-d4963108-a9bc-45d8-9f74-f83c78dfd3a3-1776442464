@@ -10,6 +10,7 @@ import { AddFoodDialog } from "@/components/AddFoodDialog";
 import { ActivitiesManager } from "@/components/ActivitiesManager";
 import { MedicinesManager } from "@/components/MedicinesManager";
 import { WCManager } from "@/components/WCManager";
+import { WaterIntakeManager } from "@/components/WaterIntakeManager";
 import { FoodManagement } from "@/components/FoodManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { consumedFoodService, type DailyNutritionSummary, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
@@ -282,10 +283,11 @@ export default function Home() {
                 }}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <ActivitiesManager date={date} />
                 <MedicinesManager date={date} />
                 <WCManager date={date} />
+                <WaterIntakeManager date={date} onWaterAdded={loadDailyData} />
               </div>
 
               <ConsumedFoodsList
