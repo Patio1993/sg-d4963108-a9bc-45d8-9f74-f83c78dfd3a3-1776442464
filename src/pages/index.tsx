@@ -55,22 +55,23 @@ export default function Home() {
       setNutrition(fetchedNutrition);
 
       // Water
-      const fetchedWater = await waterService.getDailyWaterIntake(date);
+      const fetchedWater = await waterService.getDailyTotal(date);
       setWaterTotal(fetchedWater);
 
       // Daily summary (goals, exercise, etc.)
-      let summary = await dailySummaryService.getDailySummary(date);
-      if (!summary) {
-         summary = await dailySummaryService.createDailySummary(date);
-      }
+      const summary = await dailySummaryService.getOrCreateDailySummary(date);
       setExercise(summary.exercise || false);
       setWalkMinutes(summary.walk_minutes || 0);
       setRestaurant(summary.restaurant || false);
 
-      const newGoals = dailySummaryService.evaluateGoals(fetchedNutrition);
+      const newGoals = dailySummaryService.evaluateNutritionGoals(
+        fetchedNutrition.total_fiber,
+        fetchedNutrition.total_sugar,
+        fetchedNutrition.total_fats
+      );
       setGoals(newGoals);
 
-      const lastRest = await dailySummaryService.getLastRestaurantDate();
+      const lastRest = await dailySummaryService.getLastRestaurantVisit();
       setLastRestaurant(lastRest);
     } catch (error) {
       console.error("Failed to load daily data:", error);
@@ -142,7 +143,7 @@ export default function Home() {
             onRestaurantChange={async (v) => { 
               setRestaurant(v); 
               await dailySummaryService.updateDailySummary(date, { restaurant: v }); 
-              const lastRest = await dailySummaryService.getLastRestaurantDate();
+              const lastRest = await dailySummaryService.getLastRestaurantVisit();
               setLastRestaurant(lastRest);
             }}
             onNutrientClick={(nutrient) => {
