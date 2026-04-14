@@ -47,13 +47,13 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
   const formatLastConsumed = (daysAgo: number | null | undefined) => {
     if (daysAgo === null || daysAgo === undefined) return null;
+    if (daysAgo === 0) return null; // Today - don't show
 
     const lastDate = new Date();
     lastDate.setDate(lastDate.getDate() - daysAgo);
     const dateStr = format(lastDate, "d.MM.yyyy", { locale: sk });
     const dayName = format(lastDate, "EEEE", { locale: sk });
 
-    if (daysAgo === 0) return "Dnes";
     if (daysAgo === 1) return `Včera - ${dayName} (${dateStr})`;
     if (daysAgo === 2) return `Predvčerom - ${dayName} (${dateStr})`;
     return `Pred ${daysAgo} dňami - ${dayName} (${dateStr})`;
@@ -269,7 +269,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                                 <Badge variant="outline" className="text-xs">
                                   {food.kcal} kcal/100{food.unit}
                                 </Badge>
-                                {food.days_ago !== null && food.days_ago !== undefined && (
+                                {food.days_ago !== null && food.days_ago !== undefined && formatLastConsumed(food.days_ago) && (
                                   <Badge variant="outline" className="text-xs bg-muted">
                                     <Clock className="h-3 w-3 mr-1" />
                                     {formatLastConsumed(food.days_ago)}
@@ -307,7 +307,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                                 <Badge variant="outline" className="text-xs">
                                   {food.kcal} kcal/100{food.unit}
                                 </Badge>
-                                {food.days_ago !== null && food.days_ago !== undefined && (
+                                {food.days_ago !== null && food.days_ago !== undefined && formatLastConsumed(food.days_ago) && (
                                   <Badge variant="outline" className="text-xs bg-muted">
                                     <Clock className="h-3 w-3 mr-1" />
                                     {formatLastConsumed(food.days_ago)}

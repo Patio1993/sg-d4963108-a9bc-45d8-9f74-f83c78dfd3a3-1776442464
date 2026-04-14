@@ -3,23 +3,9 @@ import type { Tables } from "@/integrations/supabase/types";
 
 export type Food = Tables<"foods">;
 
-export interface CreateFoodData {
-  name: string;
-  unit: "g" | "ml";
-  kcal: number;
-  fiber: number;
-  sugar: number;
-  carbs: number;
-  fats: number;
-  protein: number;
-  salt: number;
-  is_favorite?: boolean;
-}
-
-export interface FoodWithLastConsumed extends Food {
-  last_consumed?: string | null;
+export type FoodWithLastConsumed = Food & {
   days_ago?: number | null;
-}
+};
 
 export const foodService = {
   async createFood(data: CreateFoodData): Promise<Food> {
@@ -69,65 +55,52 @@ export const foodService = {
     if (error) throw error;
   },
 
-  async searchFoods(query: string, sortBy: "favorites" | "a-z" | "z-a" = "a-z"): Promise<FoodWithLastConsumed[]> {
+  async searchFoods(query: string): Promise<FoodWithLastConsumed[]> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
-    let foodsQuery = supabase
+    const { data, error } = await supabase
       .from("foods")
       .select("*")
-      .eq("user_id", user.id);
+      .or(`user_id.eq.${user.id},user_id.is.null`)
+      .ilike("name", `%${query}%`)
+      .order("name");
 
-    if (query.trim()) {
-      foodsQuery = foodsQuery.ilike("name", `%${query}%`);
-    }
-
-    if (sortBy === "favorites") {
-      foodsQuery = foodsQuery.order("is_favorite", { ascending: false }).order("name", { ascending: true });
-    } else if (sortBy === "a-z") {
-      foodsQuery = foodsQuery.order("name", { ascending: true });
-    } else {
-      foodsQuery = foodsQuery.order("name", { ascending: false });
-    }
-
-    const { data: foods, error } = await foodsQuery;
     if (error) throw error;
 
-    // Get last consumed dates for all foods
-    const { data: lastConsumed } = await supabase
-      .from("consumed_foods")
-      .select("food_id, date")
-      .eq("user_id", user.id)
-      .order("date", { ascending: false });
+    // Calculate days_ago for each food from TODAY (not from any specific date)
+    const today = new Date().toISOString().split("T")[0];
+    const foodsWithLastConsumed = await Promise.all(
+      (data || []).map(async (food) => {
+        // Get last consumption of this food BEFORE today (excluding today)
+        const { data: lastConsumed } = await supabase
+          .from("consumed_foods")
+          .select("date")
+          .eq("food_id", food.id)
+          .lt("date", today)
+          .order("date", { ascending: false })
+          .limit(1)
+          .single();
 
-    const lastConsumedMap = new Map<string, string>();
-    lastConsumed?.forEach(item => {
-      if (!lastConsumedMap.has(item.food_id)) {
-        lastConsumedMap.set(item.food_id, item.date);
-      }
-    });
+        let days_ago: number | null = null;
+        if (lastConsumed) {
+          const lastDate = new Date(lastConsumed.date + "T00:00:00");
+          const todayDate = new Date(today + "T00:00:00");
+          const diffTime = todayDate.getTime() - lastDate.getTime();
+          days_ago = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        }
 
-    return foods.map(food => {
-      const lastDate = lastConsumedMap.get(food.id);
-      if (!lastDate) {
-        return { ...food, last_consumed: null, days_ago: null };
-      }
+        return {
+          ...food,
+          days_ago,
+        };
+      })
+    );
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const consumed = new Date(lastDate);
-      const diffTime = today.getTime() - consumed.getTime();
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-      return {
-        ...food,
-        last_consumed: lastDate,
-        days_ago: diffDays,
-      };
-    });
+    return foodsWithLastConsumed;
   },
 
-  async getAllFoods(): Promise<Food[]> {
+  async getFavoriteFoods(): Promise<FoodWithLastConsumed[]> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
@@ -135,10 +108,85 @@ export const foodService = {
       .from("foods")
       .select("*")
       .eq("user_id", user.id)
-      .order("name", { ascending: true });
+      .eq("is_favorite", true)
+      .order("name");
 
     if (error) throw error;
-    return data || [];
+
+    // Calculate days_ago for each food from TODAY
+    const today = new Date().toISOString().split("T")[0];
+    const foodsWithLastConsumed = await Promise.all(
+      (data || []).map(async (food) => {
+        // Get last consumption of this food BEFORE today (excluding today)
+        const { data: lastConsumed } = await supabase
+          .from("consumed_foods")
+          .select("date")
+          .eq("food_id", food.id)
+          .lt("date", today)
+          .order("date", { ascending: false })
+          .limit(1)
+          .single();
+
+        let days_ago: number | null = null;
+        if (lastConsumed) {
+          const lastDate = new Date(lastConsumed.date + "T00:00:00");
+          const todayDate = new Date(today + "T00:00:00");
+          const diffTime = todayDate.getTime() - lastDate.getTime();
+          days_ago = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        return {
+          ...food,
+          days_ago,
+        };
+      })
+    );
+
+    return foodsWithLastConsumed;
+  },
+
+  async getAllFoods(): Promise<FoodWithLastConsumed[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    const { data, error } = await supabase
+      .from("foods")
+      .select("*")
+      .or(`user_id.eq.${user.id},user_id.is.null`)
+      .order("name");
+
+    if (error) throw error;
+
+    // Calculate days_ago for each food from TODAY
+    const today = new Date().toISOString().split("T")[0];
+    const foodsWithLastConsumed = await Promise.all(
+      (data || []).map(async (food) => {
+        // Get last consumption of this food BEFORE today (excluding today)
+        const { data: lastConsumed } = await supabase
+          .from("consumed_foods")
+          .select("date")
+          .eq("food_id", food.id)
+          .lt("date", today)
+          .order("date", { ascending: false })
+          .limit(1)
+          .single();
+
+        let days_ago: number | null = null;
+        if (lastConsumed) {
+          const lastDate = new Date(lastConsumed.date + "T00:00:00");
+          const todayDate = new Date(today + "T00:00:00");
+          const diffTime = todayDate.getTime() - lastDate.getTime();
+          days_ago = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        return {
+          ...food,
+          days_ago,
+        };
+      })
+    );
+
+    return foodsWithLastConsumed;
   },
 
   async getFoodById(id: string): Promise<Food> {
