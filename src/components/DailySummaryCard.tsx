@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { DailyNutritionSummary } from "@/services/consumedFoodService";
 import type { NutritionGoalStatus } from "@/services/dailySummaryService";
+import { format, parseISO } from "date-fns";
+import { sk } from "date-fns/locale";
 
 interface DailySummaryCardProps {
   date: string;
@@ -15,7 +17,7 @@ interface DailySummaryCardProps {
   waterTotal: number;
   lastRestaurant: { date: string; days_ago: number } | null;
   onExerciseChange: (checked: boolean) => void;
-  onWalkMinutesChange: (minutes: number) => void;
+  onWalkMinutesChange: (value: number) => void;
   onRestaurantChange: (checked: boolean) => void;
   onNutrientClick: (nutrient: string) => void;
 }
@@ -34,154 +36,164 @@ export function DailySummaryCard({
   onRestaurantChange,
   onNutrientClick,
 }: DailySummaryCardProps) {
-  const getStatusColor = (status: "low" | "good" | "high") => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case "low":
-        return "text-orange-600";
       case "good":
         return "text-green-600";
-      case "high":
+      case "warning":
+        return "text-orange-600";
+      case "danger":
         return "text-red-600";
+      default:
+        return "text-muted-foreground";
     }
   };
 
-  const getStatusEmoji = (status: "low" | "good" | "high") => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
-      case "low":
-        return "⚠️";
       case "good":
         return "✅";
-      case "high":
+      case "warning":
+        return "⚠️";
+      case "danger":
         return "🔴";
+      default:
+        return "";
     }
   };
 
-  const formatLastRestaurant = () => {
-    if (!lastRestaurant) return "";
-    const days = lastRestaurant.days_ago;
-    const date = new Date(lastRestaurant.date);
-    const dayNames = ["nedeľa", "pondelok", "utorok", "streda", "štvrtok", "piatok", "sobota"];
-    const dayName = dayNames[date.getDay()];
-    const dateStr = date.toLocaleDateString("sk-SK");
+  const formatLastRestaurant = (lastRest: { date: string; days_ago: number } | null) => {
+    if (!lastRest || lastRest.days_ago === 0) return null;
 
-    if (days === 2) return `predvčerom – ${dayName} (${dateStr})`;
-    return `pred ${days} dňami – ${dayName} (${dateStr})`;
+    const lastDate = parseISO(lastRest.date);
+    const dateStr = format(lastDate, "d.MM.yyyy", { locale: sk });
+    const dayName = format(lastDate, "EEEE", { locale: sk });
+
+    if (lastRest.days_ago === 1) return `Včera - ${dayName} (${dateStr})`;
+    if (lastRest.days_ago === 2) return `Predvčerom - ${dayName} (${dateStr})`;
+    return `Pred ${lastRest.days_ago} dňami - ${dayName} (${dateStr})`;
   };
+
+  const lastRestaurantText = formatLastRestaurant(lastRestaurant);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Denný sumár</CardTitle>
+        <CardTitle>Denný súhrn</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Nutrition Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button
+          <div
+            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
             onClick={() => onNutrientClick("kcal")}
-            className="p-4 bg-green-50 rounded-lg text-center hover:bg-green-100 transition-colors"
           >
-            <div className="text-2xl font-bold text-green-600">{nutrition.total_kcal}</div>
+            <div className="text-2xl font-bold">{nutrition.total_kcal}</div>
             <div className="text-sm text-muted-foreground">Kcal</div>
-          </button>
+          </div>
 
-          <button
+          <div
+            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
             onClick={() => onNutrientClick("fiber")}
-            className={`p-4 bg-card border-2 rounded-lg text-center hover:bg-muted/50 transition-colors ${
-              goals.fiber === "good" ? "border-green-500" : goals.fiber === "low" ? "border-orange-500" : "border-red-500"
-            }`}
           >
             <div className={`text-2xl font-bold ${getStatusColor(goals.fiber)}`}>
-              {nutrition.total_fiber}g {getStatusEmoji(goals.fiber)}
+              {nutrition.total_fiber}g {getStatusIcon(goals.fiber)}
             </div>
             <div className="text-sm text-muted-foreground">Vláknina</div>
-            <div className="text-xs text-muted-foreground">25-30g</div>
-          </button>
+            <div className="text-xs text-muted-foreground mt-1">25-30g</div>
+          </div>
 
-          <button
+          <div
+            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
             onClick={() => onNutrientClick("sugar")}
-            className={`p-4 bg-card border-2 rounded-lg text-center hover:bg-muted/50 transition-colors ${
-              goals.sugar === "good" ? "border-green-500" : goals.sugar === "low" ? "border-orange-500" : "border-red-500"
-            }`}
           >
             <div className={`text-2xl font-bold ${getStatusColor(goals.sugar)}`}>
-              {nutrition.total_sugar}g {getStatusEmoji(goals.sugar)}
+              {nutrition.total_sugar}g {getStatusIcon(goals.sugar)}
             </div>
             <div className="text-sm text-muted-foreground">Cukor</div>
-            <div className="text-xs text-muted-foreground">30-50g</div>
-          </button>
+            <div className="text-xs text-muted-foreground mt-1">30-50g</div>
+          </div>
 
-          <button
+          <div
+            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
+            onClick={() => onNutrientClick("carbs")}
+          >
+            <div className="text-2xl font-bold">{nutrition.total_carbs}g</div>
+            <div className="text-sm text-muted-foreground">Sacharidy</div>
+          </div>
+
+          <div
+            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
             onClick={() => onNutrientClick("fats")}
-            className={`p-4 bg-card border-2 rounded-lg text-center hover:bg-muted/50 transition-colors ${
-              goals.fats === "good" ? "border-green-500" : goals.fats === "low" ? "border-orange-500" : "border-red-500"
-            }`}
           >
             <div className={`text-2xl font-bold ${getStatusColor(goals.fats)}`}>
-              {nutrition.total_fats}g {getStatusEmoji(goals.fats)}
+              {nutrition.total_fats}g {getStatusIcon(goals.fats)}
             </div>
             <div className="text-sm text-muted-foreground">Tuky</div>
-            <div className="text-xs text-muted-foreground">50-60g</div>
-          </button>
+            <div className="text-xs text-muted-foreground mt-1">50-60g</div>
+          </div>
 
-          <button
-            onClick={() => onNutrientClick("carbs")}
-            className="p-4 bg-card border rounded-lg text-center hover:bg-muted/50 transition-colors"
-          >
-            <div className="text-2xl font-bold text-primary">{nutrition.total_carbs}g</div>
-            <div className="text-sm text-muted-foreground">Sacharidy</div>
-          </button>
-
-          <button
+          <div
+            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
             onClick={() => onNutrientClick("protein")}
-            className="p-4 bg-card border rounded-lg text-center hover:bg-muted/50 transition-colors"
           >
-            <div className="text-2xl font-bold text-primary">{nutrition.total_protein}g</div>
+            <div className="text-2xl font-bold">{nutrition.total_protein}g</div>
             <div className="text-sm text-muted-foreground">Bielkoviny</div>
-          </button>
+          </div>
 
-          <button
+          <div
+            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
             onClick={() => onNutrientClick("salt")}
-            className="p-4 bg-card border rounded-lg text-center hover:bg-muted/50 transition-colors"
           >
-            <div className="text-2xl font-bold text-primary">{nutrition.total_salt}g</div>
+            <div className="text-2xl font-bold">{nutrition.total_salt}g</div>
             <div className="text-sm text-muted-foreground">Soľ</div>
-          </button>
+          </div>
 
-          <div className="p-4 bg-blue-50 rounded-lg text-center">
+          <div className="text-center p-4 rounded-lg bg-muted/50">
             <div className="text-2xl font-bold text-blue-600">{waterTotal}ml</div>
             <div className="text-sm text-muted-foreground">Voda</div>
           </div>
         </div>
 
-        <div className="space-y-3 pt-4 border-t">
-          <div className="flex items-center gap-2">
-            <Checkbox id="exercise" checked={exercise} onCheckedChange={onExerciseChange} />
+        {/* Activity Tracking */}
+        <div className="space-y-4 pt-4 border-t">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="exercise"
+              checked={exercise}
+              onCheckedChange={onExerciseChange}
+            />
             <Label htmlFor="exercise" className="cursor-pointer">
               Cvičenie
             </Label>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Label htmlFor="walk">Chôdza (minúty):</Label>
+          <div className="space-y-2">
+            <Label htmlFor="walk">Chôdza (minúty)</Label>
             <Input
               id="walk"
               type="number"
               min="0"
-              value={walkMinutes || ""}
+              value={walkMinutes}
               onChange={(e) => onWalkMinutesChange(parseInt(e.target.value) || 0)}
-              className="w-24"
+              className="max-w-[200px]"
             />
           </div>
 
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Checkbox id="restaurant" checked={restaurant} onCheckedChange={onRestaurantChange} />
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="restaurant"
+                checked={restaurant}
+                onCheckedChange={onRestaurantChange}
+              />
               <Label htmlFor="restaurant" className="cursor-pointer">
                 Reštaurácia
               </Label>
             </div>
-            {lastRestaurant && (
+            {lastRestaurantText && (
               <p className="text-sm text-muted-foreground ml-6">
-                Naposledy: {formatLastRestaurant()}
+                Naposledy: {lastRestaurantText}
               </p>
             )}
           </div>

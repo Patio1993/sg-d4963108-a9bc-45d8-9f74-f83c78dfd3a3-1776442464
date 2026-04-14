@@ -109,7 +109,7 @@ export default function Home() {
       );
       setGoals(newGoals);
 
-      const lastRest = await dailySummaryService.getLastRestaurantVisit(date);
+      const lastRest = await dailySummaryService.getLastRestaurantVisit();
       setLastRestaurant(lastRest);
     } catch (error) {
       console.error("Failed to load daily data:", error);
@@ -274,7 +274,7 @@ export default function Home() {
                 onRestaurantChange={async (v) => { 
                   setRestaurant(v); 
                   await dailySummaryService.updateDailySummary(date, { restaurant: v }); 
-                  const lastRest = await dailySummaryService.getLastRestaurantVisit(date);
+                  const lastRest = await dailySummaryService.getLastRestaurantVisit();
                   setLastRestaurant(lastRest);
                 }}
                 onNutrientClick={(nutrient) => {

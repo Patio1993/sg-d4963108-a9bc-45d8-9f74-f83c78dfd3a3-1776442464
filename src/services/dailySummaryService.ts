@@ -3,81 +3,77 @@ import type { Tables } from "@/integrations/supabase/types";
 
 export type DailySummary = Tables<"daily_summary">;
 
-export interface UpdateDailySummaryData {
-  exercise?: boolean;
-  walk_minutes?: number;
-  restaurant?: boolean;
-}
-
-export interface NutritionGoalStatus {
-  fiber: "low" | "good" | "high";
-  sugar: "low" | "good" | "high";
-  fats: "low" | "good" | "high";
-}
+export type NutritionGoalStatus = {
+  fiber: "good" | "warning" | "danger" | "neutral";
+  sugar: "good" | "warning" | "danger" | "neutral";
+  fats: "good" | "warning" | "danger" | "neutral";
+};
 
 export const dailySummaryService = {
   async getOrCreateDailySummary(date: string): Promise<DailySummary> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
-    const { data: existing } = await supabase
+    let { data, error } = await supabase
       .from("daily_summary")
       .select("*")
-      .eq("user_id", user.id)
       .eq("date", date)
+      .eq("user_id", user.id)
       .single();
 
-    if (existing) return existing;
+    if (error && error.code !== "PGRST116") {
+      throw error;
+    }
 
-    const { data, error } = await supabase
-      .from("daily_summary")
-      .insert({
-        user_id: user.id,
-        date,
-      })
-      .select()
-      .single();
+    if (!data) {
+      const { data: newSummary, error: createError } = await supabase
+        .from("daily_summary")
+        .insert({
+          user_id: user.id,
+          date,
+          exercise: false,
+          walk_minutes: 0,
+          restaurant: false,
+        })
+        .select()
+        .single();
 
-    if (error) throw error;
+      if (createError) throw createError;
+      data = newSummary;
+    }
+
     return data;
   },
 
-  async updateDailySummary(date: string, data: UpdateDailySummaryData): Promise<DailySummary> {
+  async updateDailySummary(
+    date: string,
+    updates: Partial<Pick<DailySummary, "exercise" | "walk_minutes" | "restaurant">>
+  ): Promise<void> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
-    await this.getOrCreateDailySummary(date);
-
-    const { data: summary, error } = await supabase
+    const { error } = await supabase
       .from("daily_summary")
-      .update(data)
-      .eq("user_id", user.id)
+      .update(updates)
       .eq("date", date)
-      .select()
-      .single();
+      .eq("user_id", user.id);
 
     if (error) throw error;
-    return summary;
   },
 
-  evaluateNutritionGoals(fiber: number, sugar: number, fats: number): NutritionGoalStatus {
-    return {
-      fiber: fiber < 25 ? "low" : fiber > 30 ? "high" : "good",
-      sugar: sugar < 30 ? "low" : sugar > 50 ? "high" : "good",
-      fats: fats < 50 ? "low" : fats > 60 ? "high" : "good",
-    };
-  },
-
-  async getLastRestaurantVisit(currentDate: string): Promise<{ date: string; days_ago: number } | null> {
+  async getLastRestaurantVisit(): Promise<{ date: string; days_ago: number } | null> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
+
+    // Always calculate from TODAY, not from any specific displayed date
+    const today = new Date().toISOString().split("T")[0];
 
     const { data, error } = await supabase
       .from("daily_summary")
       .select("date")
       .eq("user_id", user.id)
       .eq("restaurant", true)
-      .lt("date", currentDate)
+      .lt("date", today) // Get last restaurant visit BEFORE today
       .order("date", { ascending: false })
       .limit(1)
       .single();
@@ -85,15 +81,33 @@ export const dailySummaryService = {
     if (error && error.code !== "PGRST116") throw error;
     if (!data) return null;
 
-    const current = new Date(currentDate);
-    current.setHours(0, 0, 0, 0);
-    const last = new Date(data.date);
-    const diffTime = current.getTime() - last.getTime();
+    const lastDate = new Date(data.date + "T00:00:00");
+    const todayDate = new Date(today + "T00:00:00");
+    const diffTime = todayDate.getTime() - lastDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     return {
       date: data.date,
       days_ago: diffDays,
+    };
+  },
+
+  evaluateNutritionGoals(fiber: number, sugar: number, fats: number): NutritionGoalStatus {
+    const evaluateNutrient = (
+      value: number,
+      min: number,
+      max: number
+    ): "good" | "warning" | "danger" | "neutral" => {
+      if (value === 0) return "neutral";
+      if (value >= min && value <= max) return "good";
+      if (value < min) return "warning";
+      return "danger";
+    };
+
+    return {
+      fiber: evaluateNutrient(fiber, 25, 30),
+      sugar: evaluateNutrient(sugar, 30, 50),
+      fats: evaluateNutrient(fats, 50, 60),
     };
   },
 };
