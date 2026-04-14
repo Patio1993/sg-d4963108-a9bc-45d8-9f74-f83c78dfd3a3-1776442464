@@ -1,20 +1,26 @@
----
-title: Design system and database setup
-status: done
+<![CDATA[---
+title: Databázová štruktúra a schéma
+status: in_progress
 priority: urgent
 type: feature
-tags: [setup, database]
+tags: [database, schema]
 created_by: agent
-created_at: 2026-04-14T08:28:04Z
+created_at: 2026-04-14T08:37:27Z
 position: 0
 ---
 
 ## Notes
-Set up the complete design system with custom colors and fonts, then create the database schema for food tracking. This establishes the foundation for all other features.
+Vytvorenie kompletnej databázovej štruktúry pre Food Tracker so všetkými entitami: potraviny, konzumované potraviny, aktivity, lieky, WC záznamy, pitný režim, denný sumár.
 
 ## Checklist
-- [x] Update globals.css with sage green/amber theme and font imports
-- [x] Configure tailwind.config.ts with custom color tokens and fonts
-- [x] Create food_entries table with meal_type, food_name, portion, calories, eaten_at
-- [x] Add RLS policies for user-owned food entries (T1 pattern)
-- [x] Create profiles table with auto-trigger for new users
+- [ ] Vymazať staré tabuľky (food_entries)
+- [ ] Vytvoriť foods tabuľku s nutričnými hodnotami
+- [ ] Vytvoriť consumed_foods tabuľku s reláciami
+- [ ] Vytvoriť activities tabuľku
+- [ ] Vytvoriť medicines tabuľku
+- [ ] Vytvoriť wc_entries tabuľku
+- [ ] Vytvoriť water_intake tabuľku
+- [ ] Vytvoriť daily_summary tabuľku
+- [ ] Nastaviť RLS policies pre všetky tabuľky
+- [ ] Predplniť activities tabuľku
+</tasks/task-1.md>

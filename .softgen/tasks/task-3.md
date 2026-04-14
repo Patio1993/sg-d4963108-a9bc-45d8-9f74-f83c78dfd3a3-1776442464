@@ -1,19 +1,22 @@
----
-title: Authentication and user profiles
-status: done
-priority: medium
+<![CDATA[---
+title: Dashboard a denný sumár
+status: todo
+priority: high
 type: feature
-tags: [auth]
+tags: [ui, dashboard]
 created_by: agent
-created_at: 2026-04-14T08:28:04Z
+created_at: 2026-04-14T08:37:27Z
 position: 2
 ---
 
 ## Notes
-Add simple email/password authentication so users can save their food entries across sessions. Use existing authService.ts.
+Hlavná obrazovka s denným sumárom nutričných hodnôt, farebnými indikátormi cieľov a zoznamom konzumovaných potravín.
 
 ## Checklist
-- [x] Create AuthDialog component with login/signup tabs
-- [x] Add authentication check to index.tsx
-- [x] Show user email in header when logged in
-- [x] Add sign out button
+- [ ] DailySummary komponenta: Kcal, Vláknina, Cukor, Tuky, Sacharidy, Bielkoviny, Soľ
+- [ ] Farebné indikátory: zelená (v rozsahu), oranžová (pod), červená (nad)
+- [ ] Klikateľné nutričné hodnoty → detail zoznam
+- [ ] Cvičenie checkbox, chôdza v minútach
+- [ ] Reštaurácia checkbox s "naposledy" výpočtom
+- [ ] Pitný režim súčet
+</tasks/task-3.md>

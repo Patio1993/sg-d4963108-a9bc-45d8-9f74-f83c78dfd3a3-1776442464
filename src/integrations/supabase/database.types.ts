@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -15,40 +15,260 @@ export type Database = {
   }
   public: {
     Tables: {
-      food_entries: {
+      activities: {
         Row: {
-          calories: number
           created_at: string | null
-          eaten_at: string
-          food_name: string
+          id: string
+          is_system: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_system?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_system?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      consumed_foods: {
+        Row: {
+          amount: number
+          coffee_count: number | null
+          created_at: string | null
+          date: string
+          day_number: number
+          food_id: string
           id: string
           meal_type: string
-          portion: string
+          reaction: string | null
+          time: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
-          calories: number
+          amount: number
+          coffee_count?: number | null
           created_at?: string | null
-          eaten_at?: string
-          food_name: string
+          date: string
+          day_number: number
+          food_id: string
           id?: string
           meal_type: string
-          portion: string
+          reaction?: string | null
+          time: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
-          calories?: number
+          amount?: number
+          coffee_count?: number | null
           created_at?: string | null
-          eaten_at?: string
-          food_name?: string
+          date?: string
+          day_number?: number
+          food_id?: string
           id?: string
           meal_type?: string
-          portion?: string
+          reaction?: string | null
+          time?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "food_entries_user_id_fkey"
+            foreignKeyName: "consumed_foods_food_id_fkey"
+            columns: ["food_id"]
+            isOneToOne: false
+            referencedRelation: "foods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consumed_foods_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_summary: {
+        Row: {
+          created_at: string | null
+          date: string
+          exercise: boolean
+          id: string
+          restaurant: boolean
+          updated_at: string | null
+          user_id: string
+          walk_minutes: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          exercise?: boolean
+          id?: string
+          restaurant?: boolean
+          updated_at?: string | null
+          user_id: string
+          walk_minutes?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          exercise?: boolean
+          id?: string
+          restaurant?: boolean
+          updated_at?: string | null
+          user_id?: string
+          walk_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_summary_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      foods: {
+        Row: {
+          carbs: number
+          created_at: string | null
+          fats: number
+          fiber: number
+          id: string
+          is_favorite: boolean
+          kcal: number
+          name: string
+          protein: number
+          salt: number
+          sugar: number
+          unit: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          carbs?: number
+          created_at?: string | null
+          fats?: number
+          fiber?: number
+          id?: string
+          is_favorite?: boolean
+          kcal?: number
+          name: string
+          protein?: number
+          salt?: number
+          sugar?: number
+          unit: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          carbs?: number
+          created_at?: string | null
+          fats?: number
+          fiber?: number
+          id?: string
+          is_favorite?: boolean
+          kcal?: number
+          name?: string
+          protein?: number
+          salt?: number
+          sugar?: number
+          unit?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "foods_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medicine_logs: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          medicine_id: string
+          time: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: string
+          medicine_id: string
+          time: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          medicine_id?: string
+          time?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicine_logs_medicine_id_fkey"
+            columns: ["medicine_id"]
+            isOneToOne: false
+            referencedRelation: "medicines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medicine_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medicines: {
+        Row: {
+          created_at: string | null
+          diagnosis: string | null
+          dosage: string | null
+          id: string
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          diagnosis?: string | null
+          dosage?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          diagnosis?: string | null
+          dosage?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicines_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -82,6 +302,121 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      user_activities: {
+        Row: {
+          activity_id: string
+          created_at: string | null
+          date: string
+          id: string
+          time: string
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string | null
+          date: string
+          id?: string
+          time: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          time?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activities_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_intake: {
+        Row: {
+          amount_ml: number
+          created_at: string | null
+          date: string
+          id: string
+          time: string
+          user_id: string
+        }
+        Insert: {
+          amount_ml: number
+          created_at?: string | null
+          date: string
+          id?: string
+          time: string
+          user_id: string
+        }
+        Update: {
+          amount_ml?: number
+          created_at?: string | null
+          date?: string
+          id?: string
+          time?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_intake_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wc_entries: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          note: string | null
+          time: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: string
+          note?: string | null
+          time: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          note?: string | null
+          time?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wc_entries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

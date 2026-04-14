@@ -1,20 +1,24 @@
----
-title: Food entry form and daily view
-status: done
+<![CDATA[---
+title: Backend služby a validácie
+status: todo
 priority: high
 type: feature
-tags: [ui, forms]
+tags: [backend, services]
 created_by: agent
-created_at: 2026-04-14T08:28:04Z
+created_at: 2026-04-14T08:37:27Z
 position: 1
 ---
 
 ## Notes
-Build the main interface: a form to add food entries and a daily view showing all meals grouped by type (Breakfast, Lunch, Dinner, Snacks). Include calorie totals.
+Vytvorenie backend služieb pre všetky entity s validáciami, výpočtami nutričných hodnôt a agregáciami.
 
 ## Checklist
-- [x] Create FoodEntryForm component: meal type selector, food name input, portion input, calorie input
-- [x] Create DailyFoodLog component: displays entries grouped by meal with totals
-- [x] Create FoodEntryCard component: shows individual food item with edit/delete actions
-- [x] Create foodService.ts with CRUD operations for food_entries
-- [x] Update index.tsx with full layout: header, form, and daily log
+- [ ] foodService: CRUD, vyhľadávanie, obľúbené, naposledy konzumované
+- [ ] consumedFoodService: CRUD, denný sumár, nutričné výpočty
+- [ ] activityService: výber, pridanie do dňa
+- [ ] medicineService: CRUD, dávkovanie
+- [ ] wcService: CRUD s časom
+- [ ] waterService: pridanie, denný súčet
+- [ ] dailySummaryService: agregácia, ciele, farebné indikátory
+- [ ] Validačné schémy (min 2 desatinné miesta)
+</tasks/task-2.md>

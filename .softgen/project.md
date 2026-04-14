@@ -1,7 +1,7 @@
-# Food Tracker
+<![CDATA[# Food Tracker - Komplexná nutričná aplikácia
 
-## Vision
-A clean, intuitive food tracking app that helps users log meals and monitor their daily nutrition. Designed for health-conscious individuals who want simple, visual meal tracking without complexity.
+## Vízia
+Komplexná aplikácia pre sledovanie dennej konzumácie potravín s detailnými nutričnými hodnotami, aktivitami, liekmi, WC záznamami a pitným režimom. Multi-user aplikácia s autentifikáciou.
 
 ## Design
 - **Primary:** 142 23% 39% (sage green)
@@ -12,10 +12,30 @@ A clean, intuitive food tracking app that helps users log meals and monitor thei
 - **Card:** 0 0% 100% (white)
 - **Heading font:** Plus Jakarta Sans (600/700)
 - **Body font:** Work Sans (400/500)
-- **Style:** Modern wellness aesthetic, card-based layout, rounded corners, generous spacing, soft shadows
+- **Style:** Moderný wellness estetický, card-based layout, zaoblené rohy, veľkorysý spacing, jemné tiene
+- **Farebné indikátory:** Zelená (v rozsahu), Oranžová (pod minimom), Červená (nad maximom)
 
-## Features
-- Log meals with food items, portions, and calories
-- View daily food entries grouped by meal type
-- Track daily calorie totals
-- Simple, fast meal entry form
+## Funkcie
+
+### Databázové entity
+- **Foods:** Potraviny s plnými nutričnými hodnotami (Kcal, Vláknina, Cukor, Sacharidy, Tuky, Bielkoviny, Soľ)
+- **ConsumedFoods:** Skonzumované potraviny s časom, množstvom, typom jedla, reakciou
+- **Activities:** Predplnené aktivity (prechádzka, nákup, pranie...)
+- **Medicines:** Lieky s dávkovaním a diagnózou
+- **WC Entries:** WC záznamy s poznámkami
+- **Water Intake:** Pitný režim
+- **Daily Summary:** Denný súhrn s cvičením, chôdzou, reštauráciou
+
+### Hlavné obrazovky
+- **Dashboard:** Denný sumár s farebnými indikátormi nutričných cieľov
+- **Zoznam potravín:** Detail konzumovaných potravín s editáciou
+- **Pridanie potraviny:** Vyhľadávanie, obľúbené, naposledy konzumované
+- **Správa potravín:** CRUD operácie, vlastné potraviny
+- **Aktivity, lieky, WC:** Rýchle pridanie a prehľad
+- **Pitný režim:** Sledovanie dennéj konzumácie vody
+
+### Denné ciele
+- Vláknina: 25-30g
+- Cukry: 30-50g
+- Tuky: 50-60g
+</project.md>
