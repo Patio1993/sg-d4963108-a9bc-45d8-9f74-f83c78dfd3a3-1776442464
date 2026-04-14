@@ -1,6 +1,6 @@
 <![CDATA[---
 title: Dashboard a denný sumár
-status: in_progress
+status: done
 priority: high
 type: feature
 tags: [ui, dashboard]
@@ -13,10 +13,10 @@ position: 2
 Hlavná obrazovka s denným sumárom nutričných hodnôt, farebnými indikátormi cieľov a zoznamom konzumovaných potravín.
 
 ## Checklist
-- [ ] DailySummary komponenta: Kcal, Vláknina, Cukor, Tuky, Sacharidy, Bielkoviny, Soľ
-- [ ] Farebné indikátory: zelená (v rozsahu), oranžová (pod), červená (nad)
-- [ ] Klikateľné nutričné hodnoty → detail zoznam
-- [ ] Cvičenie checkbox, chôdza v minútach
-- [ ] Reštaurácia checkbox s "naposledy" výpočtom
-- [ ] Pitný režim súčet
-</tasks/task-3.md>
+- [x] DailySummary komponenta: Kcal, Vláknina, Cukor, Tuky, Sacharidy, Bielkoviny, Soľ
+- [x] Farebné indikátory: zelená (v rozsahu), oranžová (pod), červená (nad)
+- [x] Klikateľné nutričné hodnoty → detail zoznam
+- [x] Cvičenie checkbox, chôdza v minútach
+- [x] Reštaurácia checkbox s "naposledy" výpočtom
+- [x] Pitný režim súčet
+]]></update>
