@@ -111,8 +111,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
   const loadFoods = async () => {
     try {
-      const data = await foodService.searchFoods("");
-      setFoods(data);
+      const allFoods = await foodService.getAllFoods();
+      setFoods(allFoods);
     } catch (error) {
       console.error("Failed to load foods:", error);
     }
@@ -131,6 +131,14 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   const handleSelectFood = (food: FoodWithLastConsumed) => {
     setSelectedFood(food);
   };
+
+  const filteredFoods = searchQuery
+    ? foods.filter((f) =>
+        f.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : foods;
+
+  const favoriteFoods = foods.filter((f) => f.is_favorite === true);
 
   const mapMealTypeToDb = (type: string): CreateConsumedFoodData["meal_type"] => {
     switch (type) {
@@ -215,9 +223,6 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
     }
   };
 
-  const favoritesFoods = foods.filter(f => f.is_favorite);
-  const otherFoods = foods.filter(f => !f.is_favorite);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -244,13 +249,13 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
                 {/* Favorites */}
-                {favoritesFoods.length > 0 && (
+                {favoriteFoods.length > 0 && (
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold flex items-center gap-2">
                       <Star className="h-4 w-4 fill-accent text-accent" />
                       Obľúbené
                     </h3>
-                    {favoritesFoods.map((food) => (
+                    {favoriteFoods.map((food) => (
                       <Card
                         key={food.id}
                         className={`cursor-pointer transition-colors ${
@@ -285,10 +290,10 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                 )}
 
                 {/* All foods */}
-                {otherFoods.length > 0 && (
+                {filteredFoods.length > 0 && (
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold">Všetky potraviny</h3>
-                    {otherFoods.map((food) => (
+                    {filteredFoods.map((food) => (
                       <Card
                         key={food.id}
                         className={`cursor-pointer transition-colors ${
