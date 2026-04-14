@@ -1,98 +1,155 @@
-import { supabase } from "@/integrations/supabase/client";
+<![CDATA[import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
-export type FoodEntry = Tables<"food_entries">;
-export type MealType = "Breakfast" | "Lunch" | "Dinner" | "Snacks";
+export type Food = Tables<"foods">;
 
-export interface CreateFoodEntryInput {
-  meal_type: MealType;
-  food_name: string;
-  portion: string;
-  calories: number;
-  eaten_at?: string;
+export interface CreateFoodData {
+  name: string;
+  unit: "g" | "ml";
+  kcal: number;
+  fiber: number;
+  sugar: number;
+  carbs: number;
+  fats: number;
+  protein: number;
+  salt: number;
+  is_favorite?: boolean;
 }
 
-export interface UpdateFoodEntryInput {
-  meal_type?: MealType;
-  food_name?: string;
-  portion?: string;
-  calories?: number;
-  eaten_at?: string;
+export interface FoodWithLastConsumed extends Food {
+  last_consumed?: string | null;
+  days_ago?: number | null;
 }
 
 export const foodService = {
-  async createEntry(input: CreateFoodEntryInput): Promise<FoodEntry | null> {
+  async createFood(data: CreateFoodData): Promise<Food> {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("User not authenticated");
+    if (!user) throw new Error("Not authenticated");
 
-    const { data, error } = await supabase
-      .from("food_entries")
+    const { data: food, error } = await supabase
+      .from("foods")
       .insert({
         user_id: user.id,
-        meal_type: input.meal_type,
-        food_name: input.food_name,
-        portion: input.portion,
-        calories: input.calories,
-        eaten_at: input.eaten_at || new Date().toISOString(),
+        ...data,
       })
       .select()
       .single();
 
-    console.log("Create entry:", { data, error });
-    if (error) {
-      console.error("Error creating entry:", error);
-      throw error;
-    }
-    return data;
+    if (error) throw error;
+    return food;
   },
 
-  async getTodayEntries(): Promise<FoodEntry[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const { data, error } = await supabase
-      .from("food_entries")
-      .select("*")
-      .gte("eaten_at", today.toISOString())
-      .lt("eaten_at", tomorrow.toISOString())
-      .order("eaten_at", { ascending: false });
-
-    console.log("Get today entries:", { data, error });
-    if (error) {
-      console.error("Error fetching entries:", error);
-      throw error;
-    }
-    return data || [];
-  },
-
-  async updateEntry(id: string, input: UpdateFoodEntryInput): Promise<FoodEntry | null> {
-    const { data, error } = await supabase
-      .from("food_entries")
-      .update(input)
+  async updateFood(id: string, data: Partial<CreateFoodData>): Promise<Food> {
+    const { data: food, error } = await supabase
+      .from("foods")
+      .update(data)
       .eq("id", id)
       .select()
       .single();
 
-    console.log("Update entry:", { data, error });
-    if (error) {
-      console.error("Error updating entry:", error);
-      throw error;
-    }
-    return data;
+    if (error) throw error;
+    return food;
   },
 
-  async deleteEntry(id: string): Promise<void> {
+  async deleteFood(id: string): Promise<void> {
     const { error } = await supabase
-      .from("food_entries")
+      .from("foods")
       .delete()
       .eq("id", id);
 
-    console.log("Delete entry:", { error });
-    if (error) {
-      console.error("Error deleting entry:", error);
-      throw error;
+    if (error) throw error;
+  },
+
+  async toggleFavorite(id: string, is_favorite: boolean): Promise<void> {
+    const { error } = await supabase
+      .from("foods")
+      .update({ is_favorite })
+      .eq("id", id);
+
+    if (error) throw error;
+  },
+
+  async searchFoods(query: string, sortBy: "favorites" | "a-z" | "z-a" = "a-z"): Promise<FoodWithLastConsumed[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    let foodsQuery = supabase
+      .from("foods")
+      .select("*")
+      .eq("user_id", user.id);
+
+    if (query.trim()) {
+      foodsQuery = foodsQuery.ilike("name", `%${query}%`);
     }
+
+    if (sortBy === "favorites") {
+      foodsQuery = foodsQuery.order("is_favorite", { ascending: false }).order("name", { ascending: true });
+    } else if (sortBy === "a-z") {
+      foodsQuery = foodsQuery.order("name", { ascending: true });
+    } else {
+      foodsQuery = foodsQuery.order("name", { ascending: false });
+    }
+
+    const { data: foods, error } = await foodsQuery;
+    if (error) throw error;
+
+    // Get last consumed dates for all foods
+    const { data: lastConsumed } = await supabase
+      .from("consumed_foods")
+      .select("food_id, date")
+      .eq("user_id", user.id)
+      .order("date", { ascending: false });
+
+    const lastConsumedMap = new Map<string, string>();
+    lastConsumed?.forEach(item => {
+      if (!lastConsumedMap.has(item.food_id)) {
+        lastConsumedMap.set(item.food_id, item.date);
+      }
+    });
+
+    return foods.map(food => {
+      const lastDate = lastConsumedMap.get(food.id);
+      if (!lastDate) {
+        return { ...food, last_consumed: null, days_ago: null };
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const consumed = new Date(lastDate);
+      const diffTime = today.getTime() - consumed.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      return {
+        ...food,
+        last_consumed: lastDate,
+        days_ago: diffDays,
+      };
+    });
+  },
+
+  async getAllFoods(): Promise<Food[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    const { data, error } = await supabase
+      .from("foods")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("name", { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getFoodById(id: string): Promise<Food> {
+    const { data, error } = await supabase
+      .from("foods")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+    return data;
   },
 };
+</foodService.ts>

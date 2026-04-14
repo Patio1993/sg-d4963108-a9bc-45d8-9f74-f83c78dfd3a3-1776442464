@@ -1,6 +1,6 @@
 <![CDATA[---
 title: Databázová štruktúra a schéma
-status: in_progress
+status: done
 priority: urgent
 type: feature
 tags: [database, schema]
@@ -13,14 +13,14 @@ position: 0
 Vytvorenie kompletnej databázovej štruktúry pre Food Tracker so všetkými entitami: potraviny, konzumované potraviny, aktivity, lieky, WC záznamy, pitný režim, denný sumár.
 
 ## Checklist
-- [ ] Vymazať staré tabuľky (food_entries)
-- [ ] Vytvoriť foods tabuľku s nutričnými hodnotami
-- [ ] Vytvoriť consumed_foods tabuľku s reláciami
-- [ ] Vytvoriť activities tabuľku
-- [ ] Vytvoriť medicines tabuľku
-- [ ] Vytvoriť wc_entries tabuľku
-- [ ] Vytvoriť water_intake tabuľku
-- [ ] Vytvoriť daily_summary tabuľku
-- [ ] Nastaviť RLS policies pre všetky tabuľky
-- [ ] Predplniť activities tabuľku
-</tasks/task-1.md>
+- [x] Vymazať staré tabuľky (food_entries)
+- [x] Vytvoriť foods tabuľku s nutričnými hodnotami
+- [x] Vytvoriť consumed_foods tabuľku s reláciami
+- [x] Vytvoriť activities tabuľku
+- [x] Vytvoriť medicines tabuľku
+- [x] Vytvoriť wc_entries tabuľku
+- [x] Vytvoriť water_intake tabuľku
+- [x] Vytvoriť daily_summary tabuľku
+- [x] Nastaviť RLS policies pre všetky tabuľky
+- [x] Predplniť activities tabuľku
+]]></update>
