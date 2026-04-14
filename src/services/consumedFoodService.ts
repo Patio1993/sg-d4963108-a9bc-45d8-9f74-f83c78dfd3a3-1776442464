@@ -2,30 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type ConsumedFood = Tables<"consumed_foods">;
-
-export interface ConsumedFoodWithDetails extends ConsumedFood {
-  food: Tables<"foods">;
-  calculated_kcal: number;
-  calculated_fiber: number;
-  calculated_sugar: number;
-  calculated_carbs: number;
-  calculated_fats: number;
-  calculated_protein: number;
-  calculated_salt: number;
-}
-
-export interface CreateConsumedFoodData {
-  food_id: string;
-  date: string;
-  time: string;
-  amount: number;
-  meal_type: "breakfast" | "snack" | "lunch" | "afternoon_snack" | "dinner" | "coffee";
-  reaction?: "good" | "neutral" | "bad";
-  day_number: number;
-  coffee_count?: number;
-}
-
-export interface DailyNutritionSummary {
+export type DailyNutritionSummary = {
   total_kcal: number;
   total_fiber: number;
   total_sugar: number;
@@ -33,7 +10,23 @@ export interface DailyNutritionSummary {
   total_fats: number;
   total_protein: number;
   total_salt: number;
-}
+};
+
+export type ConsumedFoodWithDetails = ConsumedFood & {
+  food: Tables<"foods"> | null;
+  days_ago?: number | null;
+};
+
+export type CreateConsumedFoodData = {
+  food_id: string;
+  date: string;
+  time: string;
+  amount: number;
+  meal_type: "breakfast" | "snack" | "lunch" | "afternoon_snack" | "dinner" | "coffee";
+  reaction: "good" | "neutral" | "bad";
+  day_number: number;
+  coffee_count?: number;
+};
 
 export const consumedFoodService = {
   async createConsumedFood(data: CreateConsumedFoodData): Promise<ConsumedFood> {
@@ -75,59 +68,89 @@ export const consumedFoodService = {
   },
 
   async getDailyConsumedFoods(date: string): Promise<ConsumedFoodWithDetails[]> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not authenticated");
-
     const { data, error } = await supabase
       .from("consumed_foods")
-      .select("*, food:foods(*)")
-      .eq("user_id", user.id)
+      .select(`
+        *,
+        food:foods(*)
+      `)
       .eq("date", date)
       .order("time", { ascending: true });
 
     if (error) throw error;
 
-    return (data || []).map(item => {
-      const food = item.food as Tables<"foods">;
-      const multiplier = item.amount / 100;
+    // For each consumed food, calculate days_ago from TODAY (not from the displayed date)
+    const today = new Date().toISOString().split("T")[0];
+    const foodsWithLastConsumed = await Promise.all(
+      (data || []).map(async (item) => {
+        // Get last consumption of this food BEFORE today (excluding today)
+        const { data: lastConsumed } = await supabase
+          .from("consumed_foods")
+          .select("date")
+          .eq("food_id", item.food_id)
+          .lt("date", today)
+          .order("date", { ascending: false })
+          .limit(1)
+          .single();
 
-      return {
-        ...item,
-        food,
-        calculated_kcal: parseFloat((food.kcal * multiplier).toFixed(2)),
-        calculated_fiber: parseFloat((food.fiber * multiplier).toFixed(2)),
-        calculated_sugar: parseFloat((food.sugar * multiplier).toFixed(2)),
-        calculated_carbs: parseFloat((food.carbs * multiplier).toFixed(2)),
-        calculated_fats: parseFloat((food.fats * multiplier).toFixed(2)),
-        calculated_protein: parseFloat((food.protein * multiplier).toFixed(2)),
-        calculated_salt: parseFloat((food.salt * multiplier).toFixed(2)),
-      };
-    });
+        let days_ago: number | null = null;
+        if (lastConsumed) {
+          const lastDate = new Date(lastConsumed.date);
+          const todayDate = new Date(today);
+          const diffTime = todayDate.getTime() - lastDate.getTime();
+          days_ago = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        return {
+          ...item,
+          days_ago,
+        };
+      })
+    );
+
+    return foodsWithLastConsumed;
   },
 
   async getDailyNutritionSummary(date: string): Promise<DailyNutritionSummary> {
-    const foods = await this.getDailyConsumedFoods(date);
+    const { data, error } = await supabase
+      .from("consumed_foods")
+      .select(`
+        amount,
+        food:foods(kcal, fiber, sugar, carbs, fats, protein, salt)
+      `)
+      .eq("date", date);
 
-    return foods.reduce(
-      (acc, item) => ({
-        total_kcal: parseFloat((acc.total_kcal + item.calculated_kcal).toFixed(2)),
-        total_fiber: parseFloat((acc.total_fiber + item.calculated_fiber).toFixed(2)),
-        total_sugar: parseFloat((acc.total_sugar + item.calculated_sugar).toFixed(2)),
-        total_carbs: parseFloat((acc.total_carbs + item.calculated_carbs).toFixed(2)),
-        total_fats: parseFloat((acc.total_fats + item.calculated_fats).toFixed(2)),
-        total_protein: parseFloat((acc.total_protein + item.calculated_protein).toFixed(2)),
-        total_salt: parseFloat((acc.total_salt + item.calculated_salt).toFixed(2)),
-      }),
-      {
-        total_kcal: 0,
-        total_fiber: 0,
-        total_sugar: 0,
-        total_carbs: 0,
-        total_fats: 0,
-        total_protein: 0,
-        total_salt: 0,
+    if (error) throw error;
+
+    const summary: DailyNutritionSummary = {
+      total_kcal: 0,
+      total_fiber: 0,
+      total_sugar: 0,
+      total_carbs: 0,
+      total_fats: 0,
+      total_protein: 0,
+      total_salt: 0,
+    };
+
+    data?.forEach((item: any) => {
+      if (item.food) {
+        const ratio = item.amount / 100;
+        summary.total_kcal += item.food.kcal * ratio;
+        summary.total_fiber += item.food.fiber * ratio;
+        summary.total_sugar += item.food.sugar * ratio;
+        summary.total_carbs += item.food.carbs * ratio;
+        summary.total_fats += item.food.fats * ratio;
+        summary.total_protein += item.food.protein * ratio;
+        summary.total_salt += item.food.salt * ratio;
       }
-    );
+    });
+
+    // Round to 2 decimal places
+    Object.keys(summary).forEach((key) => {
+      summary[key as keyof DailyNutritionSummary] = Math.round(summary[key as keyof DailyNutritionSummary] * 100) / 100;
+    });
+
+    return summary;
   },
 
   async getNextDayNumber(): Promise<number> {
