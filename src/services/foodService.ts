@@ -7,6 +7,19 @@ export type FoodWithLastConsumed = Food & {
   days_ago?: number | null;
 };
 
+export type CreateFoodData = {
+  name: string;
+  unit: string;
+  kcal: number;
+  fiber: number;
+  sugar: number;
+  carbs: number;
+  fats: number;
+  protein: number;
+  salt: number;
+  is_favorite?: boolean;
+};
+
 export const foodService = {
   async createFood(data: CreateFoodData): Promise<Food> {
     const { data: { user } } = await supabase.auth.getUser();
