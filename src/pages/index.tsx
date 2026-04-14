@@ -5,11 +5,17 @@ import { DailySummaryCard } from "@/components/DailySummaryCard";
 import { ConsumedFoodsList } from "@/components/ConsumedFoodsList";
 import { AuthDialog } from "@/components/AuthDialog";
 import { AddFoodDialog } from "@/components/AddFoodDialog";
-import { consumedFoodService, type DailyNutrition } from "@/services/consumedFoodService";
+import { consumedFoodService, type DailyNutritionSummary } from "@/services/consumedFoodService";
 import { waterService } from "@/services/waterService";
-import { dailySummaryService, type NutritionGoals } from "@/services/dailySummaryService";
+import { dailySummaryService } from "@/services/dailySummaryService";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User, Plus } from "lucide-react";
+
+export interface NutritionGoals {
+  fiber: { status: "neutral" | "good" | "warning" | "danger"; min: number; max: number };
+  sugar: { status: "neutral" | "good" | "warning" | "danger"; min: number; max: number };
+  fats: { status: "neutral" | "good" | "warning" | "danger"; min: number; max: number };
+}
 
 export default function Home() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -18,7 +24,7 @@ export default function Home() {
   const [showAddFoodDialog, setShowAddFoodDialog] = useState(false);
   
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [nutrition, setNutrition] = useState<DailyNutrition>({
+  const [nutrition, setNutrition] = useState<DailyNutritionSummary>({
     total_kcal: 0,
     total_fiber: 0,
     total_sugar: 0,

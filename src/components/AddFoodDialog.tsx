@@ -7,8 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, Star, Clock, Plus } from "lucide-react";
-import { foodService, type Food } from "@/services/foodService";
-import { consumedFoodService } from "@/services/consumedFoodService";
+import { foodService, type Food, type FoodWithLastConsumed } from "@/services/foodService";
+import { consumedFoodService, type CreateConsumedFoodData } from "@/services/consumedFoodService";
 import { useToast } from "@/hooks/use-toast";
 
 type MealType = "Raňajky" | "Desiata" | "Obed" | "Olovrant" | "Večera" | "Káva";
@@ -31,8 +31,8 @@ interface AddFoodDialogProps {
 export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDialogProps) {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [foods, setFoods] = useState<Food[]>([]);
-  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
+  const [foods, setFoods] = useState<FoodWithLastConsumed[]>([]);
+  const [selectedFood, setSelectedFood] = useState<FoodWithLastConsumed | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Form state
@@ -70,8 +70,29 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
     }
   };
 
-  const handleSelectFood = (food: Food) => {
+  const handleSelectFood = (food: FoodWithLastConsumed) => {
     setSelectedFood(food);
+  };
+
+  const mapMealTypeToDb = (type: string): CreateConsumedFoodData["meal_type"] => {
+    switch (type) {
+      case "Raňajky": return "breakfast";
+      case "Desiata": return "snack";
+      case "Obed": return "lunch";
+      case "Olovrant": return "afternoon_snack";
+      case "Večera": return "dinner";
+      case "Káva": return "coffee";
+      default: return "breakfast";
+    }
+  };
+
+  const mapReactionToDb = (reaction: string): CreateConsumedFoodData["reaction"] => {
+    switch (reaction) {
+      case "Dobré": return "good";
+      case "Neutrálne": return "neutral";
+      case "Zlé": return "bad";
+      default: return "neutral";
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,14 +119,16 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
 
     setLoading(true);
     try {
+      const dayNumber = await consumedFoodService.getNextDayNumber();
       await consumedFoodService.createConsumedFood({
         food_id: selectedFood.id,
         date,
         time,
         amount: Math.round(amountNum * 100) / 100, // 2 decimal places
-        meal_type: mealType,
-        reaction,
-        coffee_number: mealType === "Káva" ? coffeeNumber : null,
+        meal_type: mapMealTypeToDb(mealType),
+        reaction: mapReactionToDb(reaction),
+        day_number: dayNumber,
+        coffee_count: mealType === "Káva" ? coffeeNumber : undefined,
       });
 
       toast({
@@ -182,16 +205,16 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
                                 {food.kcal} kcal / 100{food.unit}
                               </p>
                             </div>
-                            {food.last_consumed_days_ago !== null && (
+                            {food.days_ago !== null && food.days_ago !== undefined && (
                               <Badge variant="outline" className="text-xs">
                                 <Clock className="h-3 w-3 mr-1" />
-                                {food.last_consumed_days_ago === 0
+                                {food.days_ago === 0
                                   ? "Dnes"
-                                  : food.last_consumed_days_ago === 1
+                                  : food.days_ago === 1
                                   ? "Včera"
-                                  : food.last_consumed_days_ago === 2
+                                  : food.days_ago === 2
                                   ? "Predvčerom"
-                                  : `Pred ${food.last_consumed_days_ago} dňami`}
+                                  : `Pred ${food.days_ago} dňami`}
                               </Badge>
                             )}
                           </div>
@@ -221,16 +244,16 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
                                 {food.kcal} kcal / 100{food.unit}
                               </p>
                             </div>
-                            {food.last_consumed_days_ago !== null && (
+                            {food.days_ago !== null && food.days_ago !== undefined && (
                               <Badge variant="outline" className="text-xs">
                                 <Clock className="h-3 w-3 mr-1" />
-                                {food.last_consumed_days_ago === 0
+                                {food.days_ago === 0
                                   ? "Dnes"
-                                  : food.last_consumed_days_ago === 1
+                                  : food.days_ago === 1
                                   ? "Včera"
-                                  : food.last_consumed_days_ago === 2
+                                  : food.days_ago === 2
                                   ? "Predvčerom"
-                                  : `Pred ${food.last_consumed_days_ago} dňami`}
+                                  : `Pred ${food.days_ago} dňami`}
                               </Badge>
                             )}
                           </div>
@@ -267,7 +290,7 @@ export function AddFoodDialog({ open, onOpenChange, date, onSuccess }: AddFoodDi
                         <span className="text-muted-foreground">Tuky:</span> {selectedFood.fats}g
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Bielkoviny:</span> {selectedFood.proteins}g
+                        <span className="text-muted-foreground">Bielkoviny:</span> {selectedFood.protein}g
                       </div>
                     </div>
                   </CardContent>
