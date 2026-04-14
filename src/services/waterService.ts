@@ -1,4 +1,4 @@
-<![CDATA[import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type WaterIntake = Tables<"water_intake">;
@@ -52,4 +52,3 @@ export const waterService = {
     return intake.reduce((sum, item) => sum + item.amount_ml, 0);
   },
 };
-</waterService.ts>

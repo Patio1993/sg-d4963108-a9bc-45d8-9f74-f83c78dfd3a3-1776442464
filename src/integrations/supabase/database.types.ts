@@ -152,7 +152,7 @@ export type Database = {
           sugar: number
           unit: string
           updated_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           carbs?: number
@@ -168,7 +168,7 @@ export type Database = {
           sugar?: number
           unit: string
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           carbs?: number
@@ -184,7 +184,7 @@ export type Database = {
           sugar?: number
           unit?: string
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {

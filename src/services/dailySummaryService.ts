@@ -1,4 +1,4 @@
-<![CDATA[import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type DailySummary = Tables<"daily_summary">;
@@ -97,4 +97,3 @@ export const dailySummaryService = {
     };
   },
 };
-</dailySummaryService.ts>

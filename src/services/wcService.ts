@@ -1,4 +1,4 @@
-<![CDATA[import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type WCEntry = Tables<"wc_entries">;
@@ -63,4 +63,3 @@ export const wcService = {
     return data || [];
   },
 };
-</wcService.ts>

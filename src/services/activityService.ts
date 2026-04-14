@@ -1,4 +1,4 @@
-<![CDATA[import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type Activity = Tables<"activities">;
@@ -62,4 +62,3 @@ export const activityService = {
     if (error) throw error;
   },
 };
-</activityService.ts>
