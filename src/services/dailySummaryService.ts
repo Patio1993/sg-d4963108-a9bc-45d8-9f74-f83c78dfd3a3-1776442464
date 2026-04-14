@@ -14,12 +14,14 @@ export const dailySummaryService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
-    let { data, error } = await supabase
+    const { data: initialData, error } = await supabase
       .from("daily_summary")
       .select("*")
       .eq("date", date)
       .eq("user_id", user.id)
       .single();
+
+    let data = initialData;
 
     if (error && error.code !== "PGRST116") {
       throw error;
