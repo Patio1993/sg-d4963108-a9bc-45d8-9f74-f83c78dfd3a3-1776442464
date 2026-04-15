@@ -14,10 +14,10 @@ interface ConsumedFoodsListProps {
 }
 
 const MEAL_TYPE_ICONS: Record<string, string> = {
-  breakfast: "🍳",
+  breakfast: "🌅",
   snack: "🍎",
   lunch: "🍽️",
-  afternoon_snack: "☕",
+  afternoon_snack: "🥤",
   dinner: "🌙",
   coffee: "☕",
 };

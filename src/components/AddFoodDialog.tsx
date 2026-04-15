@@ -23,7 +23,7 @@ interface AddFoodDialogProps {
   onSuccess: () => void;
 }
 
-const MEAL_TYPES = ["raňajky", "desiata", "obed", "olovrant", "večera", "iné"] as const;
+const MEAL_TYPES = ["raňajky", "desiata", "obed", "olovrant", "večera", "káva", "iné"] as const;
 const REACTIONS = ["v pohode", "ľahké problémy", "stredné problémy", "veľké problémy"] as const;
 
 const mapMealTypeToDb = (mealType: string): "breakfast" | "snack" | "lunch" | "afternoon_snack" | "dinner" | "coffee" => {
@@ -33,6 +33,7 @@ const mapMealTypeToDb = (mealType: string): "breakfast" | "snack" | "lunch" | "a
     "obed": "lunch",
     "olovrant": "afternoon_snack",
     "večera": "dinner",
+    "káva": "coffee",
     "iné": "coffee"
   };
   return mapping[mealType] || "lunch";
@@ -45,7 +46,7 @@ const mapMealTypeFromDb = (dbMealType: string): string => {
     "lunch": "obed",
     "afternoon_snack": "olovrant",
     "dinner": "večera",
-    "coffee": "iné"
+    "coffee": "káva"
   };
   return mapping[dbMealType] || "obed";
 };
