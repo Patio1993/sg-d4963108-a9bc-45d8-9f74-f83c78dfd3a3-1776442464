@@ -23,6 +23,49 @@ interface AddFoodDialogProps {
 const MEAL_TYPES = ["raňajky", "desiata", "obed", "olovrant", "večera", "iné"] as const;
 const REACTIONS = ["v pohode", "ľahké problémy", "stredné problémy", "veľké problémy"] as const;
 
+const mapMealTypeToDb = (mealType: string): "breakfast" | "snack" | "lunch" | "afternoon_snack" | "dinner" | "coffee" => {
+  const mapping: Record<string, "breakfast" | "snack" | "lunch" | "afternoon_snack" | "dinner" | "coffee"> = {
+    "raňajky": "breakfast",
+    "desiata": "snack",
+    "obed": "lunch",
+    "olovrant": "afternoon_snack",
+    "večera": "dinner",
+    "iné": "coffee"
+  };
+  return mapping[mealType] || "lunch";
+};
+
+const mapMealTypeFromDb = (dbMealType: string): string => {
+  const mapping: Record<string, string> = {
+    "breakfast": "raňajky",
+    "snack": "desiata",
+    "lunch": "obed",
+    "afternoon_snack": "olovrant",
+    "dinner": "večera",
+    "coffee": "iné"
+  };
+  return mapping[dbMealType] || "obed";
+};
+
+const mapReactionToDb = (reaction: string): "good" | "neutral" | "bad" => {
+  const mapping: Record<string, "good" | "neutral" | "bad"> = {
+    "v pohode": "good",
+    "ľahké problémy": "neutral",
+    "stredné problémy": "bad",
+    "veľké problémy": "bad"
+  };
+  return mapping[reaction] || "good";
+};
+
+const mapReactionFromDb = (dbReaction: string): string => {
+  const mapping: Record<string, string> = {
+    "good": "v pohode",
+    "neutral": "ľahké problémy",
+    "bad": "stredné problémy"
+  };
+  return mapping[dbReaction] || "v pohode";
+};
+
 export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess }: AddFoodDialogProps) {
   const { toast } = useToast();
   const [foods, setFoods] = useState<FoodWithLastConsumed[]>([]);
@@ -58,8 +101,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
     if (editingFood && open) {
       setSelectedFood(editingFood.food);
       setAmount(editingFood.amount.toString());
-      setMealType(editingFood.meal_type);
-      setReaction(editingFood.reaction);
+      setMealType(mapMealTypeFromDb(editingFood.meal_type));
+      setReaction(mapReactionFromDb(editingFood.reaction));
       setTime(editingFood.time);
     } else if (!open) {
       resetForm();
@@ -105,8 +148,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
           editingFood.id,
           {
             amount: parseFloat(amount),
-            meal_type: mealType as any,
-            reaction: reaction as any,
+            meal_type: mapMealTypeToDb(mealType),
+            reaction: mapReactionToDb(reaction),
             time
           }
         );
@@ -120,8 +163,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
           food_id: selectedFood.id,
           date,
           amount: parseFloat(amount),
-          meal_type: mealType as any,
-          reaction: reaction as any,
+          meal_type: mapMealTypeToDb(mealType),
+          reaction: mapReactionToDb(reaction),
           time,
           day_number: dayNumber
         });
