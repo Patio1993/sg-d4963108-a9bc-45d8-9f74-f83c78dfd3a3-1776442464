@@ -21,6 +21,9 @@ interface DailySummaryCardProps {
   onWalkMinutesChange: (value: number) => void;
   onRestaurantChange: (checked: boolean) => void;
   onNutrientClick: (nutrient: string) => void;
+  onActivityClick: () => void;
+  onMedicineClick: () => void;
+  onWCClick: () => void;
 }
 
 export function DailySummaryCard({
@@ -37,6 +40,9 @@ export function DailySummaryCard({
   onWalkMinutesChange,
   onRestaurantChange,
   onNutrientClick,
+  onActivityClick,
+  onMedicineClick,
+  onWCClick,
 }: DailySummaryCardProps) {
   const getGoalCardBg = (status: string) => {
     switch (status) {
@@ -141,17 +147,28 @@ export function DailySummaryCard({
 
         {/* Quick Actions */}
         <div className="grid grid-cols-3 gap-3">
-          <button className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/30 transition-colors">
-            <div className="text-2xl mb-1">📊</div>
-            <div className="text-sm opacity-90">Aktivity</div>
+          <button
+            onClick={onActivityClick}
+            className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/30 transition-colors cursor-pointer"
+          >
+            <div className="text-2xl mb-1">🚶</div>
+            <div className="text-xs opacity-90">Aktivity</div>
           </button>
-          <button className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/30 transition-colors">
+          
+          <button
+            onClick={onMedicineClick}
+            className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/30 transition-colors cursor-pointer"
+          >
             <div className="text-2xl mb-1">💊</div>
-            <div className="text-sm opacity-90">Lieky</div>
+            <div className="text-xs opacity-90">Lieky</div>
           </button>
-          <button className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/30 transition-colors">
-            <div className="text-2xl mb-1">🗃️</div>
-            <div className="text-sm opacity-90">WC</div>
+          
+          <button
+            onClick={onWCClick}
+            className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/30 transition-colors cursor-pointer"
+          >
+            <div className="text-2xl mb-1">🚽</div>
+            <div className="text-xs opacity-90">WC</div>
           </button>
         </div>
 

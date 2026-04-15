@@ -27,9 +27,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAddFoodDialog, setShowAddFoodDialog] = useState(false);
-  const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null);
   const [showNutrientDialog, setShowNutrientDialog] = useState(false);
+  const [showActivityDialog, setShowActivityDialog] = useState(false);
+  const [showMedicineDialog, setShowMedicineDialog] = useState(false);
+  const [showWCDialog, setShowWCDialog] = useState(false);
   const [selectedNutrient, setSelectedNutrient] = useState<"fiber" | "sugar" | "fats" | null>(null);
+  const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null);
   
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [consumedFoods, setConsumedFoods] = useState<ConsumedFoodWithDetails[]>([]);
@@ -268,6 +271,9 @@ export default function Home() {
                   setLastRestaurant(lastRest);
                 }}
                 onNutrientClick={handleNutrientClick}
+                onActivityClick={() => setShowActivityDialog(true)}
+                onMedicineClick={() => setShowMedicineDialog(true)}
+                onWCClick={() => setShowWCDialog(true)}
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -321,6 +327,24 @@ export default function Home() {
           onOpenChange={setShowNutrientDialog}
           nutrientType={selectedNutrient}
           foods={consumedFoods}
+        />
+
+        <ActivitiesManager
+          open={showActivityDialog}
+          onOpenChange={setShowActivityDialog}
+          date={date}
+        />
+
+        <MedicinesManager
+          open={showMedicineDialog}
+          onOpenChange={setShowMedicineDialog}
+          date={date}
+        />
+
+        <WCManager
+          open={showWCDialog}
+          onOpenChange={setShowWCDialog}
+          date={date}
         />
       </div>
     </>
