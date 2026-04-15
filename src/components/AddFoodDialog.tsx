@@ -103,24 +103,28 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
       if (editingFood) {
         await consumedFoodService.updateConsumedFood(
           editingFood.id,
-          parseFloat(amount),
-          mealType,
-          reaction,
-          time
+          {
+            amount: parseFloat(amount),
+            meal_type: mealType as any,
+            reaction: reaction as any,
+            time
+          }
         );
         toast({
           title: "Úspech",
           description: "Potravina upravená",
         });
       } else {
-        await consumedFoodService.addConsumedFood(
-          selectedFood.id,
+        const dayNumber = await consumedFoodService.getNextDayNumber();
+        await consumedFoodService.createConsumedFood({
+          food_id: selectedFood.id,
           date,
-          parseFloat(amount),
-          mealType,
-          reaction,
-          time
-        );
+          amount: parseFloat(amount),
+          meal_type: mealType as any,
+          reaction: reaction as any,
+          time,
+          day_number: dayNumber
+        });
         toast({
           title: "Úspech",
           description: "Potravina pridaná",
@@ -151,16 +155,17 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
     }
 
     try {
-      await foodService.createFood(
-        newFoodName.trim(),
-        parseFloat(newFoodKcal) || 0,
-        parseFloat(newFoodFiber) || 0,
-        parseFloat(newFoodSugar) || 0,
-        parseFloat(newFoodCarbs) || 0,
-        parseFloat(newFoodFats) || 0,
-        parseFloat(newFoodProtein) || 0,
-        parseFloat(newFoodSalt) || 0
-      );
+      await foodService.createFood({
+        name: newFoodName.trim(),
+        unit: "g",
+        kcal: parseFloat(newFoodKcal) || 0,
+        fiber: parseFloat(newFoodFiber) || 0,
+        sugar: parseFloat(newFoodSugar) || 0,
+        carbs: parseFloat(newFoodCarbs) || 0,
+        fats: parseFloat(newFoodFats) || 0,
+        protein: parseFloat(newFoodProtein) || 0,
+        salt: parseFloat(newFoodSalt) || 0
+      });
       toast({
         title: "Úspech",
         description: "Nová potravina vytvorená",
@@ -196,11 +201,11 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   const favoriteFoods = foods.filter((f) => f.is_favorite === true);
 
   const recentFoods = [...foods]
-    .filter((f) => f.last_consumed_date)
+    .filter((f) => f.days_ago !== null && f.days_ago !== undefined)
     .sort((a, b) => {
-      if (!a.last_consumed_date) return 1;
-      if (!b.last_consumed_date) return -1;
-      return b.last_consumed_date.localeCompare(a.last_consumed_date);
+      if (a.days_ago === null || a.days_ago === undefined) return 1;
+      if (b.days_ago === null || b.days_ago === undefined) return -1;
+      return a.days_ago - b.days_ago;
     })
     .slice(0, 10);
 
@@ -270,7 +275,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                               <div className="flex-1">
                                 <div className="font-medium">{food.name}</div>
                                 <div className="text-sm text-muted-foreground mt-1">
-                                  {food.kcal_per_100g} kcal • V: {food.fiber_per_100g}g • C: {food.sugar_per_100g}g • T: {food.fats_per_100g}g
+                                  {food.kcal} kcal • V: {food.fiber}g • C: {food.sugar}g • T: {food.fats}g
                                 </div>
                               </div>
                               {food.is_favorite && (
@@ -302,7 +307,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                           >
                             <div className="font-medium">{food.name}</div>
                             <div className="text-sm text-muted-foreground mt-1">
-                              {food.kcal_per_100g} kcal • V: {food.fiber_per_100g}g • C: {food.sugar_per_100g}g • T: {food.fats_per_100g}g
+                              {food.kcal} kcal • V: {food.fiber}g • C: {food.sugar}g • T: {food.fats}g
                             </div>
                           </div>
                         ))
@@ -331,11 +336,11 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                               <div className="flex-1">
                                 <div className="font-medium">{food.name}</div>
                                 <div className="text-sm text-muted-foreground mt-1">
-                                  {food.kcal_per_100g} kcal • V: {food.fiber_per_100g}g • C: {food.sugar_per_100g}g • T: {food.fats_per_100g}g
+                                  {food.kcal} kcal • V: {food.fiber}g • C: {food.sugar}g • T: {food.fats}g
                                 </div>
-                                {food.last_consumed_date && (
+                                {food.days_ago !== null && food.days_ago !== undefined && (
                                   <div className="text-xs text-muted-foreground mt-1">
-                                    Naposledy: {food.last_consumed_date}
+                                    Naposledy: pred {food.days_ago} dňami
                                   </div>
                                 )}
                               </div>
@@ -355,7 +360,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                     <div className="font-medium mb-2">Vybraná potravina:</div>
                     <div className="text-sm">{selectedFood.name}</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {selectedFood.kcal_per_100g} kcal/100g • V: {selectedFood.fiber_per_100g}g • C: {selectedFood.sugar_per_100g}g • T: {selectedFood.fats_per_100g}g
+                      {selectedFood.kcal} kcal/{selectedFood.unit === "ml" ? "100ml" : "100g"} • V: {selectedFood.fiber}g • C: {selectedFood.sugar}g • T: {selectedFood.fats}g
                     </div>
                   </div>
                 )}
