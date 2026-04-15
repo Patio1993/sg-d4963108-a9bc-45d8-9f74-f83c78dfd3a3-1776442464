@@ -22,9 +22,11 @@ import { useToast } from "@/hooks/use-toast";
 interface ActivitiesManagerProps {
   date: string;
   onActivityAdded?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function ActivitiesManager({ date, onActivityAdded }: ActivitiesManagerProps) {
+export function ActivitiesManager({ date, onActivityAdded, open, onOpenChange }: ActivitiesManagerProps) {
   const { toast } = useToast();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [userActivities, setUserActivities] = useState<UserActivityWithDetails[]>([]);
@@ -39,6 +41,17 @@ export function ActivitiesManager({ date, onActivityAdded }: ActivitiesManagerPr
     loadActivities();
     loadUserActivities();
   }, [date]);
+
+  useEffect(() => {
+    if (open !== undefined) {
+      setShowSelectDialog(open);
+    }
+  }, [open]);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setShowSelectDialog(newOpen);
+    onOpenChange?.(newOpen);
+  };
 
   const loadActivities = async () => {
     try {
@@ -185,7 +198,7 @@ export function ActivitiesManager({ date, onActivityAdded }: ActivitiesManagerPr
       </CardContent>
 
       {/* Select Activity Dialog */}
-      <Dialog open={showSelectDialog} onOpenChange={setShowSelectDialog}>
+      <Dialog open={showSelectDialog} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Pridať aktivitu</DialogTitle>

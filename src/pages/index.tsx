@@ -277,9 +277,21 @@ export default function Home() {
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <ActivitiesManager date={date} />
-                <MedicinesManager date={date} />
-                <WCManager date={date} />
+                <ActivitiesManager 
+                  date={date} 
+                  open={showActivityDialog}
+                  onOpenChange={setShowActivityDialog}
+                />
+                <MedicinesManager 
+                  date={date} 
+                  open={showMedicineDialog}
+                  onOpenChange={setShowMedicineDialog}
+                />
+                <WCManager 
+                  date={date} 
+                  open={showWCDialog}
+                  onOpenChange={setShowWCDialog}
+                />
                 <WaterIntakeManager date={date} onWaterAdded={loadDailyData} />
               </div>
 
@@ -327,24 +339,6 @@ export default function Home() {
           onOpenChange={setShowNutrientDialog}
           nutrientType={selectedNutrient}
           foods={consumedFoods}
-        />
-
-        <ActivitiesManager
-          open={showActivityDialog}
-          onOpenChange={setShowActivityDialog}
-          date={date}
-        />
-
-        <MedicinesManager
-          open={showMedicineDialog}
-          onOpenChange={setShowMedicineDialog}
-          date={date}
-        />
-
-        <WCManager
-          open={showWCDialog}
-          onOpenChange={setShowWCDialog}
-          date={date}
         />
       </div>
     </>

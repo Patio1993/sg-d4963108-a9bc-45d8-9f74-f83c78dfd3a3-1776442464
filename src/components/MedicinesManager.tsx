@@ -22,9 +22,11 @@ import { useToast } from "@/hooks/use-toast";
 
 interface MedicinesManagerProps {
   date: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function MedicinesManager({ date }: MedicinesManagerProps) {
+export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerProps) {
   const { toast } = useToast();
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [userMedicines, setUserMedicines] = useState<UserMedicineWithDetails[]>([]);
@@ -45,6 +47,21 @@ export function MedicinesManager({ date }: MedicinesManagerProps) {
     loadMedicines();
     loadUserMedicines();
   }, [date]);
+
+  useEffect(() => {
+    if (open !== undefined) {
+      setShowSelectDialog(open);
+    }
+  }, [open]);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setShowSelectDialog(newOpen);
+    onOpenChange?.(newOpen);
+    if (!newOpen) {
+      setSelectedMedicine(null);
+      setTime("");
+    }
+  };
 
   useEffect(() => {
     if (showSelectDialog) {
@@ -226,13 +243,7 @@ export function MedicinesManager({ date }: MedicinesManagerProps) {
       </CardContent>
 
       {/* Select Medicine Dialog */}
-      <Dialog open={showSelectDialog} onOpenChange={(open) => {
-        setShowSelectDialog(open);
-        if (!open) {
-          setSelectedMedicine(null);
-          setTime("");
-        }
-      }}>
+      <Dialog open={showSelectDialog} onOpenChange={handleOpenChange}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Pridať liek</DialogTitle>

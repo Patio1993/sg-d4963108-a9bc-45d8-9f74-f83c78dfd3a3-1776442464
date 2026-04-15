@@ -12,9 +12,11 @@ import { useToast } from "@/hooks/use-toast";
 interface WCManagerProps {
   date: string;
   onWCAdded?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function WCManager({ date, onWCAdded }: WCManagerProps) {
+export function WCManager({ date, onWCAdded, open, onOpenChange }: WCManagerProps) {
   const { toast } = useToast();
   const [entries, setEntries] = useState<WCEntry[]>([]);
   const [showDialog, setShowDialog] = useState(false);
@@ -27,6 +29,24 @@ export function WCManager({ date, onWCAdded }: WCManagerProps) {
   useEffect(() => {
     loadEntries();
   }, [date]);
+
+  useEffect(() => {
+    if (open !== undefined) {
+      setShowDialog(open);
+      if (open && !editingEntry) {
+        const now = new Date();
+        setTime(now.toTimeString().slice(0, 5));
+      }
+    }
+  }, [open]);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setShowDialog(newOpen);
+    onOpenChange?.(newOpen);
+    if (!newOpen) {
+      resetForm();
+    }
+  };
 
   const loadEntries = async () => {
     setLoading(true);
@@ -50,6 +70,7 @@ export function WCManager({ date, onWCAdded }: WCManagerProps) {
   const handleOpenCreate = () => {
     resetForm();
     setShowDialog(true);
+    onOpenChange?.(true);
   };
 
   const handleOpenEdit = (entry: WCEntry) => {
@@ -165,7 +186,7 @@ export function WCManager({ date, onWCAdded }: WCManagerProps) {
       </CardContent>
 
       {/* Create/Edit Dialog */}
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+      <Dialog open={showDialog} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingEntry ? "Upraviť záznam" : "Nový WC záznam"}</DialogTitle>
