@@ -142,6 +142,9 @@ export default function Home() {
     }
   };
 
+  // Calculate coffee count from consumed foods
+  const coffeeCount = consumedFoods.filter(f => f.meal_type === "coffee").length;
+
   if (loading) {
     return (
       <>
@@ -245,6 +248,7 @@ export default function Home() {
                 nutrition={nutrition}
                 goals={goals}
                 waterTotal={waterTotal}
+                coffeeCount={coffeeCount}
                 exercise={exercise}
                 walkMinutes={walkMinutes}
                 restaurant={restaurant}

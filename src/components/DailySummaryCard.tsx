@@ -15,6 +15,7 @@ interface DailySummaryCardProps {
   walkMinutes: number;
   restaurant: boolean;
   waterTotal: number;
+  coffeeCount: number;
   lastRestaurant: { date: string; days_ago: number } | null;
   onExerciseChange: (checked: boolean) => void;
   onWalkMinutesChange: (value: number) => void;
@@ -30,6 +31,7 @@ export function DailySummaryCard({
   walkMinutes,
   restaurant,
   waterTotal,
+  coffeeCount,
   lastRestaurant,
   onExerciseChange,
   onWalkMinutesChange,
@@ -207,10 +209,17 @@ export function DailySummaryCard({
           </div>
         </div>
 
-        {/* Water */}
-        <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
-          <div className="text-3xl font-bold">{waterTotal}ml</div>
-          <div className="text-sm opacity-90">💧 Voda</div>
+        {/* Water & Coffee */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
+            <div className="text-3xl font-bold">{waterTotal}ml</div>
+            <div className="text-sm opacity-90">💧 Voda</div>
+          </div>
+          
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
+            <div className="text-3xl font-bold">{coffeeCount}x</div>
+            <div className="text-sm opacity-90">☕ Káva</div>
+          </div>
         </div>
       </CardContent>
     </Card>
