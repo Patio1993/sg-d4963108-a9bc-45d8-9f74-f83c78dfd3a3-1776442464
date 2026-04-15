@@ -43,15 +43,15 @@ export default function Home() {
     total_salt: 0,
   });
   const [waterTotal, setWaterTotal] = useState(0);
+  const [goals, setGoals] = useState<NutritionGoalStatus>({
+    fiber: "warning",
+    sugar: "warning",
+    fats: "warning",
+  });
   const [exercise, setExercise] = useState(false);
   const [walkMinutes, setWalkMinutes] = useState(0);
   const [restaurant, setRestaurant] = useState(false);
   const [lastRestaurant, setLastRestaurant] = useState<{ date: string; days_ago: number } | null>(null);
-  const [goals, setGoals] = useState<NutritionGoalStatus>({
-    fiber: "neutral",
-    sugar: "neutral",
-    fats: "neutral",
-  });
 
   const formatDateDisplay = (dateStr: string) => {
     const d = parseISO(dateStr);
