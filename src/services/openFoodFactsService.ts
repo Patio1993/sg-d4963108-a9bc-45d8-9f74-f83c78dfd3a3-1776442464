@@ -2,21 +2,28 @@ export interface OpenFoodFactsProduct {
   code: string;
   product_name: string;
   product_name_sk?: string;
+  brands?: string;
   image_url?: string;
   image_small_url?: string;
   nutriments?: {
     "energy-kcal_100g"?: number;
     "energy-kcal"?: number;
     fiber_100g?: number;
+    fiber?: number;
     sugars_100g?: number;
+    sugars?: number;
     carbohydrates_100g?: number;
+    carbohydrates?: number;
     fat_100g?: number;
+    fat?: number;
     proteins_100g?: number;
+    proteins?: number;
     salt_100g?: number;
+    salt?: number;
   };
 }
 
-export interface OpenFoodFactsSearchResult {
+export interface OpenFoodFactsResponse {
   products: OpenFoodFactsProduct[];
   count: number;
   page: number;
@@ -24,64 +31,31 @@ export interface OpenFoodFactsSearchResult {
 }
 
 export const openFoodFactsService = {
-  async searchProducts(query: string, page = 1): Promise<OpenFoodFactsSearchResult> {
+  async searchProducts(query: string): Promise<OpenFoodFactsResponse> {
     try {
-      // Use Slovak API endpoint with proper encoding
-      const encodedQuery = encodeURIComponent(query);
-      const url = `https://sk.openfoodfacts.org/cgi/search.pl?search_terms=${encodedQuery}&search_simple=1&action=process&json=1&page=${page}&page_size=20&fields=code,product_name,product_name_sk,image_url,image_small_url,nutriments`;
-      
-      console.log("Fetching from OFF:", url);
-      
-      const response = await fetch(url);
+      console.log("Searching OFF via API route for:", query);
+
+      const response = await fetch(`/api/openfoodfacts?query=${encodeURIComponent(query)}`);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        console.error("API route error:", response.status, errorData);
+        throw new Error(errorData.error || "Failed to search products");
       }
 
       const data = await response.json();
-      console.log("OFF Response:", data);
-      
+      console.log("API route response:", data);
+
       return {
         products: data.products || [],
         count: data.count || 0,
         page: data.page || 1,
         page_size: data.page_size || 20,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error searching OFF:", error);
-      throw new Error("Nepodarilo sa vyhľadať v Open Food Facts databáze");
+      throw error;
     }
-  },
-
-  async getProduct(barcode: string): Promise<OpenFoodFactsProduct | null> {
-    try {
-      const response = await fetch(
-        `https://sk.openfoodfacts.org/api/v0/product/${barcode}.json`
-      );
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const data = await response.json();
-      return data.status === 1 ? data.product : null;
-    } catch (error) {
-      console.error("Error fetching product:", error);
-      return null;
-    }
-  },
-
-  extractNutrients(product: OpenFoodFactsProduct) {
-    const n = product.nutriments || {};
-    return {
-      kcal: n["energy-kcal_100g"] || n["energy-kcal"] || 0,
-      fiber: n.fiber_100g || 0,
-      sugar: n.sugars_100g || 0,
-      carbs: n.carbohydrates_100g || 0,
-      fats: n.fat_100g || 0,
-      protein: n.proteins_100g || 0,
-      salt: n.salt_100g || 0,
-    };
   },
 
   getDisplayName(product: OpenFoodFactsProduct): string {
@@ -90,5 +64,19 @@ export const openFoodFactsService = {
 
   getImageUrl(product: OpenFoodFactsProduct): string | null {
     return product.image_small_url || product.image_url || null;
+  },
+
+  extractNutrients(product: OpenFoodFactsProduct) {
+    const n = product.nutriments || {};
+
+    return {
+      kcal: Math.round(n["energy-kcal_100g"] || n["energy-kcal"] || 0),
+      fiber: Math.round((n.fiber_100g || n.fiber || 0) * 100) / 100,
+      sugar: Math.round((n.sugars_100g || n.sugars || 0) * 100) / 100,
+      carbs: Math.round((n.carbohydrates_100g || n.carbohydrates || 0) * 100) / 100,
+      fats: Math.round((n.fat_100g || n.fat || 0) * 100) / 100,
+      protein: Math.round((n.proteins_100g || n.proteins || 0) * 100) / 100,
+      salt: Math.round((n.salt_100g || n.salt || 0) * 100) / 100,
+    };
   },
 };
