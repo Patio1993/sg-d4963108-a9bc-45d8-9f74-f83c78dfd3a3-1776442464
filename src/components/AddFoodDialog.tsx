@@ -80,6 +80,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   const [reaction, setReaction] = useState<string>("v pohode");
   const [time, setTime] = useState("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   // OFF State
   const [showOffDialog, setShowOffDialog] = useState(false);
@@ -196,8 +197,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
         coffeeCount = currentCount + 1;
       }
 
-      if (editingEntry) {
-        await consumedFoodService.updateConsumedFood(editingEntry.id, {
+      if (editingFood) {
+        await consumedFoodService.updateConsumedFood(editingFood.id, {
           food_id: selectedFood.id,
           date,
           time,
