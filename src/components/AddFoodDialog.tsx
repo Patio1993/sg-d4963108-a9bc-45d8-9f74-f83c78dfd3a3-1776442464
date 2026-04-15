@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +82,9 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   
+  // Refs for auto-focus
+  const newFoodNameInputRef = useRef<HTMLInputElement>(null);
+  
   // OFF State
   const [showOffDialog, setShowOffDialog] = useState(false);
   const [offSearchQuery, setOffSearchQuery] = useState("");
@@ -122,6 +125,15 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
       resetForm();
     }
   }, [editingFood, open]);
+
+  // Auto-focus on new food name input when create dialog opens
+  useEffect(() => {
+    if (showCreateDialog && newFoodNameInputRef.current) {
+      setTimeout(() => {
+        newFoodNameInputRef.current?.focus();
+      }, 100);
+    }
+  }, [showCreateDialog]);
 
   const loadFoods = async () => {
     try {
@@ -838,6 +850,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
               <Label htmlFor="new-food-name">Názov potraviny *</Label>
               <div className="flex gap-2">
                 <Input
+                  ref={newFoodNameInputRef}
                   id="new-food-name"
                   value={newFoodName}
                   onChange={(e) => setNewFoodName(e.target.value)}

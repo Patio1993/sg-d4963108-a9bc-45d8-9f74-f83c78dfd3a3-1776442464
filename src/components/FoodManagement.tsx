@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,9 @@ export function FoodManagement() {
   const [loading, setLoading] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingFood, setEditingFood] = useState<Food | null>(null);
+
+  // Refs for auto-focus
+  const foodNameInputRef = useRef<HTMLInputElement>(null);
 
   // OFF State
   const [showOffDialog, setShowOffDialog] = useState(false);
@@ -292,6 +295,15 @@ export function FoodManagement() {
     f.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Auto-focus on food name input when dialog opens for creation
+  useEffect(() => {
+    if (showCreateDialog && !editingFood && foodNameInputRef.current) {
+      setTimeout(() => {
+        foodNameInputRef.current?.focus();
+      }, 100);
+    }
+  }, [showCreateDialog, editingFood]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -552,6 +564,7 @@ export function FoodManagement() {
               <Label htmlFor="name">Názov *</Label>
               <div className="flex gap-2">
                 <Input
+                  ref={foodNameInputRef}
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
