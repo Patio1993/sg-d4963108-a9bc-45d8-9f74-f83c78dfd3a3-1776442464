@@ -217,7 +217,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   const handleImportOff = (product: OpenFoodFactsProduct) => {
     const nutrients = openFoodFactsService.extractNutrients(product);
     
-    setNewFoodName(product.product_name || "");
+    setNewFoodName(openFoodFactsService.getDisplayName(product));
     setNewFoodKcal(nutrients.kcal.toString());
     setNewFoodFiber(nutrients.fiber.toString());
     setNewFoodSugar(nutrients.sugar.toString());
@@ -225,7 +225,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
     setNewFoodFats(nutrients.fats.toString());
     setNewFoodProtein(nutrients.protein.toString());
     setNewFoodSalt(nutrients.salt.toString());
-    setNewFoodPhotoUrl(product.image_url || null);
+    setNewFoodPhotoUrl(openFoodFactsService.getImageUrl(product));
     
     setShowOffDialog(false);
     setShowCreateDialog(true);
@@ -622,8 +622,12 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
             
             {offResults.map((product) => (
               <div key={product.code} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.product_name} className="w-16 h-16 rounded object-cover bg-white" />
+                {openFoodFactsService.getImageUrl(product) ? (
+                  <img 
+                    src={openFoodFactsService.getImageUrl(product)!} 
+                    alt={openFoodFactsService.getDisplayName(product)} 
+                    className="w-16 h-16 rounded object-cover bg-white" 
+                  />
                 ) : (
                   <div className="w-16 h-16 rounded bg-muted flex items-center justify-center">
                     <ImageIcon className="h-6 w-6 text-muted-foreground" />
@@ -631,9 +635,9 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                 )}
                 
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold truncate">{product.product_name || "Neznámy názov"}</h4>
+                  <h4 className="font-semibold truncate">{openFoodFactsService.getDisplayName(product)}</h4>
                   <div className="text-sm text-muted-foreground mt-1 flex gap-3">
-                    <span>{product.nutriments?.["energy-kcal_100g"] || 0} kcal</span>
+                    <span>{product.nutriments?.["energy-kcal_100g"] || product.nutriments?.["energy-kcal"] || 0} kcal</span>
                     <span>B: {product.nutriments?.proteins_100g || 0}g</span>
                     <span>S: {product.nutriments?.carbohydrates_100g || 0}g</span>
                   </div>
