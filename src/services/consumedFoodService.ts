@@ -160,8 +160,6 @@ export const consumedFoodService = {
   async getConsecutiveDaysForFood(foodId: string, currentDate: string): Promise<number> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
-
-    console.log(`🔍 Calculating consecutive days for food ${foodId} on ${currentDate}`);
     
     let consecutiveDays = 1; // Including current date
     const checkDate = new Date(currentDate + "T12:00:00"); // Use noon to avoid timezone issues
@@ -172,8 +170,6 @@ export const consumedFoodService = {
       checkDate.setDate(checkDate.getDate() - 1);
       const dateStr = checkDate.toISOString().split("T")[0];
 
-      console.log(`  Checking ${dateStr}...`);
-
       // Check if this food was consumed on this date
       const { data, error } = await supabase
         .from("consumed_foods")
@@ -183,28 +179,20 @@ export const consumedFoodService = {
         .eq("date", dateStr)
         .limit(1);
 
-      if (error) {
-        console.error(`  Error checking ${dateStr}:`, error);
-        throw error;
-      }
+      if (error) throw error;
 
       // If food was consumed on this date, increment counter
       if (data && data.length > 0) {
         consecutiveDays++;
-        console.log(`  ✓ Found! Total: ${consecutiveDays}`);
       } else {
-        console.log(`  ✗ Not found. Stopping. Final count: ${consecutiveDays}`);
+        // No consumption found on this date, stop counting
         break;
       }
 
       // Safety limit: stop after checking 365 days back
-      if (consecutiveDays > 365) {
-        console.log(`  Safety limit reached`);
-        break;
-      }
+      if (consecutiveDays > 365) break;
     }
 
-    console.log(`📊 Final result: ${consecutiveDays} consecutive days`);
     return consecutiveDays;
   },
 
