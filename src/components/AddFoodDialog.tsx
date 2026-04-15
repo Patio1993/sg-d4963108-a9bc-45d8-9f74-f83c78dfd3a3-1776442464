@@ -142,6 +142,13 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
   const handleSelectFood = (food: FoodWithLastConsumed) => {
     setSelectedFood(food);
+    setAmount(food.unit === "ml" ? "250" : "100");
+    
+    // Auto-select 'káva' if food name contains káva or kava
+    const foodName = food.name.toLowerCase();
+    if (foodName.includes("káva") || foodName.includes("kava")) {
+      setMealType("káva");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
