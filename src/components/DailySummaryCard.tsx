@@ -1,11 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import type { DailyNutritionSummary } from "@/services/consumedFoodService";
 import type { NutritionGoalStatus } from "@/services/dailySummaryService";
 import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
+import { Activity, Pill, Archive } from "lucide-react";
 
 interface DailySummaryCardProps {
   date: string;
@@ -36,27 +38,27 @@ export function DailySummaryCard({
   onRestaurantChange,
   onNutrientClick,
 }: DailySummaryCardProps) {
-  const getStatusColor = (status: string) => {
+  const getGoalCardBg = (status: string) => {
     switch (status) {
       case "good":
-        return "text-green-600";
+        return "bg-green-50 border-green-200";
       case "warning":
-        return "text-orange-600";
+        return "bg-yellow-50 border-yellow-200";
       case "danger":
-        return "text-red-600";
+        return "bg-red-50 border-red-200";
       default:
-        return "text-muted-foreground";
+        return "bg-gray-50 border-gray-200";
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getGoalIcon = (status: string) => {
     switch (status) {
       case "good":
-        return "✅";
+        return "😊";
       case "warning":
-        return "⚠️";
+        return "😐";
       case "danger":
-        return "🔴";
+        return "😟";
       default:
         return "";
     }
@@ -77,126 +79,164 @@ export function DailySummaryCard({
   const lastRestaurantText = formatLastRestaurant(lastRestaurant);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Denný súhrn</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Nutrition Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div
-            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
-            onClick={() => onNutrientClick("kcal")}
-          >
-            <div className="text-2xl font-bold">{nutrition.total_kcal}</div>
-            <div className="text-sm text-muted-foreground">Kcal</div>
-          </div>
+    <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 border-0 text-white overflow-hidden">
+      <CardContent className="p-6 space-y-6">
+        {/* Main Calories Display */}
+        <div className="text-center space-y-1">
+          <div className="text-6xl font-bold">{nutrition.total_kcal}</div>
+          <div className="text-lg opacity-90">kcal dnes</div>
+        </div>
 
-          <div
-            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
-            onClick={() => onNutrientClick("fiber")}
-          >
-            <div className={`text-2xl font-bold ${getStatusColor(goals.fiber)}`}>
-              {nutrition.total_fiber}g {getStatusIcon(goals.fiber)}
-            </div>
-            <div className="text-sm text-muted-foreground">Vláknina</div>
-            <div className="text-xs text-muted-foreground mt-1">25-30g</div>
-          </div>
-
-          <div
-            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
-            onClick={() => onNutrientClick("sugar")}
-          >
-            <div className={`text-2xl font-bold ${getStatusColor(goals.sugar)}`}>
-              {nutrition.total_sugar}g {getStatusIcon(goals.sugar)}
-            </div>
-            <div className="text-sm text-muted-foreground">Cukor</div>
-            <div className="text-xs text-muted-foreground mt-1">30-50g</div>
-          </div>
-
-          <div
-            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
-            onClick={() => onNutrientClick("carbs")}
-          >
-            <div className="text-2xl font-bold">{nutrition.total_carbs}g</div>
-            <div className="text-sm text-muted-foreground">Sacharidy</div>
-          </div>
-
-          <div
-            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
-            onClick={() => onNutrientClick("fats")}
-          >
-            <div className={`text-2xl font-bold ${getStatusColor(goals.fats)}`}>
-              {nutrition.total_fats}g {getStatusIcon(goals.fats)}
-            </div>
-            <div className="text-sm text-muted-foreground">Tuky</div>
-            <div className="text-xs text-muted-foreground mt-1">50-60g</div>
-          </div>
-
-          <div
-            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
+        {/* Top 3 Nutrients */}
+        <div className="grid grid-cols-3 gap-3">
+          <div 
+            className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center cursor-pointer hover:bg-white/30 transition-colors"
             onClick={() => onNutrientClick("protein")}
           >
             <div className="text-2xl font-bold">{nutrition.total_protein}g</div>
-            <div className="text-sm text-muted-foreground">Bielkoviny</div>
+            <div className="text-sm opacity-90">Bielkoviny</div>
           </div>
-
-          <div
-            className="text-center p-4 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
+          <div 
+            className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center cursor-pointer hover:bg-white/30 transition-colors"
+            onClick={() => onNutrientClick("carbs")}
+          >
+            <div className="text-2xl font-bold">{nutrition.total_carbs}g</div>
+            <div className="text-sm opacity-90">Sacharidy</div>
+          </div>
+          <div 
+            className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center cursor-pointer hover:bg-white/30 transition-colors"
             onClick={() => onNutrientClick("salt")}
           >
             <div className="text-2xl font-bold">{nutrition.total_salt}g</div>
-            <div className="text-sm text-muted-foreground">Soľ</div>
-          </div>
-
-          <div className="text-center p-4 rounded-lg bg-muted/50">
-            <div className="text-2xl font-bold text-blue-600">{waterTotal}ml</div>
-            <div className="text-sm text-muted-foreground">Voda</div>
+            <div className="text-sm opacity-90">Soľ</div>
           </div>
         </div>
 
-        {/* Activity Tracking */}
-        <div className="space-y-4 pt-4 border-t">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="exercise"
-              checked={exercise}
-              onCheckedChange={onExerciseChange}
-            />
-            <Label htmlFor="exercise" className="cursor-pointer">
-              Cvičenie
-            </Label>
-          </div>
+        {/* Daily Goals Section */}
+        <div className="space-y-3">
+          <div className="text-center text-sm font-medium opacity-90">Denné ciele:</div>
+          <div className="grid grid-cols-3 gap-3">
+            {/* Fiber Goal */}
+            <div 
+              className={`${getGoalCardBg(goals.fiber)} rounded-xl p-4 text-center cursor-pointer hover:shadow-lg transition-all relative border-2`}
+              onClick={() => onNutrientClick("fiber")}
+            >
+              <div className="absolute top-2 right-2 text-xl">{getGoalIcon(goals.fiber)}</div>
+              <div className="text-2xl font-bold text-gray-800">{nutrition.total_fiber}g</div>
+              <div className="text-sm font-medium text-gray-700">Vláknina</div>
+              <div className="text-xs text-gray-600 mt-1">25-30g</div>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="walk">Chôdza (minúty)</Label>
-            <Input
-              id="walk"
-              type="number"
-              min="0"
-              value={walkMinutes}
-              onChange={(e) => onWalkMinutesChange(parseInt(e.target.value) || 0)}
-              className="max-w-[200px]"
-            />
-          </div>
+            {/* Sugar Goal */}
+            <div 
+              className={`${getGoalCardBg(goals.sugar)} rounded-xl p-4 text-center cursor-pointer hover:shadow-lg transition-all relative border-2`}
+              onClick={() => onNutrientClick("sugar")}
+            >
+              <div className="absolute top-2 right-2 text-xl">{getGoalIcon(goals.sugar)}</div>
+              <div className="text-2xl font-bold text-gray-800">{nutrition.total_sugar}g</div>
+              <div className="text-sm font-medium text-gray-700">Cukry</div>
+              <div className="text-xs text-gray-600 mt-1">30-50g</div>
+            </div>
 
-          <div className="space-y-2">
+            {/* Fats Goal */}
+            <div 
+              className={`${getGoalCardBg(goals.fats)} rounded-xl p-4 text-center cursor-pointer hover:shadow-lg transition-all relative border-2`}
+              onClick={() => onNutrientClick("fats")}
+            >
+              <div className="absolute top-2 right-2 text-xl">{getGoalIcon(goals.fats)}</div>
+              <div className="text-2xl font-bold text-gray-800">{nutrition.total_fats}g</div>
+              <div className="text-sm font-medium text-gray-700">Tuky</div>
+              <div className="text-xs text-gray-600 mt-1">50-60g</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Action Buttons - Aktivity, Lieky, WC */}
+        <div className="grid grid-cols-3 gap-3">
+          <Button 
+            variant="secondary" 
+            className="bg-white/20 hover:bg-white/30 border-0 text-white h-auto py-3"
+          >
+            <Activity className="h-5 w-5 mr-2" />
+            Aktivity
+          </Button>
+          <Button 
+            variant="secondary" 
+            className="bg-white/20 hover:bg-white/30 border-0 text-white h-auto py-3"
+          >
+            <Pill className="h-5 w-5 mr-2" />
+            Lieky
+          </Button>
+          <Button 
+            variant="secondary" 
+            className="bg-white/20 hover:bg-white/30 border-0 text-white h-auto py-3"
+          >
+            <Archive className="h-5 w-5 mr-2" />
+            WC
+          </Button>
+        </div>
+
+        {/* Activity Tracking Cards */}
+        <div className="grid grid-cols-3 gap-3">
+          {/* Exercise Card */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
             <div className="flex items-center space-x-2">
               <Checkbox
-                id="restaurant"
-                checked={restaurant}
-                onCheckedChange={onRestaurantChange}
+                id="exercise"
+                checked={exercise}
+                onCheckedChange={onExerciseChange}
+                className="border-white data-[state=checked]:bg-white data-[state=checked]:text-emerald-600"
               />
-              <Label htmlFor="restaurant" className="cursor-pointer">
-                Reštaurácia
+              <Label htmlFor="exercise" className="cursor-pointer text-sm font-medium">
+                🏋️ Cvičenie
               </Label>
             </div>
-            {lastRestaurantText && (
-              <p className="text-sm text-muted-foreground ml-6">
-                Naposledy: {lastRestaurantText}
-              </p>
-            )}
           </div>
+
+          {/* Walk Card */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+            <div className="space-y-2">
+              <Label htmlFor="walk" className="text-sm font-medium flex items-center gap-1">
+                🚶 Chôdza (min)
+              </Label>
+              <Input
+                id="walk"
+                type="number"
+                min="0"
+                value={walkMinutes}
+                onChange={(e) => onWalkMinutesChange(parseInt(e.target.value) || 0)}
+                className="bg-white/30 border-white/50 text-white placeholder:text-white/60 h-8"
+              />
+            </div>
+          </div>
+
+          {/* Restaurant Card */}
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="restaurant"
+                  checked={restaurant}
+                  onCheckedChange={onRestaurantChange}
+                  className="border-white data-[state=checked]:bg-white data-[state=checked]:text-emerald-600"
+                />
+                <Label htmlFor="restaurant" className="cursor-pointer text-sm font-medium">
+                  🍽️ Reštaurácia
+                </Label>
+              </div>
+              {lastRestaurantText && (
+                <p className="text-xs opacity-80 ml-6">
+                  Naposledy: {lastRestaurantText}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Water Intake Display */}
+        <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
+          <div className="text-3xl font-bold">{waterTotal}ml</div>
+          <div className="text-sm opacity-90">💧 Voda</div>
         </div>
       </CardContent>
     </Card>
