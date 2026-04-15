@@ -7,9 +7,10 @@ import { sk } from "date-fns/locale";
 import type { ConsumedFoodWithDetails } from "@/services/consumedFoodService";
 
 interface ConsumedFoodsListProps {
+  date?: string;
   foods: ConsumedFoodWithDetails[];
-  onEdit: (food: ConsumedFoodWithDetails) => void;
-  onDelete: (id: string) => void;
+  onEdit: (food: ConsumedFoodWithDetails) => void | Promise<void>;
+  onDelete: (id: string) => void | Promise<void>;
 }
 
 const MEAL_TYPE_ICONS: Record<string, string> = {
@@ -67,16 +68,25 @@ export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsList
   };
 
   const formatLastConsumed = (food: ConsumedFoodWithDetails) => {
-    if (!food.food?.days_ago || food.food.days_ago === 0) return null;
+    const daysAgo = (food.food as any)?.days_ago;
+    if (daysAgo === undefined || daysAgo === null || daysAgo === 0) return null;
 
     const lastDate = new Date();
-    lastDate.setDate(lastDate.getDate() - food.food.days_ago);
+    lastDate.setDate(lastDate.getDate() - daysAgo);
     const dateStr = format(lastDate, "d.M.yyyy", { locale: sk });
     const dayName = format(lastDate, "EEEE", { locale: sk });
 
-    if (food.food.days_ago === 1) return `Včera - ${dayName} (${dateStr})`;
-    if (food.food.days_ago === 2) return `Predvčerom - ${dayName} (${dateStr})`;
-    return `pred ${food.food.days_ago} dňami - ${dayName} (${dateStr})`;
+    if (daysAgo === 1) return `včera - ${dayName} (${dateStr})`;
+    if (daysAgo === 2) return `predvčerom - ${dayName} (${dateStr})`;
+    return `pred ${daysAgo} dňami - ${dayName} (${dateStr})`;
+  };
+
+  const renderNutrient = (label: string, value: string) => {
+    const numValue = parseFloat(value);
+    const valueClass = numValue > 0 ? "text-blue-600 font-medium" : "";
+    return (
+      <span>{label}: <span className={valueClass}>{value}g</span></span>
+    );
   };
 
   return (
@@ -105,69 +115,71 @@ export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsList
                 return (
                   <div
                     key={food.id}
-                    className="p-4 border rounded-lg space-y-2 hover:bg-muted/50 transition-colors"
+                    className="p-4 border rounded-xl bg-card hover:bg-muted/30 transition-colors shadow-sm"
                   >
-                    {/* Header: Meal Type, Time, Edit, Delete */}
-                    <div className="flex items-center justify-between">
+                    {/* Top Row: Meal Type, Time, Edit */}
+                    <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Utensils className="h-4 w-4" />
                         <span>{MEAL_TYPE_LABELS[food.meal_type]}</span>
-                        <span>•</span>
+                        <span>·</span>
                         <span>{food.time}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => onEdit(food)}
-                        >
-                          <Edit className="h-4 w-4 text-blue-600" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => onDelete(food.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-blue-500 hover:text-blue-700"
+                        onClick={() => onEdit(food)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
                     </div>
 
-                    {/* Food Name and Amount */}
-                    <div className="flex items-baseline gap-2">
-                      <h3 className="text-lg font-semibold">{food.food?.name}</h3>
-                      <span className="text-sm text-muted-foreground">
+                    {/* Second Row: Food Name and Delete */}
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-xl font-semibold leading-tight">{food.food?.name}</h3>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-red-500 hover:text-red-700 -mt-2"
+                        onClick={() => onDelete(food.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    {/* Third Row: Amount and Badge */}
+                    <div className="flex items-center gap-2 mt-2 mb-3">
+                      <span className="text-muted-foreground">
                         {food.amount}{food.food?.unit === "ml" ? "ml" : "g"}
                       </span>
-                      <Badge variant="outline" className="ml-2">
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 font-normal rounded-md">
                         {food.day_number}. deň
                       </Badge>
                     </div>
 
-                    {/* Calories */}
-                    <div className="text-base font-medium">
+                    {/* Fourth Row: Calories */}
+                    <div className="text-emerald-600 font-semibold mb-2">
                       {nutrients.kcal} kcal
                     </div>
 
-                    {/* Nutrients - Two Lines */}
-                    <div className="space-y-1 text-sm">
-                      <div className="flex gap-4">
-                        <span>Vláknina: <span className="font-medium">{nutrients.fiber}g</span></span>
-                        <span>Cukry: <span className="font-medium">{nutrients.sugar}g</span></span>
-                        <span>Tuky: <span className="font-medium">{nutrients.fats}g</span></span>
+                    {/* Fifth/Sixth Row: Nutrients */}
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                      <div className="flex flex-wrap gap-x-4 gap-y-1">
+                        {renderNutrient("Vláknina", nutrients.fiber)}
+                        {renderNutrient("Cukry", nutrients.sugar)}
+                        {renderNutrient("Tuky", nutrients.fats)}
                       </div>
-                      <div className="flex gap-4">
-                        <span>Bielkoviny: <span className="font-medium">{nutrients.protein}g</span></span>
-                        <span>Sacharidy: <span className="font-medium">{nutrients.carbs}g</span></span>
-                        <span>Soľ: <span className="font-medium">{nutrients.salt}g</span></span>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1">
+                        {renderNutrient("Bielkoviny", nutrients.protein)}
+                        {renderNutrient("Sacharidy", nutrients.carbs)}
+                        {renderNutrient("Soľ", nutrients.salt)}
                       </div>
                     </div>
 
                     {/* Last Consumed */}
                     {lastConsumed && (
-                      <div className="text-xs text-purple-600 dark:text-purple-400">
+                      <div className="text-sm text-purple-600 mt-2">
                         Naposledy: {lastConsumed}
                       </div>
                     )}
