@@ -21,6 +21,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User, Plus, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { format, addDays, subDays, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
+import { activityService } from "@/services/activityService";
+import { medicineService } from "@/services/medicineService";
+import { wcService } from "@/services/wcService";
+import type { 
+  ConsumedFoodWithDetails, 
+  DailyNutritionSummary,
+  NutritionGoalStatus,
+} from "@/services/consumedFoodService";
 
 export default function Home() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -37,24 +45,27 @@ export default function Home() {
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [consumedFoods, setConsumedFoods] = useState<ConsumedFoodWithDetails[]>([]);
   const [nutrition, setNutrition] = useState<DailyNutritionSummary>({
-    total_kcal: 0,
     total_fiber: 0,
     total_sugar: 0,
-    total_carbs: 0,
     total_fats: 0,
-    total_protein: 0,
+    total_kcal: 0,
+    total_carbs: 0,
+    total_proteins: 0,
     total_salt: 0,
   });
   const [waterTotal, setWaterTotal] = useState(0);
-  const [goals, setGoals] = useState<NutritionGoalStatus>({
-    fiber: "warning",
-    sugar: "warning",
-    fats: "warning",
-  });
   const [exercise, setExercise] = useState(false);
   const [walkMinutes, setWalkMinutes] = useState(0);
   const [restaurant, setRestaurant] = useState(false);
+  const [goals, setGoals] = useState<NutritionGoalStatus>({
+    fiber: "normal",
+    sugar: "normal",
+    fats: "normal",
+  });
   const [lastRestaurant, setLastRestaurant] = useState<{ date: string; days_ago: number } | null>(null);
+  const [activityCount, setActivityCount] = useState(0);
+  const [medicineCount, setMedicineCount] = useState(0);
+  const [wcCount, setWcCount] = useState(0);
 
   const formatDateDisplay = (dateStr: string) => {
     const d = parseISO(dateStr);
@@ -102,6 +113,16 @@ export default function Home() {
       // Water
       const fetchedWater = await waterService.getDailyTotal(date);
       setWaterTotal(fetchedWater);
+
+      // Activity, Medicine, WC counts
+      const activities = await activityService.getUserActivitiesByDate(date);
+      setActivityCount(activities.length);
+
+      const medicines = await medicineService.getUserMedicinesByDate(date);
+      setMedicineCount(medicines.length);
+
+      const wcEntries = await wcService.getEntriesByDate(date);
+      setWcCount(wcEntries.length);
 
       // Daily summary (goals, exercise, etc.)
       const summary = await dailySummaryService.getOrCreateDailySummary(date);
@@ -252,6 +273,9 @@ export default function Home() {
                 goals={goals}
                 waterTotal={waterTotal}
                 coffeeCount={coffeeCount}
+                activityCount={activityCount}
+                medicineCount={medicineCount}
+                wcCount={wcCount}
                 exercise={exercise}
                 walkMinutes={walkMinutes}
                 restaurant={restaurant}
