@@ -156,11 +156,11 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
         });
         toast({ title: "Úspech", description: "Liek aktualizovaný" });
       } else {
-        await medicineService.createMedicine({
-          name: newMedicineName,
-          dosage: newMedicineDosage || null,
-          diagnosis: newMedicineDiagnosis || null,
-        });
+        await medicineService.createMedicine(
+          newMedicineName,
+          newMedicineDosage,
+          newMedicineDiagnosis
+        );
         toast({ title: "Úspech", description: "Liek vytvorený" });
       }
       setShowCreateDialog(false);

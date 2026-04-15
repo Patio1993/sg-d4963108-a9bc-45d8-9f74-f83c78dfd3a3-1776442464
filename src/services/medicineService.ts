@@ -23,11 +23,7 @@ export const medicineService = {
     return data || [];
   },
 
-  async createMedicine(
-    name: string,
-    dosage: string,
-    diagnosis?: string
-  ): Promise<Medicine> {
+  async createMedicine(name: string, dosage: string, diagnosis?: string): Promise<Medicine> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
@@ -37,8 +33,28 @@ export const medicineService = {
         user_id: user.id,
         name,
         dosage,
-        diagnosis: diagnosis || null,
+        diagnosis,
       })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async updateMedicine(id: string, updates: { name: string; dosage: string | null; diagnosis: string | null }): Promise<Medicine> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+
+    const { data, error } = await supabase
+      .from("medicines")
+      .update({
+        name: updates.name,
+        dosage: updates.dosage,
+        diagnosis: updates.diagnosis,
+      })
+      .eq("id", id)
+      .eq("user_id", user.id)
       .select()
       .single();
 
