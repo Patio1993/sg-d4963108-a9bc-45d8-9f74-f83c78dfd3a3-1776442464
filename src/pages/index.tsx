@@ -167,7 +167,7 @@ export default function Home() {
             </Button>
           </div>
         </div>
-        <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
+        <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} onSuccess={checkAuth} />
       </>
     );
   }
