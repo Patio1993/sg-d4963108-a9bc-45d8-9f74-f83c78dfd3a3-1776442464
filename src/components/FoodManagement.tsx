@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, Star, Plus, Search, Download, Image as ImageIcon } from "lucide-react";
+import { Trash2, Edit, Star, Plus, Search, Download, Image as ImageIcon, Upload, Link as LinkIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { foodService, type Food, type FoodWithLastConsumed } from "@/services/foodService";
 import { openFoodFactsService, type OpenFoodFactsProduct } from "@/services/openFoodFactsService";
+import { storageService } from "@/services/storageService";
 import { emojiService } from "@/services/emojiService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,6 +39,8 @@ export function FoodManagement() {
   const [protein, setProtein] = useState("");
   const [salt, setSalt] = useState("");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [photoUrlInput, setPhotoUrlInput] = useState("");
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
     loadFoods();
@@ -65,6 +69,7 @@ export function FoodManagement() {
     setProtein("");
     setSalt("");
     setPhotoUrl(null);
+    setPhotoUrlInput("");
     setEditingFood(null);
   };
 
@@ -85,6 +90,7 @@ export function FoodManagement() {
     setProtein(food.protein.toString());
     setSalt(food.salt.toString());
     setPhotoUrl(food.photo_url || null);
+    setPhotoUrlInput(food.photo_url || "");
     setShowCreateDialog(true);
   };
 
@@ -124,6 +130,68 @@ export function FoodManagement() {
     
     setShowOffDialog(false);
     setShowCreateDialog(true);
+  };
+
+  const handlePhotoUrlChange = (url: string) => {
+    setPhotoUrlInput(url);
+    setPhotoUrl(url || null);
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast({
+        title: "Chyba",
+        description: "Môžete nahrať iba obrázky",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Chyba",
+        description: "Obrázok je príliš veľký (max 5MB)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      const url = await storageService.uploadFoodPhoto(file);
+      setPhotoUrl(url);
+      setPhotoUrlInput(url);
+      toast({
+        title: "Úspech",
+        description: "Obrázok nahraný",
+      });
+    } catch (error: any) {
+      console.error("Photo upload error:", error);
+      toast({
+        title: "Chyba",
+        description: error.message || "Nepodarilo sa nahrať obrázok",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    if (photoUrl && photoUrl.includes("food-photos")) {
+      try {
+        await storageService.deleteFoodPhoto(photoUrl);
+      } catch (error) {
+        console.error("Failed to delete photo:", error);
+      }
+    }
+    setPhotoUrl(null);
+    setPhotoUrlInput("");
   };
 
   const validateNumber = (value: string): number => {
@@ -419,22 +487,66 @@ export function FoodManagement() {
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {photoUrl && (
-              <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <img src={photoUrl} alt="Náhľad" className="w-24 h-24 rounded-lg object-cover shadow-sm" />
-                  <Button 
-                    type="button" 
-                    variant="destructive" 
-                    size="icon" 
-                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                    onClick={() => setPhotoUrl(null)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
+            {/* Photo Section */}
+            <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+              <Label>Obrázok potraviny</Label>
+              
+              {photoUrl && (
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <img src={photoUrl} alt="Náhľad" className="w-32 h-32 rounded-lg object-cover shadow-sm" />
+                    <Button 
+                      type="button" 
+                      variant="destructive" 
+                      size="icon" 
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                      onClick={handleRemovePhoto}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+
+              <Tabs defaultValue="url" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="url">
+                    <LinkIcon className="h-4 w-4 mr-2" />
+                    URL
+                  </TabsTrigger>
+                  <TabsTrigger value="upload">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Nahrať
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="url" className="space-y-2">
+                  <Input
+                    placeholder="https://example.com/photo.jpg alebo Google Photos URL"
+                    value={photoUrlInput}
+                    onChange={(e) => handlePhotoUrlChange(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Vložte URL obrázka (napr. z Google Photos alebo iného zdroja)
+                  </p>
+                </TabsContent>
+                
+                <TabsContent value="upload" className="space-y-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    disabled={uploadingPhoto}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Maximálna veľkosť: 5MB. Podporované formáty: JPG, PNG, WebP
+                  </p>
+                  {uploadingPhoto && (
+                    <p className="text-sm text-blue-600">Nahráva sa...</p>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="name">Názov *</Label>
