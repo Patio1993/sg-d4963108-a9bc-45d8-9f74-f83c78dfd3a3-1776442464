@@ -67,7 +67,6 @@ export const dailySummaryService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
-    // Always calculate from TODAY, not from any specific displayed date
     const today = new Date().toISOString().split("T")[0];
 
     const { data, error } = await supabase
@@ -75,7 +74,7 @@ export const dailySummaryService = {
       .select("date")
       .eq("user_id", user.id)
       .eq("restaurant", true)
-      .lt("date", today) // Get last restaurant visit BEFORE today
+      .lt("date", today)
       .order("date", { ascending: false })
       .limit(1)
       .single();
