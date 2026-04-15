@@ -58,9 +58,9 @@ export default function Home() {
   const [walkMinutes, setWalkMinutes] = useState(0);
   const [restaurant, setRestaurant] = useState(false);
   const [goals, setGoals] = useState<NutritionGoalStatus>({
-    fiber: "normal",
-    sugar: "normal",
-    fats: "normal",
+    fiber: "warning",
+    sugar: "warning",
+    fats: "warning",
   });
   const [lastRestaurant, setLastRestaurant] = useState<{ date: string; days_ago: number } | null>(null);
   const [activityCount, setActivityCount] = useState(0);
