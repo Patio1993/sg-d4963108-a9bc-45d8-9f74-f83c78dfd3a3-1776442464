@@ -27,8 +27,8 @@ import { wcService } from "@/services/wcService";
 import type { 
   ConsumedFoodWithDetails, 
   DailyNutritionSummary,
-  NutritionGoalStatus,
 } from "@/services/consumedFoodService";
+import type { NutritionGoalStatus } from "@/services/dailySummaryService";
 
 export default function Home() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
