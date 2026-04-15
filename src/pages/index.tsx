@@ -144,122 +144,97 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Načítavam...</p>
-      </div>
+      <>
+        <SEO title="Food Tracker - Načítavam..." />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <p>Načítavam...</p>
+        </div>
+      </>
     );
   }
 
   if (!userEmail) {
     return (
       <>
-        <SEO 
-          title="Food Tracker - Sledujte výživu"
-          description="Komplexná aplikácia pre sledovanie dennej konzumácie potravín s nutričnými hodnotami"
-        />
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="w-full max-w-md text-center space-y-6">
-            <div className="space-y-2">
-              <h1 className="text-4xl font-bold">Food Tracker</h1>
-              <p className="text-muted-foreground">Sledujte svoje jedlá a nutričné ciele</p>
-            </div>
-            <div className="p-6 bg-card rounded-lg shadow-md space-y-4">
-              <p className="text-sm text-muted-foreground">Prihláste sa pre začatie sledovania</p>
-              <Button className="w-full" onClick={() => setShowAuthDialog(true)}>
-                Prihlásiť / Registrovať
-              </Button>
-            </div>
+        <SEO title="Food Tracker - Prihlásenie" />
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold">Food Tracker</h1>
+            <p className="text-muted-foreground">Prihlásenie vyžadované</p>
+            <Button onClick={() => setShowAuthDialog(true)}>
+              <User className="h-4 w-4 mr-2" />
+              Prihlásiť sa
+            </Button>
           </div>
         </div>
-        <AuthDialog 
-          open={showAuthDialog} 
-          onOpenChange={setShowAuthDialog}
-          onSuccess={checkAuth}
-        />
+        <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
       </>
     );
   }
 
   return (
     <>
-      <SEO 
-        title="Food Tracker - Sledujte výživu"
-        description="Komplexná aplikácia pre sledovanie dennej konzumácie potravín s nutričnými hodnotami"
-      />
-      <div className="min-h-screen bg-background pb-20">
-        <header className="border-b bg-card shadow-sm sticky top-0 z-10">
-          <div className="container py-4">
-            <div className="flex items-center justify-between mb-3">
-              <h1 className="text-2xl font-bold">Food Tracker</h1>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <User className="h-4 w-4" />
-                  {userEmail}
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Odhlásiť
-                </Button>
-              </div>
+      <SEO title={`Food Tracker - ${format(parseISO(date), "d. MMMM yyyy", { locale: sk })}`} />
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="border-b bg-card">
+          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              <span className="text-sm">{userEmail}</span>
             </div>
-            
-            {/* Date Navigation */}
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => changeDate(-1)}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="min-w-[280px] justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formatDateDisplay(date)}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={parseISO(date)}
-                      onSelect={(d) => {
-                        if (d) {
-                          setDate(format(d, "yyyy-MM-dd"));
-                        }
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => changeDate(1)}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {!isToday && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={goToToday}
-                >
-                  Dnes
-                </Button>
-              )}
-            </div>
+            <Button variant="ghost" size="sm" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Odhlásiť
+            </Button>
           </div>
         </header>
 
-        <main className="container py-8 max-w-5xl space-y-6">
-          <Tabs defaultValue="dashboard" className="w-full space-y-6">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+        {/* Main Content */}
+        <main className="container mx-auto px-4 py-8 space-y-6">
+          {/* Centered App Title and Date Picker */}
+          <div className="flex flex-col items-center gap-4">
+            <h1 className="text-4xl font-bold text-center">Food Tracker</h1>
+            
+            {/* Date Navigation */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setDate(format(subDays(parseISO(date), 1), "yyyy-MM-dd"))}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="min-w-[200px]">
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    {format(parseISO(date), "d. MMMM yyyy", { locale: sk })}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="center">
+                  <Calendar
+                    mode="single"
+                    selected={parseISO(date)}
+                    onSelect={(d) => d && setDate(format(d, "yyyy-MM-dd"))}
+                    locale={sk}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setDate(format(addDays(parseISO(date), 1), "yyyy-MM-dd"))}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <Tabs defaultValue="dashboard" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="foods">Správa potravín</TabsTrigger>
             </TabsList>
