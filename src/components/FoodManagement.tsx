@@ -242,9 +242,9 @@ export function FoodManagement() {
         });
       }
 
+      await loadFoods();
       setShowCreateDialog(false);
       resetForm();
-      loadFoods();
     } catch (error: any) {
       toast({
         title: "Chyba",
