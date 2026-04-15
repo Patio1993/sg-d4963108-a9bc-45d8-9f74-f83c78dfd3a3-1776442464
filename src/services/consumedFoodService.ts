@@ -161,14 +161,18 @@ export const consumedFoodService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
-    let consecutiveDays = 1; // Including today
-    const checkDate = new Date(currentDate + "T00:00:00");
+    console.log(`🔍 Calculating consecutive days for food ${foodId} on ${currentDate}`);
+    
+    let consecutiveDays = 1; // Including current date
+    const checkDate = new Date(currentDate + "T12:00:00"); // Use noon to avoid timezone issues
 
     // Go backwards in time and count consecutive days
     while (true) {
       // Move to previous day
       checkDate.setDate(checkDate.getDate() - 1);
       const dateStr = checkDate.toISOString().split("T")[0];
+
+      console.log(`  Checking ${dateStr}...`);
 
       // Check if this food was consumed on this date
       const { data, error } = await supabase
@@ -179,20 +183,28 @@ export const consumedFoodService = {
         .eq("date", dateStr)
         .limit(1);
 
-      if (error) throw error;
+      if (error) {
+        console.error(`  Error checking ${dateStr}:`, error);
+        throw error;
+      }
 
       // If food was consumed on this date, increment counter
       if (data && data.length > 0) {
         consecutiveDays++;
+        console.log(`  ✓ Found! Total: ${consecutiveDays}`);
       } else {
-        // No consumption found on this date, stop counting
+        console.log(`  ✗ Not found. Stopping. Final count: ${consecutiveDays}`);
         break;
       }
 
       // Safety limit: stop after checking 365 days back
-      if (consecutiveDays > 365) break;
+      if (consecutiveDays > 365) {
+        console.log(`  Safety limit reached`);
+        break;
+      }
     }
 
+    console.log(`📊 Final result: ${consecutiveDays} consecutive days`);
     return consecutiveDays;
   },
 
