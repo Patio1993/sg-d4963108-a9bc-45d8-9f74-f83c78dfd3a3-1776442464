@@ -17,10 +17,9 @@ interface WaterIntakeManagerProps {
 export function WaterIntakeManager({ date, onWaterAdded }: WaterIntakeManagerProps) {
   const { toast } = useToast();
   const [waterIntakes, setWaterIntakes] = useState<WaterIntake[]>([]);
-  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [amount, setAmount] = useState("");
-  const [dailyTotal, setDailyTotal] = useState(0);
+  const [customAmount, setCustomAmount] = useState("");
 
   useEffect(() => {
     loadWaterIntakes();
@@ -31,9 +30,6 @@ export function WaterIntakeManager({ date, onWaterAdded }: WaterIntakeManagerPro
     try {
       const data = await waterService.getDailyWaterIntakes(date);
       setWaterIntakes(data);
-      
-      const total = await waterService.getDailyTotal(date);
-      setDailyTotal(total);
     } catch (error) {
       console.error("Failed to load water intakes:", error);
     } finally {
@@ -41,35 +37,47 @@ export function WaterIntakeManager({ date, onWaterAdded }: WaterIntakeManagerPro
     }
   };
 
-  const handleAddWater = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const amountNum = parseInt(amount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      toast({
-        title: "Chyba",
-        description: "Zadajte platné množstvo väčšie ako 0",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleQuickAdd = async (amount: number) => {
     try {
       const time = new Date().toTimeString().slice(0, 5);
-      await waterService.addWaterIntake(date, amountNum, time);
+      await waterService.addWaterIntake(date, amount, time);
       toast({
         title: "Úspech",
-        description: `Pridané ${amountNum}ml vody`,
+        description: `Pridané ${amount}ml vody`,
       });
-      setAmount("");
-      setShowAddDialog(false);
       await loadWaterIntakes();
       onWaterAdded?.();
     } catch (error) {
-      console.error("Failed to add water intake:", error);
+      console.error("Failed to add water:", error);
       toast({
         title: "Chyba",
-        description: "Nepodarilo sa pridať záznam",
+        description: "Nepodarilo sa pridať vodu",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCustomAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const amount = parseInt(customAmount);
+    if (!amount || amount <= 0) return;
+
+    try {
+      const time = new Date().toTimeString().slice(0, 5);
+      await waterService.addWaterIntake(date, amount, time);
+      toast({
+        title: "Úspech",
+        description: `Pridané ${amount}ml vody`,
+      });
+      setCustomAmount("");
+      setShowDialog(false);
+      await loadWaterIntakes();
+      onWaterAdded?.();
+    } catch (error) {
+      console.error("Failed to add water:", error);
+      toast({
+        title: "Chyba",
+        description: "Nepodarilo sa pridať vodu",
         variant: "destructive",
       });
     }
@@ -94,38 +102,11 @@ export function WaterIntakeManager({ date, onWaterAdded }: WaterIntakeManagerPro
     }
   };
 
-  const quickAddPresets = [250, 500, 750, 1000];
-
-  const handleQuickAdd = async (ml: number) => {
-    try {
-      const time = new Date().toTimeString().slice(0, 5);
-      await waterService.addWaterIntake(date, ml, time);
-      toast({
-        title: "Úspech",
-        description: `Pridané ${ml}ml vody`,
-      });
-      await loadWaterIntakes();
-      onWaterAdded?.();
-    } catch (error) {
-      console.error("Failed to add water intake:", error);
-      toast({
-        title: "Chyba",
-        description: "Nepodarilo sa pridať záznam",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <div className="flex items-center gap-2">
-          <CardTitle className="text-lg">Pitný režim</CardTitle>
-          <Badge variant="secondary" className="text-blue-600">
-            {dailyTotal}ml
-          </Badge>
-        </div>
-        <Button size="sm" onClick={() => setShowAddDialog(true)}>
+        <CardTitle className="text-lg">💧 Pitný režim</CardTitle>
+        <Button size="sm" onClick={() => setShowDialog(true)}>
           <Plus className="h-4 w-4 mr-1" />
           Pridať
         </Button>
@@ -159,57 +140,66 @@ export function WaterIntakeManager({ date, onWaterAdded }: WaterIntakeManagerPro
         )}
       </CardContent>
 
-      {/* Add Water Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Pridať vodu</DialogTitle>
-            <DialogDescription>Zadajte množstvo vypitej vody v ml</DialogDescription>
+            <DialogDescription>Vyberte množstvo alebo zadajte vlastnú hodnotu</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
-              {quickAddPresets.map((ml) => (
-                <Button
-                  key={ml}
-                  variant="outline"
-                  onClick={() => {
-                    handleQuickAdd(ml);
-                    setShowAddDialog(false);
-                  }}
-                >
-                  <Droplet className="h-4 w-4 mr-2" />
-                  {ml}ml
-                </Button>
-              ))}
-            </div>
-            
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">alebo vlastné</span>
-              </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleQuickAdd(250);
+                  setShowDialog(false);
+                }}
+              >
+                250ml
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleQuickAdd(500);
+                  setShowDialog(false);
+                }}
+              >
+                500ml
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleQuickAdd(750);
+                  setShowDialog(false);
+                }}
+              >
+                750ml
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  handleQuickAdd(1000);
+                  setShowDialog(false);
+                }}
+              >
+                1000ml
+              </Button>
             </div>
 
-            <form onSubmit={handleAddWater} className="space-y-4">
+            <form onSubmit={handleCustomAdd} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="amount">Množstvo (ml) *</Label>
+                <Label htmlFor="custom-amount">Vlastné množstvo (ml)</Label>
                 <Input
-                  id="amount"
+                  id="custom-amount"
                   type="number"
                   min="1"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  value={customAmount}
+                  onChange={(e) => setCustomAmount(e.target.value)}
                   placeholder="napr. 350"
-                  required
                 />
               </div>
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => {
-                  setShowAddDialog(false);
-                  setAmount("");
-                }}>
+                <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                   Zrušiť
                 </Button>
                 <Button type="submit">
