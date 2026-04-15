@@ -3,25 +3,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Search, Star, Clock, Plus } from "lucide-react";
-import { foodService, type Food, type FoodWithLastConsumed } from "@/services/foodService";
-import { consumedFoodService, type CreateConsumedFoodData, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { foodService, type FoodWithLastConsumed } from "@/services/foodService";
+import { consumedFoodService, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
+import { Plus, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
-import { sk } from "date-fns/locale";
-
-type MealType = "Raňajky" | "Desiata" | "Obed" | "Olovrant" | "Večera" | "Káva";
-type Reaction = "Dobré" | "Neutrálne" | "Zlé";
-
-const MEAL_TYPES: MealType[] = ["Raňajky", "Desiata", "Obed", "Olovrant", "Večera", "Káva"];
-const REACTIONS: { value: Reaction; emoji: string }[] = [
-  { value: "Dobré", emoji: "🙂" },
-  { value: "Neutrálne", emoji: "😐" },
-  { value: "Zlé", emoji: "🙁" },
-];
 
 interface AddFoodDialogProps {
   open: boolean;
@@ -31,33 +20,29 @@ interface AddFoodDialogProps {
   onSuccess: () => void;
 }
 
+const MEAL_TYPES = ["raňajky", "desiata", "obed", "olovrant", "večera", "iné"] as const;
+const REACTIONS = ["v pohode", "ľahké problémy", "stredné problémy", "veľké problémy"] as const;
+
 export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess }: AddFoodDialogProps) {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
   const [foods, setFoods] = useState<FoodWithLastConsumed[]>([]);
   const [selectedFood, setSelectedFood] = useState<FoodWithLastConsumed | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  // Form state
+  const [searchQuery, setSearchQuery] = useState("");
   const [amount, setAmount] = useState("");
+  const [mealType, setMealType] = useState<string>("obed");
+  const [reaction, setReaction] = useState<string>("v pohode");
   const [time, setTime] = useState("");
-  const [mealType, setMealType] = useState("Raňajky");
-  const [reaction, setReaction] = useState("Neutrálne");
-  const [coffeeNumber, setCoffeeNumber] = useState(1);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
-  const formatLastConsumed = (daysAgo: number | null | undefined) => {
-    if (daysAgo === null || daysAgo === undefined) return null;
-    if (daysAgo === 0) return null; // Today - don't show
-
-    const lastDate = new Date();
-    lastDate.setDate(lastDate.getDate() - daysAgo);
-    const dateStr = format(lastDate, "d.MM.yyyy", { locale: sk });
-    const dayName = format(lastDate, "EEEE", { locale: sk });
-
-    if (daysAgo === 1) return `Včera - ${dayName} (${dateStr})`;
-    if (daysAgo === 2) return `Predvčerom - ${dayName} (${dateStr})`;
-    return `Pred ${daysAgo} dňami - ${dayName} (${dateStr})`;
-  };
+  // Create food form state
+  const [newFoodName, setNewFoodName] = useState("");
+  const [newFoodKcal, setNewFoodKcal] = useState("");
+  const [newFoodFiber, setNewFoodFiber] = useState("");
+  const [newFoodSugar, setNewFoodSugar] = useState("");
+  const [newFoodCarbs, setNewFoodCarbs] = useState("");
+  const [newFoodFats, setNewFoodFats] = useState("");
+  const [newFoodProtein, setNewFoodProtein] = useState("");
+  const [newFoodSalt, setNewFoodSalt] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -70,44 +55,16 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   }, [open, editingFood]);
 
   useEffect(() => {
-    if (editingFood) {
-      // Populate form with editing data
-      setSelectedFood(editingFood.food as FoodWithLastConsumed);
+    if (editingFood && open) {
+      setSelectedFood(editingFood.food);
       setAmount(editingFood.amount.toString());
+      setMealType(editingFood.meal_type);
+      setReaction(editingFood.reaction);
       setTime(editingFood.time);
-      
-      // Map DB values to display values
-      const mealTypeMap: Record<string, string> = {
-        breakfast: "Raňajky",
-        snack: "Desiata",
-        lunch: "Obed",
-        afternoon_snack: "Olovrant",
-        dinner: "Večera",
-        coffee: "Káva",
-      };
-      setMealType(mealTypeMap[editingFood.meal_type] || "Raňajky");
-      
-      const reactionMap: Record<string, string> = {
-        good: "Dobré",
-        neutral: "Neutrálne",
-        bad: "Zlé",
-      };
-      setReaction(reactionMap[editingFood.reaction] || "Neutrálne");
-      
-      if (editingFood.coffee_count) {
-        setCoffeeNumber(editingFood.coffee_count);
-      }
-    } else {
-      // Reset form for new entry
-      setSelectedFood(null);
-      setAmount("");
-      const now = new Date();
-      setTime(now.toTimeString().slice(0, 5));
-      setMealType("Raňajky");
-      setReaction("Neutrálne");
-      setCoffeeNumber(1);
+    } else if (!open) {
+      resetForm();
     }
-  }, [editingFood]);
+  }, [editingFood, open]);
 
   const loadFoods = async () => {
     try {
@@ -118,18 +75,116 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
     }
   };
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    try {
-      const data = await foodService.searchFoods(query);
-      setFoods(data);
-    } catch (error) {
-      console.error("Search failed:", error);
-    }
+  const resetForm = () => {
+    setSelectedFood(null);
+    setSearchQuery("");
+    setAmount("");
+    setMealType("obed");
+    setReaction("v pohode");
+    setTime("");
   };
 
   const handleSelectFood = (food: FoodWithLastConsumed) => {
     setSelectedFood(food);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedFood || !amount || !time) {
+      toast({
+        title: "Chyba",
+        description: "Vyplňte všetky povinné polia",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (editingFood) {
+        await consumedFoodService.updateConsumedFood(
+          editingFood.id,
+          parseFloat(amount),
+          mealType,
+          reaction,
+          time
+        );
+        toast({
+          title: "Úspech",
+          description: "Potravina upravená",
+        });
+      } else {
+        await consumedFoodService.addConsumedFood(
+          selectedFood.id,
+          date,
+          parseFloat(amount),
+          mealType,
+          reaction,
+          time
+        );
+        toast({
+          title: "Úspech",
+          description: "Potravina pridaná",
+        });
+      }
+      onSuccess();
+      onOpenChange(false);
+      resetForm();
+    } catch (error) {
+      console.error("Failed to save food:", error);
+      toast({
+        title: "Chyba",
+        description: "Nepodarilo sa uložiť potravinu",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCreateFood = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFoodName.trim()) {
+      toast({
+        title: "Chyba",
+        description: "Zadajte názov potraviny",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await foodService.createFood(
+        newFoodName.trim(),
+        parseFloat(newFoodKcal) || 0,
+        parseFloat(newFoodFiber) || 0,
+        parseFloat(newFoodSugar) || 0,
+        parseFloat(newFoodCarbs) || 0,
+        parseFloat(newFoodFats) || 0,
+        parseFloat(newFoodProtein) || 0,
+        parseFloat(newFoodSalt) || 0
+      );
+      toast({
+        title: "Úspech",
+        description: "Nová potravina vytvorená",
+      });
+      // Reset form
+      setNewFoodName("");
+      setNewFoodKcal("");
+      setNewFoodFiber("");
+      setNewFoodSugar("");
+      setNewFoodCarbs("");
+      setNewFoodFats("");
+      setNewFoodProtein("");
+      setNewFoodSalt("");
+      setShowCreateDialog(false);
+      // Reload foods
+      await loadFoods();
+    } catch (error) {
+      console.error("Failed to create food:", error);
+      toast({
+        title: "Chyba",
+        description: "Nepodarilo sa vytvoriť potravinu",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredFoods = searchQuery
@@ -140,315 +195,375 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
   const favoriteFoods = foods.filter((f) => f.is_favorite === true);
 
-  const mapMealTypeToDb = (type: string): CreateConsumedFoodData["meal_type"] => {
-    switch (type) {
-      case "Raňajky": return "breakfast";
-      case "Desiata": return "snack";
-      case "Obed": return "lunch";
-      case "Olovrant": return "afternoon_snack";
-      case "Večera": return "dinner";
-      case "Káva": return "coffee";
-      default: return "breakfast";
-    }
-  };
-
-  const mapReactionToDb = (reaction: string): CreateConsumedFoodData["reaction"] => {
-    switch (reaction) {
-      case "Dobré": return "good";
-      case "Neutrálne": return "neutral";
-      case "Zlé": return "bad";
-      default: return "neutral";
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedFood) return;
-
-    const amountNum = parseFloat(amount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      toast({
-        title: "Chyba",
-        description: "Zadajte platné množstvo väčšie ako 0",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const data = {
-        food_id: selectedFood.id,
-        date,
-        time,
-        amount: Math.round(amountNum * 100) / 100,
-        meal_type: mapMealTypeToDb(mealType),
-        reaction: mapReactionToDb(reaction),
-        day_number: editingFood?.day_number || await consumedFoodService.getNextDayNumber(),
-        coffee_count: mealType === "Káva" ? coffeeNumber : undefined,
-      };
-
-      if (editingFood) {
-        // Update existing entry
-        await consumedFoodService.updateConsumedFood(editingFood.id, data);
-        toast({
-          title: "Úspech",
-          description: "Potravina aktualizovaná",
-        });
-      } else {
-        // Create new entry
-        await consumedFoodService.createConsumedFood(data);
-        toast({
-          title: "Úspech",
-          description: "Potravina pridaná",
-        });
-      }
-
-      onOpenChange(false);
-      onSuccess();
-      
-      // Reset form
-      setSelectedFood(null);
-      setAmount("");
-      setSearchQuery("");
-    } catch (error) {
-      console.error("Failed to save consumed food:", error);
-      toast({
-        title: "Chyba",
-        description: "Nepodarilo sa uložiť potravinu",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const recentFoods = [...foods]
+    .filter((f) => f.last_consumed_date)
+    .sort((a, b) => {
+      if (!a.last_consumed_date) return 1;
+      if (!b.last_consumed_date) return -1;
+      return b.last_consumed_date.localeCompare(a.last_consumed_date);
+    })
+    .slice(0, 10);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{editingFood ? "Upraviť potravinu" : "Pridať potravinu"}</DialogTitle>
-          <DialogDescription>
-            {editingFood ? "Upravte detaily konzumovanej potraviny" : "Vyhľadajte a pridajte potravinu do denného záznamu"}
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingFood ? "Upraviť potravinu" : "Pridať potravinu"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingFood
+                ? "Upravte množstvo a typ jedla"
+                : "Vyberte potravinu a zadajte množstvo"}
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-6">
-          {/* Left: Food search and selection */}
-          <div className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Vyhľadať potravinu..."
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-
-            <ScrollArea className="h-[400px] pr-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {!editingFood && (
               <div className="space-y-4">
-                {/* Favorites */}
-                {favoriteFoods.length > 0 && (
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <Star className="h-4 w-4 fill-accent text-accent" />
-                      Obľúbené
-                    </h3>
-                    {favoriteFoods.map((food) => (
-                      <Card
-                        key={food.id}
-                        className={`cursor-pointer transition-colors ${
-                          selectedFood?.id === food.id ? "border-primary bg-primary/5" : "hover:border-primary/50"
-                        }`}
-                        onClick={() => handleSelectFood(food)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                {food.is_favorite && <Star className="h-4 w-4 fill-accent text-accent flex-shrink-0" />}
-                                <span className="font-medium truncate">{food.name}</span>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <Badge variant="outline" className="text-xs">
-                                  {food.kcal} kcal/100{food.unit}
-                                </Badge>
-                                {food.days_ago !== null && food.days_ago !== undefined && formatLastConsumed(food.days_ago) && (
-                                  <Badge variant="outline" className="text-xs bg-muted">
-                                    <Clock className="h-3 w-3 mr-1" />
-                                    {formatLastConsumed(food.days_ago)}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                <div className="flex items-center justify-between">
+                  <div className="relative flex-1 mr-2">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Hľadať potravinu..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9"
+                    />
                   </div>
-                )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowCreateDialog(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nová potravina
+                  </Button>
+                </div>
 
-                {/* All foods */}
-                {filteredFoods.length > 0 && (
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-semibold">Všetky potraviny</h3>
-                    {filteredFoods.map((food) => (
-                      <Card
-                        key={food.id}
-                        className={`cursor-pointer transition-colors ${
-                          selectedFood?.id === food.id ? "border-primary bg-primary/5" : "hover:border-primary/50"
-                        }`}
-                        onClick={() => handleSelectFood(food)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                <Star className="h-4 w-4 fill-accent text-accent flex-shrink-0" />
-                                <span className="font-medium truncate">{food.name}</span>
+                <Tabs defaultValue="all" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="all">Všetky</TabsTrigger>
+                    <TabsTrigger value="favorites">Obľúbené</TabsTrigger>
+                    <TabsTrigger value="recent">Naposledy</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="all" className="mt-4">
+                    <div className="grid gap-2 max-h-[400px] overflow-y-auto">
+                      {filteredFoods.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-8">
+                          Žiadne potraviny
+                        </p>
+                      ) : (
+                        filteredFoods.map((food) => (
+                          <div
+                            key={food.id}
+                            className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                              selectedFood?.id === food.id
+                                ? "border-primary bg-primary/5"
+                                : "hover:bg-muted/50"
+                            }`}
+                            onClick={() => handleSelectFood(food)}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="font-medium">{food.name}</div>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  {food.kcal_per_100g} kcal • V: {food.fiber_per_100g}g • C: {food.sugar_per_100g}g • T: {food.fats_per_100g}g
+                                </div>
                               </div>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <Badge variant="outline" className="text-xs">
-                                  {food.kcal} kcal/100{food.unit}
-                                </Badge>
-                                {food.days_ago !== null && food.days_ago !== undefined && formatLastConsumed(food.days_ago) && (
-                                  <Badge variant="outline" className="text-xs bg-muted">
-                                    <Clock className="h-3 w-3 mr-1" />
-                                    {formatLastConsumed(food.days_ago)}
-                                  </Badge>
-                                )}
-                              </div>
+                              {food.is_favorite && (
+                                <Badge variant="secondary" className="ml-2">⭐</Badge>
+                              )}
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                        ))
+                      )}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="favorites" className="mt-4">
+                    <div className="grid gap-2 max-h-[400px] overflow-y-auto">
+                      {favoriteFoods.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-8">
+                          Žiadne obľúbené potraviny
+                        </p>
+                      ) : (
+                        favoriteFoods.map((food) => (
+                          <div
+                            key={food.id}
+                            className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                              selectedFood?.id === food.id
+                                ? "border-primary bg-primary/5"
+                                : "hover:bg-muted/50"
+                            }`}
+                            onClick={() => handleSelectFood(food)}
+                          >
+                            <div className="font-medium">{food.name}</div>
+                            <div className="text-sm text-muted-foreground mt-1">
+                              {food.kcal_per_100g} kcal • V: {food.fiber_per_100g}g • C: {food.sugar_per_100g}g • T: {food.fats_per_100g}g
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="recent" className="mt-4">
+                    <div className="grid gap-2 max-h-[400px] overflow-y-auto">
+                      {recentFoods.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-8">
+                          Žiadne nedávno konzumované potraviny
+                        </p>
+                      ) : (
+                        recentFoods.map((food) => (
+                          <div
+                            key={food.id}
+                            className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                              selectedFood?.id === food.id
+                                ? "border-primary bg-primary/5"
+                                : "hover:bg-muted/50"
+                            }`}
+                            onClick={() => handleSelectFood(food)}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="font-medium">{food.name}</div>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  {food.kcal_per_100g} kcal • V: {food.fiber_per_100g}g • C: {food.sugar_per_100g}g • T: {food.fats_per_100g}g
+                                </div>
+                                {food.last_consumed_date && (
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    Naposledy: {food.last_consumed_date}
+                                  </div>
+                                )}
+                              </div>
+                              {food.is_favorite && (
+                                <Badge variant="secondary" className="ml-2">⭐</Badge>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                {selectedFood && (
+                  <div className="p-4 border rounded-lg bg-muted/50">
+                    <div className="font-medium mb-2">Vybraná potravina:</div>
+                    <div className="text-sm">{selectedFood.name}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {selectedFood.kcal_per_100g} kcal/100g • V: {selectedFood.fiber_per_100g}g • C: {selectedFood.sugar_per_100g}g • T: {selectedFood.fats_per_100g}g
+                    </div>
                   </div>
                 )}
               </div>
-            </ScrollArea>
-          </div>
+            )}
 
-          {/* Right: Entry form */}
-          <div className="space-y-4">
-            {selectedFood ? (
-              <>
-                <Card className="bg-primary/5 border-primary">
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">{selectedFood.name}</h3>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="text-muted-foreground">Kcal:</span> {selectedFood.kcal}
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Vláknina:</span> {selectedFood.fiber}g
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Cukor:</span> {selectedFood.sugar}g
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Sacharidy:</span> {selectedFood.carbs}g
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Tuky:</span> {selectedFood.fats}g
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Bielkoviny:</span> {selectedFood.protein}g
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+            {(selectedFood || editingFood) && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Množstvo (g) *</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="napr. 150"
+                    required
+                  />
+                </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="amount">Množstvo ({selectedFood.unit})</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      min="0.01"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      placeholder="napr. 150"
-                      required
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="time">Čas *</Label>
+                  <Input
+                    id="time"
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    required
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="time">Čas</Label>
-                    <Input
-                      id="time"
-                      type="time"
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Typ jedla</Label>
-                    <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-2">
+                  <Label htmlFor="meal-type">Typ jedla *</Label>
+                  <Select value={mealType} onValueChange={setMealType}>
+                    <SelectTrigger id="meal-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
                       {MEAL_TYPES.map((type) => (
-                        <Button
-                          key={type}
-                          type="button"
-                          variant={mealType === type ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setMealType(type)}
-                        >
+                        <SelectItem key={type} value={type}>
                           {type}
-                        </Button>
+                        </SelectItem>
                       ))}
-                    </div>
-                  </div>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {mealType === "Káva" && (
-                    <div className="space-y-2">
-                      <Label htmlFor="coffee">Koľkáta káva dnes</Label>
-                      <Input
-                        id="coffee"
-                        type="number"
-                        min="1"
-                        value={coffeeNumber}
-                        onChange={(e) => setCoffeeNumber(parseInt(e.target.value))}
-                      />
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label>Reakcia</Label>
-                    <div className="flex gap-2">
-                      {REACTIONS.map(({ value, emoji }) => (
-                        <Button
-                          key={value}
-                          type="button"
-                          variant={reaction === value ? "default" : "outline"}
-                          onClick={() => setReaction(value)}
-                          className="flex-1"
-                        >
-                          {emoji} {value}
-                        </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="reaction">Reakcia *</Label>
+                  <Select value={reaction} onValueChange={setReaction}>
+                    <SelectTrigger id="reaction">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {REACTIONS.map((r) => (
+                        <SelectItem key={r} value={r}>
+                          {r}
+                        </SelectItem>
                       ))}
-                    </div>
-                  </div>
-
-                  <Button type="submit" disabled={!selectedFood || loading} className="w-full">
-                    {loading ? "Ukladám..." : editingFood ? "Uložiť zmeny" : "Pridať"}
-                  </Button>
-                </form>
-              </>
-            ) : (
-              <div className="h-full flex items-center justify-center text-center text-muted-foreground">
-                <div>
-                  <Search className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p>Vyberte potravinu zo zoznamu</p>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Zrušiť
+              </Button>
+              <Button type="submit" disabled={!selectedFood && !editingFood}>
+                {editingFood ? "Uložiť" : "Pridať"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Food Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Vytvoriť novú potravinu</DialogTitle>
+            <DialogDescription>
+              Zadajte nutričné hodnoty na 100g potraviny
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateFood} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-food-name">Názov potraviny *</Label>
+              <Input
+                id="new-food-name"
+                value={newFoodName}
+                onChange={(e) => setNewFoodName(e.target.value)}
+                placeholder="napr. Jablko"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-kcal">Kcal/100g</Label>
+                <Input
+                  id="new-kcal"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodKcal}
+                  onChange={(e) => setNewFoodKcal(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-fiber">Vláknina/100g (g)</Label>
+                <Input
+                  id="new-fiber"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodFiber}
+                  onChange={(e) => setNewFoodFiber(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-sugar">Cukor/100g (g)</Label>
+                <Input
+                  id="new-sugar"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodSugar}
+                  onChange={(e) => setNewFoodSugar(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-carbs">Sacharidy/100g (g)</Label>
+                <Input
+                  id="new-carbs"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodCarbs}
+                  onChange={(e) => setNewFoodCarbs(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-fats">Tuky/100g (g)</Label>
+                <Input
+                  id="new-fats"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodFats}
+                  onChange={(e) => setNewFoodFats(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-protein">Bielkoviny/100g (g)</Label>
+                <Input
+                  id="new-protein"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodProtein}
+                  onChange={(e) => setNewFoodProtein(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="new-salt">Soľ/100g (g)</Label>
+                <Input
+                  id="new-salt"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodSalt}
+                  onChange={(e) => setNewFoodSalt(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCreateDialog(false)}
+              >
+                Zrušiť
+              </Button>
+              <Button type="submit">
+                Vytvoriť
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
