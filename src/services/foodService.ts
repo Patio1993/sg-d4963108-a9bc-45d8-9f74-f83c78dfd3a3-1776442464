@@ -45,7 +45,7 @@ export const foodService = {
       .from("foods")
       .select(`
         *,
-        consumed_foods!inner(date)
+        consumed_foods(date)
       `)
       .eq("user_id", user.id)
       .order("name");
