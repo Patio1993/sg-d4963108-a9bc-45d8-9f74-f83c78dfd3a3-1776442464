@@ -290,7 +290,6 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
               <Button 
                 onClick={handleOpenCreate}
                 className="w-full"
-                variant="outline"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Vytvoriť nový liek
