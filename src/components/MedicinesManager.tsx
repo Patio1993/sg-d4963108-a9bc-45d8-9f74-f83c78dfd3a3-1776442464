@@ -287,6 +287,14 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full"
               />
+              <Button 
+                onClick={handleOpenCreate}
+                className="w-full"
+                variant="outline"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Vytvoriť nový liek
+              </Button>
             </div>
 
             {/* Medicine List */}
