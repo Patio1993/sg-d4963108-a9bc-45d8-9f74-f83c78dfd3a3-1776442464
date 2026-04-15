@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type Medicine = Tables<"medicines">;
-export type UserMedicine = Tables<"user_medicines">;
+export type UserMedicine = Tables<"medicine_logs">;
 
 export type UserMedicineWithDetails = UserMedicine & {
   medicine: Medicine | null;
@@ -60,7 +60,7 @@ export const medicineService = {
     if (!user) throw new Error("Not authenticated");
 
     const { data, error } = await supabase
-      .from("user_medicines")
+      .from("medicine_logs")
       .select(`
         *,
         medicine:medicines(*)
@@ -70,7 +70,7 @@ export const medicineService = {
       .order("time", { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    return data as unknown as UserMedicineWithDetails[];
   },
 
   async addUserMedicine(medicineId: string, date: string, time: string): Promise<void> {
@@ -78,7 +78,7 @@ export const medicineService = {
     if (!user) throw new Error("Not authenticated");
 
     const { error } = await supabase
-      .from("user_medicines")
+      .from("medicine_logs")
       .insert({
         user_id: user.id,
         medicine_id: medicineId,
@@ -91,7 +91,7 @@ export const medicineService = {
 
   async deleteUserMedicine(id: string): Promise<void> {
     const { error } = await supabase
-      .from("user_medicines")
+      .from("medicine_logs")
       .delete()
       .eq("id", id);
 
