@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,9 +16,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Trash2, Plus, X } from "lucide-react";
+import { Trash2, Plus, X, Pencil } from "lucide-react";
 import { medicineService, type Medicine, type UserMedicineWithDetails } from "@/services/medicineService";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface MedicinesManagerProps {
   date: string;
@@ -34,9 +35,11 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [medicineToDelete, setMedicineToDelete] = useState<Medicine | null>(null);
+  const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null);
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
   const [loading, setLoading] = useState(false);
   const [time, setTime] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Create form state
   const [newMedicineName, setNewMedicineName] = useState("");
@@ -125,32 +128,55 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
     }
   };
 
+  const handleOpenCreate = () => {
+    setNewMedicineName("");
+    setNewMedicineDosage("");
+    setNewMedicineDiagnosis("");
+    setEditingMedicine(null);
+    setShowCreateDialog(true);
+  };
+
+  const handleOpenEdit = (medicine: Medicine) => {
+    setNewMedicineName(medicine.name);
+    setNewMedicineDosage(medicine.dosage || "");
+    setNewMedicineDiagnosis(medicine.diagnosis || "");
+    setEditingMedicine(medicine);
+    setShowCreateDialog(true);
+  };
+
   const handleCreateMedicine = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMedicineName.trim() || !newMedicineDosage.trim()) return;
-
+    setLoading(true);
     try {
-      await medicineService.createMedicine(
-        newMedicineName.trim(),
-        newMedicineDosage.trim(),
-        newMedicineDiagnosis.trim() || undefined
-      );
-      toast({
-        title: "Úspech",
-        description: "Nový liek vytvorený",
-      });
+      if (editingMedicine) {
+        await medicineService.updateMedicine(editingMedicine.id, {
+          name: newMedicineName,
+          dosage: newMedicineDosage || null,
+          diagnosis: newMedicineDiagnosis || null,
+        });
+        toast({ title: "Úspech", description: "Liek aktualizovaný" });
+      } else {
+        await medicineService.createMedicine({
+          name: newMedicineName,
+          dosage: newMedicineDosage || null,
+          diagnosis: newMedicineDiagnosis || null,
+        });
+        toast({ title: "Úspech", description: "Liek vytvorený" });
+      }
+      setShowCreateDialog(false);
       setNewMedicineName("");
       setNewMedicineDosage("");
       setNewMedicineDiagnosis("");
-      setShowCreateDialog(false);
-      await loadMedicines();
-    } catch (error) {
-      console.error("Failed to create medicine:", error);
+      setEditingMedicine(null);
+      loadMedicines();
+    } catch (error: any) {
       toast({
         title: "Chyba",
-        description: "Nepodarilo sa vytvoriť liek",
+        description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -247,65 +273,82 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Pridať liek</DialogTitle>
-            <DialogDescription>Vyberte liek zo zoznamu a zadajte čas užitia</DialogDescription>
+            <DialogDescription>
+              Vyberte liek zo zoznamu alebo vytvorte nový
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex justify-end">
-              <Button size="sm" onClick={() => {
-                setShowSelectDialog(false);
-                setShowCreateDialog(true);
-              }}>
-                <Plus className="h-4 w-4 mr-1" />
-                Nový liek
-              </Button>
-            </div>
 
+          <div className="space-y-4">
+            {/* Search Input */}
             <div className="space-y-2">
-              <Label htmlFor="medicine-time">Čas užitia *</Label>
               <Input
-                id="medicine-time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                required
+                placeholder="Vyhľadať liek..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full"
               />
             </div>
 
-            <div className="grid gap-2 max-h-[300px] overflow-y-auto">
-              {medicines.map((medicine) => (
-                <div
-                  key={medicine.id}
-                  className={`flex items-start justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-                    selectedMedicine?.id === medicine.id
-                      ? "border-primary bg-primary/5"
-                      : "hover:bg-muted/50"
-                  }`}
-                  onClick={() => handleSelectMedicine(medicine)}
-                >
-                  <div className="flex-1">
-                    <div className="font-medium">{medicine.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      Dávkovanie: {medicine.dosage}
-                    </div>
-                    {medicine.diagnosis && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Diagnóza: {medicine.diagnosis}
+            {/* Medicine List */}
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-2 pr-4">
+                {medicines
+                  .filter(med => 
+                    searchQuery.trim() === "" || 
+                    med.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    med.dosage?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    med.diagnosis?.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((medicine) => (
+                    <div
+                      key={medicine.id}
+                      className={`flex items-start justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+                        selectedMedicine?.id === medicine.id
+                          ? "border-primary bg-primary/5"
+                          : "hover:bg-muted/50"
+                      }`}
+                      onClick={() => handleSelectMedicine(medicine)}
+                    >
+                      <div className="flex-1">
+                        <div className="font-medium">{medicine.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          Dávkovanie: {medicine.dosage}
+                        </div>
+                        {medicine.diagnosis && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Diagnóza: {medicine.diagnosis}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteMedicineClick(medicine);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              ))}
-            </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMedicineToDelete(medicine);
+                            setShowDeleteConfirm(true);
+                          }}
+                          className="h-8 w-8 p-0 hover:bg-red-100"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenEdit(medicine);
+                          }}
+                          className="h-8 w-8 p-0 hover:bg-blue-100"
+                        >
+                          <Pencil className="h-4 w-4 text-blue-600" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </ScrollArea>
 
             <div className="flex justify-end gap-2 pt-4 border-t">
               <Button
@@ -330,8 +373,10 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Vytvoriť nový liek</DialogTitle>
-            <DialogDescription>Zadajte informácie o novom lieku</DialogDescription>
+            <DialogTitle>{editingMedicine ? "Upraviť liek" : "Vytvoriť nový liek"}</DialogTitle>
+            <DialogDescription>
+              {editingMedicine ? "Upravte údaje o lieku" : "Zadajte údaje o novom lieku"}
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateMedicine} className="space-y-4">
             <div className="space-y-2">
@@ -373,8 +418,8 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
               }}>
                 Zrušiť
               </Button>
-              <Button type="submit">
-                Vytvoriť
+              <Button type="submit" disabled={loading}>
+                {loading ? "Ukladá sa..." : editingMedicine ? "Uložiť zmeny" : "Vytvoriť"}
               </Button>
             </div>
           </form>
