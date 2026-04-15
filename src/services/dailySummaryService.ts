@@ -4,9 +4,9 @@ import type { Tables } from "@/integrations/supabase/types";
 export type DailySummary = Tables<"daily_summary">;
 
 export type NutritionGoalStatus = {
-  fiber: "good" | "warning" | "danger" | "neutral";
-  sugar: "good" | "warning" | "danger" | "neutral";
-  fats: "good" | "warning" | "danger" | "neutral";
+  fiber: "good" | "warning" | "danger";
+  sugar: "good" | "warning" | "danger";
+  fats: "good" | "warning" | "danger";
 };
 
 export const dailySummaryService = {
@@ -98,8 +98,7 @@ export const dailySummaryService = {
       value: number,
       min: number,
       max: number
-    ): "good" | "warning" | "danger" | "neutral" => {
-      if (value === 0) return "neutral";
+    ): "good" | "warning" | "danger" => {
       if (value >= min && value <= max) return "good";
       if (value < min) return "warning";
       return "danger";
