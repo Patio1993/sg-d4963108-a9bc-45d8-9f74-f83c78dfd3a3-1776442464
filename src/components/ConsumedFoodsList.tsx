@@ -163,7 +163,7 @@ export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsList
                         {food.amount}{food.food?.unit === "ml" ? "ml" : "g"}
                       </span>
                       <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 font-normal rounded-md">
-                        {food.day_number}. deň
+                        {food.day_number}. deň po sebe
                       </Badge>
                     </div>
 

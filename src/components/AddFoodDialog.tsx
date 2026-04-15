@@ -153,56 +153,92 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFood || !amount || !time) {
+
+    if (!selectedFood) {
       toast({
         title: "Chyba",
-        description: "Vyplňte všetky povinné polia",
+        description: "Vyberte potravinu",
         variant: "destructive",
       });
       return;
     }
 
+    if (!amount || parseFloat(amount) <= 0) {
+      toast({
+        title: "Chyba",
+        description: "Zadajte platné množstvo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!time) {
+      toast({
+        title: "Chyba",
+        description: "Zadajte čas",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
     try {
-      if (editingFood) {
-        await consumedFoodService.updateConsumedFood(
-          editingFood.id,
-          {
-            amount: parseFloat(amount),
-            meal_type: mapMealTypeToDb(mealType),
-            reaction: mapReactionToDb(reaction),
-            time
-          }
-        );
-        toast({
-          title: "Úspech",
-          description: "Potravina upravená",
-        });
-      } else {
-        const dayNumber = await consumedFoodService.getNextDayNumber();
-        await consumedFoodService.createConsumedFood({
+      // Calculate consecutive days for this specific food and date
+      const dayNumber = await consumedFoodService.getConsecutiveDaysForFood(
+        selectedFood.id,
+        date
+      );
+
+      // If meal type is coffee, get the current coffee count for today
+      let coffeeCount: number | undefined;
+      if (mealType === "káva") {
+        const currentCount = await consumedFoodService.getTodayCoffeeCount(date);
+        coffeeCount = currentCount + 1;
+      }
+
+      if (editingEntry) {
+        await consumedFoodService.updateConsumedFood(editingEntry.id, {
           food_id: selectedFood.id,
           date,
+          time,
           amount: parseFloat(amount),
           meal_type: mapMealTypeToDb(mealType),
           reaction: mapReactionToDb(reaction),
+          day_number: dayNumber,
+          coffee_count: coffeeCount,
+        });
+        toast({
+          title: "Úspech",
+          description: "Záznam aktualizovaný",
+        });
+      } else {
+        await consumedFoodService.createConsumedFood({
+          food_id: selectedFood.id,
+          date,
           time,
-          day_number: dayNumber
+          amount: parseFloat(amount),
+          meal_type: mapMealTypeToDb(mealType),
+          reaction: mapReactionToDb(reaction),
+          day_number: dayNumber,
+          coffee_count: coffeeCount,
         });
         toast({
           title: "Úspech",
           description: "Potravina pridaná",
         });
       }
+
       onSuccess();
       onOpenChange(false);
-      resetForm();
-    } catch (error) {
-      console.error("Failed to save food:", error);
+    } catch (error: any) {
+      console.error("Failed to add food:", error);
       toast({
         title: "Chyba",
-        description: "Nepodarilo sa uložiť potravinu",
+        description: error.message || "Nepodarilo sa pridať potravinu",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
