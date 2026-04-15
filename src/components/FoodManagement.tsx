@@ -3,20 +3,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, Star, Plus, Search } from "lucide-react";
-import { foodService, type Food } from "@/services/foodService";
+import { Trash2, Edit, Star, Plus, Search, Download, Image as ImageIcon } from "lucide-react";
+import { foodService, type Food, type FoodWithLastConsumed } from "@/services/foodService";
+import { openFoodFactsService, type OpenFoodFactsProduct } from "@/services/openFoodFactsService";
+import { emojiService } from "@/services/emojiService";
 import { useToast } from "@/hooks/use-toast";
 
 export function FoodManagement() {
   const { toast } = useToast();
-  const [foods, setFoods] = useState<Food[]>([]);
+  const [foods, setFoods] = useState<FoodWithLastConsumed[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingFood, setEditingFood] = useState<Food | null>(null);
+
+  // OFF State
+  const [showOffDialog, setShowOffDialog] = useState(false);
+  const [offSearchQuery, setOffSearchQuery] = useState("");
+  const [offResults, setOffResults] = useState<OpenFoodFactsProduct[]>([]);
+  const [isSearchingOff, setIsSearchingOff] = useState(false);
 
   // Form state
   const [name, setName] = useState("");
@@ -28,17 +36,17 @@ export function FoodManagement() {
   const [fats, setFats] = useState("");
   const [protein, setProtein] = useState("");
   const [salt, setSalt] = useState("");
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     loadFoods();
-  }, [searchQuery]);
+  }, []);
 
   const loadFoods = async () => {
     setLoading(true);
     try {
-      const data = await foodService.searchFoods(searchQuery);
-      // Filter only user's custom foods
-      setFoods(data.filter(f => f.user_id !== null));
+      const data = await foodService.getAllFoods();
+      setFoods(data);
     } catch (error) {
       console.error("Failed to load foods:", error);
     } finally {
@@ -56,6 +64,7 @@ export function FoodManagement() {
     setFats("");
     setProtein("");
     setSalt("");
+    setPhotoUrl(null);
     setEditingFood(null);
   };
 
@@ -75,6 +84,45 @@ export function FoodManagement() {
     setFats(food.fats.toString());
     setProtein(food.protein.toString());
     setSalt(food.salt.toString());
+    setPhotoUrl(food.photo_url || null);
+    setShowCreateDialog(true);
+  };
+
+  const handleSearchOff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!offSearchQuery.trim()) return;
+
+    setIsSearchingOff(true);
+    try {
+      const result = await openFoodFactsService.searchProducts(offSearchQuery);
+      setOffResults(result.products || []);
+    } catch (error) {
+      toast({
+        title: "Chyba",
+        description: "Nepodarilo sa vyhľadať potraviny",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearchingOff(false);
+    }
+  };
+
+  const handleImportOff = (product: OpenFoodFactsProduct) => {
+    const nutrients = openFoodFactsService.extractNutrients(product);
+    
+    resetForm();
+    setName(product.product_name || "");
+    setUnit("g");
+    setKcal(nutrients.kcal.toString());
+    setFiber(nutrients.fiber.toString());
+    setSugar(nutrients.sugar.toString());
+    setCarbs(nutrients.carbs.toString());
+    setFats(nutrients.fats.toString());
+    setProtein(nutrients.protein.toString());
+    setSalt(nutrients.salt.toString());
+    setPhotoUrl(product.image_url || null);
+    
+    setShowOffDialog(false);
     setShowCreateDialog(true);
   };
 
@@ -108,6 +156,8 @@ export function FoodManagement() {
         fats: validateNumber(fats),
         protein: validateNumber(protein),
         salt: validateNumber(salt),
+        photo_url: photoUrl,
+        emoji: emojiService.getFoodEmoji(name.trim()),
       };
 
       if (editingFood) {
@@ -170,10 +220,14 @@ export function FoodManagement() {
     }
   };
 
+  const filteredFoods = foods.filter(f => 
+    f.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Hľadať potraviny..."
@@ -182,56 +236,77 @@ export function FoodManagement() {
             className="pl-9"
           />
         </div>
-        <Button onClick={handleOpenCreate}>
-          <Plus className="h-4 w-4 mr-2" />
-          Pridať potravinu
-        </Button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => setShowOffDialog(true)} className="flex-1 sm:flex-none">
+            <Download className="h-4 w-4 mr-2" />
+            Import OFF
+          </Button>
+          <Button onClick={handleOpenCreate} className="flex-1 sm:flex-none">
+            <Plus className="h-4 w-4 mr-2" />
+            Pridať
+          </Button>
+        </div>
       </div>
 
       {loading && foods.length === 0 ? (
         <p className="text-center text-muted-foreground py-8">Načítavam...</p>
-      ) : foods.length === 0 ? (
+      ) : filteredFoods.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-4">
               {searchQuery ? "Nenašli sa žiadne potraviny" : "Nemáte žiadne vlastné potraviny"}
             </p>
-            <Button variant="link" onClick={handleOpenCreate} className="mt-2">
-              Vytvoriť prvú potravinu
-            </Button>
+            <div className="flex justify-center gap-2">
+              <Button variant="outline" onClick={() => setShowOffDialog(true)}>
+                Import z Open Food Facts
+              </Button>
+              <Button onClick={handleOpenCreate}>
+                Vytvoriť prvú potravinu
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
-          {foods.map((food) => (
+          {filteredFoods.map((food) => (
             <Card key={food.id}>
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold">{food.name}</h3>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => handleToggleFavorite(food)}
-                      >
-                        <Star
-                          className={`h-4 w-4 ${
-                            food.is_favorite ? "fill-accent text-accent" : "text-muted-foreground"
-                          }`}
-                        />
-                      </Button>
+                  <div className="flex items-center gap-3">
+                    {food.photo_url ? (
+                      <img src={food.photo_url} alt={food.name} className="w-12 h-12 rounded-md object-cover" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center text-2xl">
+                        {food.emoji || "🍽️"}
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold leading-none">{food.name}</h3>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleToggleFavorite(food)}
+                        >
+                          <Star
+                            className={`h-4 w-4 ${
+                              food.is_favorite ? "fill-accent text-accent" : "text-muted-foreground"
+                            }`}
+                          />
+                        </Button>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        na 100{food.unit === "g" ? "g" : "ml"}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className="text-xs">
-                      na 100{food.unit === "g" ? "g" : "ml"}
-                    </Badge>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleOpenEdit(food)}
+                      className="h-8 w-8 text-blue-500 hover:text-blue-700"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -239,21 +314,22 @@ export function FoodManagement() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(food.id)}
+                      className="h-8 w-8 text-red-500 hover:text-red-700"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="grid grid-cols-2 gap-2 text-sm bg-muted/30 p-3 rounded-lg">
                   <div>
-                    <span className="text-muted-foreground">Kcal:</span> {food.kcal}
+                    <span className="text-muted-foreground">Kcal:</span> <span className="font-medium text-emerald-600">{food.kcal}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Vláknina:</span> {food.fiber}g
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Cukor:</span> {food.sugar}g
+                    <span className="text-muted-foreground">Cukry:</span> {food.sugar}g
                   </div>
                   <div>
                     <span className="text-muted-foreground">Sacharidy:</span> {food.carbs}g
@@ -264,7 +340,7 @@ export function FoodManagement() {
                   <div>
                     <span className="text-muted-foreground">Bielkoviny:</span> {food.protein}g
                   </div>
-                  <div className="col-span-2">
+                  <div className="col-span-2 pt-1 border-t">
                     <span className="text-muted-foreground">Soľ:</span> {food.salt}g
                   </div>
                 </div>
@@ -273,6 +349,60 @@ export function FoodManagement() {
           ))}
         </div>
       )}
+
+      {/* OFF Search Dialog */}
+      <Dialog open={showOffDialog} onOpenChange={setShowOffDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Import z Open Food Facts</DialogTitle>
+            <DialogDescription>
+              Vyhľadajte potravinu v externej databáze (v slovenčine).
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSearchOff} className="flex gap-2 mt-2">
+            <Input
+              value={offSearchQuery}
+              onChange={(e) => setOffSearchQuery(e.target.value)}
+              placeholder="Napr. Rajo Tvaroh, Kofola..."
+            />
+            <Button type="submit" disabled={isSearchingOff || !offSearchQuery.trim()}>
+              {isSearchingOff ? "Hľadám..." : "Hľadať"}
+            </Button>
+          </form>
+
+          <div className="flex-1 overflow-y-auto mt-4 space-y-2">
+            {offResults.length === 0 && !isSearchingOff && offSearchQuery && (
+              <p className="text-center text-muted-foreground py-8">Žiadne výsledky</p>
+            )}
+            
+            {offResults.map((product) => (
+              <div key={product.code} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                {product.image_url ? (
+                  <img src={product.image_url} alt={product.product_name} className="w-16 h-16 rounded object-cover bg-white" />
+                ) : (
+                  <div className="w-16 h-16 rounded bg-muted flex items-center justify-center">
+                    <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                )}
+                
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold truncate">{product.product_name || "Neznámy názov"}</h4>
+                  <div className="text-sm text-muted-foreground mt-1 flex gap-3">
+                    <span>{product.nutriments?.["energy-kcal_100g"] || 0} kcal</span>
+                    <span>B: {product.nutriments?.proteins_100g || 0}g</span>
+                    <span>S: {product.nutriments?.carbohydrates_100g || 0}g</span>
+                  </div>
+                </div>
+                
+                <Button variant="secondary" onClick={() => handleImportOff(product)}>
+                  Vybrať
+                </Button>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Create/Edit Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -285,15 +415,39 @@ export function FoodManagement() {
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {photoUrl && (
+              <div className="flex justify-center mb-4">
+                <div className="relative">
+                  <img src={photoUrl} alt="Náhľad" className="w-24 h-24 rounded-lg object-cover shadow-sm" />
+                  <Button 
+                    type="button" 
+                    variant="destructive" 
+                    size="icon" 
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                    onClick={() => setPhotoUrl(null)}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="name">Názov *</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Napr. Jablko"
-                required
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Napr. Jablko"
+                  required
+                />
+                {!photoUrl && (
+                  <div className="w-10 h-10 border rounded-md flex items-center justify-center bg-muted text-xl flex-shrink-0" title="Automatický emotikon">
+                    {name.trim() ? emojiService.getFoodEmoji(name.trim()) : "🍽️"}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -342,7 +496,7 @@ export function FoodManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sugar">Cukor (g)</Label>
+                <Label htmlFor="sugar">Cukry (g)</Label>
                 <Input
                   id="sugar"
                   type="number"
@@ -393,7 +547,7 @@ export function FoodManagement() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 col-span-2">
                 <Label htmlFor="salt">Soľ (g)</Label>
                 <Input
                   id="salt"
@@ -407,7 +561,7 @@ export function FoodManagement() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-4">
+            <DialogFooter className="pt-4 border-t mt-4">
               <Button
                 type="button"
                 variant="outline"
@@ -421,7 +575,7 @@ export function FoodManagement() {
               <Button type="submit" disabled={loading}>
                 {loading ? "Ukladám..." : editingFood ? "Uložiť" : "Vytvoriť"}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
