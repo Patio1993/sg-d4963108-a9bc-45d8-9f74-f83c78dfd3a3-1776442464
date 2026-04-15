@@ -14,13 +14,13 @@ import { WaterIntakeManager } from "@/components/WaterIntakeManager";
 import { FoodManagement } from "@/components/FoodManagement";
 import { NutrientDetailDialog } from "@/components/NutrientDetailDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { consumedFoodService, type DailyNutritionSummary, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
-import { waterService } from "@/services/waterService";
-import { dailySummaryService, type NutritionGoalStatus } from "@/services/dailySummaryService";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User, Plus, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { format, addDays, subDays, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
+import { consumedFoodService } from "@/services/consumedFoodService";
+import { waterService } from "@/services/waterService";
+import { dailySummaryService } from "@/services/dailySummaryService";
 import { activityService } from "@/services/activityService";
 import { medicineService } from "@/services/medicineService";
 import { wcService } from "@/services/wcService";
@@ -50,7 +50,7 @@ export default function Home() {
     total_fats: 0,
     total_kcal: 0,
     total_carbs: 0,
-    total_proteins: 0,
+    total_protein: 0,
     total_salt: 0,
   });
   const [waterTotal, setWaterTotal] = useState(0);
@@ -115,13 +115,13 @@ export default function Home() {
       setWaterTotal(fetchedWater);
 
       // Activity, Medicine, WC counts
-      const activities = await activityService.getUserActivitiesByDate(date);
+      const activities = await activityService.getDailyActivities(date);
       setActivityCount(activities.length);
 
-      const medicines = await medicineService.getUserMedicinesByDate(date);
+      const medicines = await medicineService.getDailyMedicines(date);
       setMedicineCount(medicines.length);
 
-      const wcEntries = await wcService.getEntriesByDate(date);
+      const wcEntries = await wcService.getDailyEntries(date);
       setWcCount(wcEntries.length);
 
       // Daily summary (goals, exercise, etc.)
