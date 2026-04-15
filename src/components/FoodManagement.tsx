@@ -300,7 +300,7 @@ export function FoodManagement() {
     if (showCreateDialog && !editingFood && foodNameInputRef.current) {
       setTimeout(() => {
         foodNameInputRef.current?.focus();
-      }, 100);
+      }, 150);
     }
   }, [showCreateDialog, editingFood]);
 
@@ -499,6 +499,25 @@ export function FoodManagement() {
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Názov *</Label>
+              <div className="flex gap-2">
+                <Input
+                  ref={foodNameInputRef}
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Napr. Jablko"
+                  required
+                />
+                {!photoUrl && (
+                  <div className="w-10 h-10 border rounded-md flex items-center justify-center bg-muted text-xl flex-shrink-0" title="Automatický emotikon">
+                    {name.trim() ? emojiService.getFoodEmoji(name.trim()) : "🍽️"}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Photo Section */}
             <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
               <Label>Obrázok potraviny</Label>
@@ -558,25 +577,6 @@ export function FoodManagement() {
                   )}
                 </TabsContent>
               </Tabs>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="name">Názov *</Label>
-              <div className="flex gap-2">
-                <Input
-                  ref={foodNameInputRef}
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Napr. Jablko"
-                  required
-                />
-                {!photoUrl && (
-                  <div className="w-10 h-10 border rounded-md flex items-center justify-center bg-muted text-xl flex-shrink-0" title="Automatický emotikon">
-                    {name.trim() ? emojiService.getFoodEmoji(name.trim()) : "🍽️"}
-                  </div>
-                )}
-              </div>
             </div>
 
             <div className="space-y-2">
