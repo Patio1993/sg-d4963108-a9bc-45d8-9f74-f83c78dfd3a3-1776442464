@@ -101,9 +101,13 @@ export const consumedFoodService = {
           days_ago = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         }
 
+        // Recalculate consecutive days on-the-fly
+        const consecutiveDays = await this.getConsecutiveDaysForFood(item.food_id, date);
+
         return {
           ...item,
           days_ago,
+          day_number: consecutiveDays, // Override with recalculated value
         };
       })
     );
