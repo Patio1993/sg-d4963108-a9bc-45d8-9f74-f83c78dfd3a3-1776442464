@@ -132,6 +132,25 @@ export const authService = {
     }
   },
 
+  // Reset password (send reset email)
+  async resetPassword(email: string): Promise<{ error: AuthError | null }> {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${getURL()}`,
+      });
+
+      if (error) {
+        return { error: { message: error.message, code: error.status?.toString() } };
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      return { 
+        error: { message: error.message || "An unexpected error occurred during password reset" } 
+      };
+    }
+  },
+
   // Sign out
   async signOut(): Promise<{ error: AuthError | null }> {
     try {
@@ -145,25 +164,6 @@ export const authService = {
     } catch (error) {
       return { 
         error: { message: "An unexpected error occurred during sign out" } 
-      };
-    }
-  },
-
-  // Reset password
-  async resetPassword(email: string): Promise<{ error: AuthError | null }> {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${getURL()}auth/reset-password`,
-      });
-
-      if (error) {
-        return { error: { message: error.message } };
-      }
-
-      return { error: null };
-    } catch (error) {
-      return { 
-        error: { message: "An unexpected error occurred during password reset" } 
       };
     }
   },
