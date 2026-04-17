@@ -172,7 +172,7 @@ export default function Home() {
   if (loading) {
     return (
       <>
-        <SEO title="Food Tracker - Načítavam..." />
+        <SEO title="IBS Diary - Načítavam..." />
         <div className="min-h-screen bg-background flex items-center justify-center">
           <p>Načítavam...</p>
         </div>
@@ -183,10 +183,10 @@ export default function Home() {
   if (!userEmail) {
     return (
       <>
-        <SEO title="Food Tracker - Prihlásenie" />
+        <SEO title="IBS Diary - Prihlásenie" />
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold">Food Tracker</h1>
+            <h1 className="text-4xl font-bold">IBS Diary</h1>
             <p className="text-muted-foreground">Prihlásenie vyžadované</p>
             <Button onClick={() => setShowAuthDialog(true)}>
               <User className="h-4 w-4 mr-2" />
@@ -227,7 +227,7 @@ export default function Home() {
         <main className="container mx-auto px-4 py-8 space-y-6">
           {/* Centered App Title and Date Picker */}
           <div className="flex flex-col items-center gap-4">
-            <h1 className="text-4xl font-bold text-center">Food Tracker</h1>
+            <h1 className="text-4xl font-bold text-center">IBS Diary</h1>
             
             {/* Date Navigation */}
             <div className="flex items-center gap-2">

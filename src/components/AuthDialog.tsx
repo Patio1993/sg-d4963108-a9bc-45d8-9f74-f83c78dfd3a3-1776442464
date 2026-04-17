@@ -69,8 +69,10 @@ export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Welcome to Food Tracker</DialogTitle>
-          <DialogDescription>Sign in to start tracking your nutrition</DialogDescription>
+          <DialogTitle>Vitajte v IBS Diary</DialogTitle>
+          <DialogDescription>
+            Prihláste sa alebo sa zaregistrujte
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="signin" className="w-full">
