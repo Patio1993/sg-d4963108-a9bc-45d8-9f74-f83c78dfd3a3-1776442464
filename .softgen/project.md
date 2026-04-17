@@ -1,4 +1,4 @@
-<![CDATA[# Food Tracker - Komplexná nutričná aplikácia
+# IBS Diary - Komplexná nutričná aplikácia
 
 ## Vízia
 Komplexná aplikácia pre sledovanie dennej konzumácie potravín s detailnými nutričnými hodnotami, aktivitami, liekmi, WC záznamami a pitným režimom. Multi-user aplikácia s autentifikáciou.
@@ -38,4 +38,3 @@ Komplexná aplikácia pre sledovanie dennej konzumácie potravín s detailnými 
 - Vláknina: 25-30g
 - Cukry: 30-50g
 - Tuky: 50-60g
-</project.md>

@@ -201,19 +201,25 @@ export default function Home() {
 
   return (
     <>
-      <SEO title={`Food Tracker - ${format(parseISO(date), "d. MMMM yyyy", { locale: sk })}`} />
-      <div className="min-h-screen bg-background">
+      <SEO 
+        title="IBS Diary - Komplexná nutričná aplikácia"
+        description="Sledujte dennú konzumáciu potravín, nutričné hodnoty, aktivity, lieky, WC záznamy a pitný režim."
+      />
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
         {/* Header */}
-        <header className="border-b bg-card">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              <span className="text-sm">{userEmail}</span>
+        <header className="bg-card/80 backdrop-blur-sm border-b sticky top-0 z-10 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-primary">IBS Diary</h1>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                <span className="text-sm">{userEmail}</span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Odhlásiť
+              </Button>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Odhlásiť
-            </Button>
           </div>
         </header>
 
