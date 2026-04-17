@@ -10,10 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
-export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
+export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
   const { toast } = useToast();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -42,6 +42,8 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           title: "Úspech",
           description: "Prosím, skontrolujte svoj email pre potvrdenie registrácie.",
         });
+        setEmail("");
+        setPassword("");
       } else {
         const { error } = await authService.signIn(email, password);
         if (error) throw error;
@@ -50,6 +52,9 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           description: "Prihlásenie úspešné",
         });
         onOpenChange(false);
+        if (onSuccess) {
+          onSuccess();
+        }
       }
     } catch (error: any) {
       toast({
@@ -64,7 +69,14 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
   const handleGoogleSignIn = async () => {
     try {
-      await authService.signInWithGoogle();
+      const result = await authService.signInWithGoogle();
+      if (result.error) throw result.error;
+      
+      // Google OAuth will redirect, so we close the dialog
+      onOpenChange(false);
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error: any) {
       toast({
         title: "Chyba",
