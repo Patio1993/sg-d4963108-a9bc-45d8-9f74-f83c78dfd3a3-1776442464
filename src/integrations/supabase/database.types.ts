@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -284,28 +284,40 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
           avatar_url: string | null
           created_at: string | null
           email: string | null
           full_name: string | null
+          gender: string | null
           id: string
+          nickname: string | null
           updated_at: string | null
+          weight: number | null
         }
         Insert: {
+          age?: number | null
           avatar_url?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
+          gender?: string | null
           id: string
+          nickname?: string | null
           updated_at?: string | null
+          weight?: number | null
         }
         Update: {
+          age?: number | null
           avatar_url?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
+          gender?: string | null
           id?: string
+          nickname?: string | null
           updated_at?: string | null
+          weight?: number | null
         }
         Relationships: []
       }
