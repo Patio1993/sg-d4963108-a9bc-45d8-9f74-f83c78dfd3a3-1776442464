@@ -178,6 +178,11 @@ export default function Home() {
     }
   };
 
+  const loadProfile = async () => {
+    const profileData = await profileService.getCurrentProfile();
+    setProfile(profileData);
+  };
+
   // Calculate coffee count from consumed foods
   const coffeeCount = consumedFoods.filter(f => f.meal_type === "coffee").length;
 

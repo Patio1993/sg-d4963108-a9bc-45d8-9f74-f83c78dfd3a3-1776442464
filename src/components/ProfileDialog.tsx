@@ -74,7 +74,7 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
         nickname: nickname || null,
         age: age ? parseInt(age) : null,
         weight: weight ? parseFloat(weight) : null,
-        gender: gender || null,
+        gender: (gender as "male" | "female" | "other") || null,
         avatar_url: avatarUrl || null,
       });
 
