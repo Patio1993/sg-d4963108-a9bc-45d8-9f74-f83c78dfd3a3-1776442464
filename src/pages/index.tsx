@@ -189,8 +189,7 @@ export default function Home() {
             <h1 className="text-4xl font-bold">IBS Diary</h1>
             <p className="text-muted-foreground">Prihlásenie vyžadované</p>
             <Button onClick={() => setShowAuthDialog(true)}>
-              <User className="h-4 w-4 mr-2" />
-              Prihlásiť sa
+              Prihlásiť sa / Zaregistrovať sa
             </Button>
           </div>
         </div>
