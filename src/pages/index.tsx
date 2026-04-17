@@ -3,6 +3,7 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DailySummaryCard } from "@/components/DailySummaryCard";
 import { ConsumedFoodsList } from "@/components/ConsumedFoodsList";
 import { AuthDialog } from "@/components/AuthDialog";
@@ -13,6 +14,7 @@ import { WCManager } from "@/components/WCManager";
 import { WaterIntakeManager } from "@/components/WaterIntakeManager";
 import { FoodManagement } from "@/components/FoodManagement";
 import { NutrientDetailDialog } from "@/components/NutrientDetailDialog";
+import { ProfileDialog } from "@/components/ProfileDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User, Plus, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
@@ -24,14 +26,19 @@ import { dailySummaryService } from "@/services/dailySummaryService";
 import { activityService } from "@/services/activityService";
 import { medicineService } from "@/services/medicineService";
 import { wcService } from "@/services/wcService";
+import { profileService } from "@/services/profileService";
 import type { 
   ConsumedFoodWithDetails, 
   DailyNutritionSummary,
 } from "@/services/consumedFoodService";
 import type { NutritionGoalStatus } from "@/services/dailySummaryService";
+import type { Tables } from "@/integrations/supabase/types";
+
+type Profile = Tables<"profiles">;
 
 export default function Home() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAddFoodDialog, setShowAddFoodDialog] = useState(false);
@@ -39,6 +46,7 @@ export default function Home() {
   const [showActivityDialog, setShowActivityDialog] = useState(false);
   const [showMedicineDialog, setShowMedicineDialog] = useState(false);
   const [showWCDialog, setShowWCDialog] = useState(false);
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [selectedNutrient, setSelectedNutrient] = useState<"fiber" | "sugar" | "fats" | null>(null);
   const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null);
   
@@ -97,6 +105,10 @@ export default function Home() {
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUserEmail(user?.email || null);
+    if (user) {
+      const profileData = await profileService.getCurrentProfile();
+      setProfile(profileData);
+    }
     setLoading(false);
   };
 
@@ -210,10 +222,22 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <h1 className="text-2xl font-bold text-primary">IBS Diary</h1>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                <span className="text-sm">{userEmail}</span>
-              </div>
+              <button
+                onClick={() => setShowProfileDialog(true)}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={profile?.avatar_url || ""} alt={profile?.nickname || userEmail || "User"} />
+                  <AvatarFallback>
+                    {profile?.nickname?.charAt(0).toUpperCase() || 
+                     profile?.full_name?.charAt(0).toUpperCase() || 
+                     userEmail?.charAt(0).toUpperCase() || "?"}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-medium">
+                  {profile?.nickname || profile?.full_name || userEmail}
+                </span>
+              </button>
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Odhlásiť
@@ -368,6 +392,12 @@ export default function Home() {
           onOpenChange={setShowNutrientDialog}
           nutrientType={selectedNutrient}
           foods={consumedFoods}
+        />
+
+        <ProfileDialog
+          open={showProfileDialog}
+          onOpenChange={setShowProfileDialog}
+          onProfileUpdated={loadProfile}
         />
       </div>
     </>
