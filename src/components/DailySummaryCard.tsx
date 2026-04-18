@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,6 +6,7 @@ import type { DailyNutritionSummary } from "@/services/consumedFoodService";
 import type { NutritionGoalStatus } from "@/services/dailySummaryService";
 import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
+import { Salad } from "lucide-react";
 
 interface DailySummaryCardProps {
   date: string;
@@ -90,8 +91,26 @@ export function DailySummaryCard({
 
   const lastRestaurantText = formatLastRestaurant(lastRestaurant);
 
+  const getProgressColor = (value: number, min: number, max: number) => {
+    if (value < min) return "bg-amber-400"; // Below min - lighter amber
+    if (value > max) return "bg-red-400";   // Above max - lighter red
+    return "bg-primary/70";                  // In range - lighter green (70% opacity)
+  };
+
+  const getProgressTextColor = (value: number, min: number, max: number) => {
+    if (value < min) return "text-amber-600"; // Below min - softer amber text
+    if (value > max) return "text-red-600";   // Above max - softer red text
+    return "text-primary";                     // In range - primary green
+  };
+
   return (
-    <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0 shadow-xl">
+    <Card className="bg-gradient-to-br from-background to-muted/30">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Salad className="h-5 w-5 text-primary" />
+          Denný súhrn
+        </CardTitle>
+      </CardHeader>
       <CardContent className="p-6 space-y-6">
         {/* Main Kcal Display */}
         <div className="text-center">
