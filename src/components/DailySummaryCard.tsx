@@ -150,10 +150,13 @@ export function DailySummaryCard({
           <h3 className="text-sm font-semibold mb-3 text-center">Denné ciele:</h3>
           <div className="grid grid-cols-3 gap-3">
             {/* Fiber */}
-            <div className={cn(
-              "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20",
-              getProgressTextColor(nutrition.total_fiber, 25, 30)
-            )}>
+            <button
+              onClick={() => onNutrientClick("fiber")}
+              className={cn(
+                "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20 hover:bg-green-100/80 cursor-pointer",
+                getProgressTextColor(nutrition.total_fiber, 25, 30)
+              )}
+            >
               <div className="text-xl font-bold mb-1">
                 {getGoalEmoji(goals.fiber)}
               </div>
@@ -166,13 +169,16 @@ export function DailySummaryCard({
               <div className="text-xs font-medium">
                 25-30g
               </div>
-            </div>
+            </button>
 
             {/* Sugar */}
-            <div className={cn(
-              "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20",
-              getProgressTextColor(nutrition.total_sugar, 30, 50)
-            )}>
+            <button
+              onClick={() => onNutrientClick("sugar")}
+              className={cn(
+                "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20 hover:bg-green-100/80 cursor-pointer",
+                getProgressTextColor(nutrition.total_sugar, 30, 50)
+              )}
+            >
               <div className="text-xl font-bold mb-1">
                 {getGoalEmoji(goals.sugar)}
               </div>
@@ -185,13 +191,16 @@ export function DailySummaryCard({
               <div className="text-xs font-medium">
                 30-50g
               </div>
-            </div>
+            </button>
 
             {/* Fats */}
-            <div className={cn(
-              "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20",
-              getProgressTextColor(nutrition.total_fats, 50, 60)
-            )}>
+            <button
+              onClick={() => onNutrientClick("fats")}
+              className={cn(
+                "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20 hover:bg-green-100/80 cursor-pointer",
+                getProgressTextColor(nutrition.total_fats, 50, 60)
+              )}
+            >
               <div className="text-xl font-bold mb-1">
                 {getGoalEmoji(goals.fats)}
               </div>
@@ -204,7 +213,7 @@ export function DailySummaryCard({
               <div className="text-xs font-medium">
                 50-60g
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
