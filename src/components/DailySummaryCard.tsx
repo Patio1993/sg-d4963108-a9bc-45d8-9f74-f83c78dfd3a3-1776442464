@@ -7,6 +7,7 @@ import type { NutritionGoalStatus } from "@/services/dailySummaryService";
 import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
 import { Salad } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface DailySummaryCardProps {
   date: string;
@@ -111,61 +112,98 @@ export function DailySummaryCard({
           Denný súhrn
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
-        {/* Main Kcal Display */}
-        <div className="text-center">
-          <div className="text-6xl font-bold">{nutrition.total_kcal}</div>
-          <div className="text-sm opacity-90 mt-1">kcal dnes</div>
+      <CardContent className="space-y-6">
+        {/* Main Calories Display */}
+        <div className="bg-green-100/60 rounded-lg p-4 border border-primary/20">
+          <div className="text-center">
+            <div className="text-5xl font-bold text-foreground">
+              {Math.round(totals.kcal)}
+            </div>
+            <div className="text-sm text-muted-foreground mt-1">kcal dnes</div>
+          </div>
         </div>
 
-        {/* Top 3 Nutrients */}
+        {/* Quick Stats - 3 columns */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center cursor-pointer hover:bg-white/30 transition-colors" onClick={() => onNutrientClick("protein")}>
-            <div className="text-2xl font-bold">{nutrition.total_protein}g</div>
-            <div className="text-sm opacity-90">Bielkoviny</div>
+          <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center">
+            <div className="text-2xl font-bold text-foreground">
+              {Math.round(totals.protein)}g
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">Bielkoviny</div>
           </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center cursor-pointer hover:bg-white/30 transition-colors" onClick={() => onNutrientClick("carbs")}>
-            <div className="text-2xl font-bold">{nutrition.total_carbs}g</div>
-            <div className="text-sm opacity-90">Sacharidy</div>
+          <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center">
+            <div className="text-2xl font-bold text-foreground">
+              {Math.round(totals.carbs)}g
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">Sacharidy</div>
           </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center cursor-pointer hover:bg-white/30 transition-colors" onClick={() => onNutrientClick("salt")}>
-            <div className="text-2xl font-bold">{nutrition.total_salt}g</div>
-            <div className="text-sm opacity-90">Soľ</div>
+          <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center">
+            <div className="text-2xl font-bold text-foreground">
+              {totals.salt.toFixed(2)}g
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">Soľ</div>
           </div>
         </div>
 
-        {/* Daily Goals */}
-        <div className="space-y-3">
-          <div className="text-center text-sm opacity-90 font-medium">Denné ciele:</div>
+        {/* Nutrient Goals */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3 text-center">Denné ciele:</h3>
           <div className="grid grid-cols-3 gap-3">
-            <div
-              className={`${getGoalCardBg(goals.fiber)} rounded-xl p-4 text-center cursor-pointer hover:opacity-90 transition-opacity`}
-              onClick={() => onNutrientClick("fiber")}
-            >
-              <div className="text-3xl mb-1">{getGoalEmoji(goals.fiber)}</div>
-              <div className="text-2xl font-bold">{nutrition.total_fiber}g</div>
-              <div className="text-sm opacity-90 mt-1">Vláknina</div>
-              <div className="text-xs opacity-75 mt-1">25-30g</div>
+            {/* Fiber */}
+            <div className={cn(
+              "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20",
+              getProgressTextColor(totals.fiber, 25, 30)
+            )}>
+              <div className="text-xl font-bold mb-1">
+                😐
+              </div>
+              <div className="text-xl font-bold">
+                {Math.round(totals.fiber)}g
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 mb-2">
+                Vláknina
+              </div>
+              <div className="text-xs font-medium">
+                25-30g
+              </div>
             </div>
 
-            <div
-              className={`${getGoalCardBg(goals.sugar)} rounded-xl p-4 text-center cursor-pointer hover:opacity-90 transition-opacity`}
-              onClick={() => onNutrientClick("sugar")}
-            >
-              <div className="text-3xl mb-1">{getGoalEmoji(goals.sugar)}</div>
-              <div className="text-2xl font-bold">{nutrition.total_sugar}g</div>
-              <div className="text-sm opacity-90 mt-1">Cukry</div>
-              <div className="text-xs opacity-75 mt-1">30-50g</div>
+            {/* Sugar */}
+            <div className={cn(
+              "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20",
+              getProgressTextColor(totals.sugar, 30, 50)
+            )}>
+              <div className="text-xl font-bold mb-1">
+                😐
+              </div>
+              <div className="text-xl font-bold">
+                {totals.sugar.toFixed(1)}g
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 mb-2">
+                Cukry
+              </div>
+              <div className="text-xs font-medium">
+                30-50g
+              </div>
             </div>
 
-            <div
-              className={`${getGoalCardBg(goals.fats)} rounded-xl p-4 text-center cursor-pointer hover:opacity-90 transition-opacity`}
-              onClick={() => onNutrientClick("fats")}
-            >
-              <div className="text-3xl mb-1">{getGoalEmoji(goals.fats)}</div>
-              <div className="text-2xl font-bold">{nutrition.total_fats}g</div>
-              <div className="text-sm opacity-90 mt-1">Tuky</div>
-              <div className="text-xs opacity-75 mt-1">50-60g</div>
+            {/* Fats */}
+            <div className={cn(
+              "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20",
+              getProgressTextColor(totals.fats, 50, 60)
+            )}>
+              <div className="text-xl font-bold mb-1">
+                😐
+              </div>
+              <div className="text-xl font-bold">
+                {Math.round(totals.fats)}g
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 mb-2">
+                Tuky
+              </div>
+              <div className="text-xs font-medium">
+                50-60g
+              </div>
             </div>
           </div>
         </div>
