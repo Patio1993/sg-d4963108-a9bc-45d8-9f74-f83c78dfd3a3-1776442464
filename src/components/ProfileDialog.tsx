@@ -245,7 +245,7 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
               <div className="flex flex-col items-center gap-4">
                 <Avatar className="h-24 w-24">
                   <AvatarImage 
-                    src={avatarUrl || ""} 
+                    src={avatarUrl ? `${avatarUrl}?t=${Date.now()}` : ""} 
                     alt={nickname || fullName || "User"} 
                     className="object-cover"
                   />
