@@ -12,17 +12,23 @@ export interface ProfileUpdate {
   avatar_url?: string | null;
   fiber_min?: number | null;
   fiber_max?: number | null;
+  fiber_target?: number | null;
   sugar_min?: number | null;
   sugar_max?: number | null;
+  sugar_target?: number | null;
   carbs_min?: number | null;
   carbs_max?: number | null;
+  carbs_target?: number | null;
   fats_min?: number | null;
   fats_max?: number | null;
+  fats_target?: number | null;
   protein_min?: number | null;
   protein_max?: number | null;
+  protein_target?: number | null;
   salt_max?: number | null;
   kcal_min?: number | null;
   kcal_max?: number | null;
+  kcal_target?: number | null;
   water_goal_ml?: number | null;
   health_goal?: "lose_weight" | "maintain" | "gain_muscle" | "improve_digestion" | null;
 }

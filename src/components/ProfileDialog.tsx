@@ -28,17 +28,23 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
   // Nutritional goals state
   const [fiberMin, setFiberMin] = useState("25");
   const [fiberMax, setFiberMax] = useState("30");
+  const [fiberTarget, setFiberTarget] = useState("27.5");
   const [sugarMin, setSugarMin] = useState("30");
   const [sugarMax, setSugarMax] = useState("50");
+  const [sugarTarget, setSugarTarget] = useState("40");
   const [carbsMin, setCarbsMin] = useState("200");
   const [carbsMax, setCarbsMax] = useState("300");
+  const [carbsTarget, setCarbsTarget] = useState("250");
   const [fatsMin, setFatsMin] = useState("50");
   const [fatsMax, setFatsMax] = useState("60");
+  const [fatsTarget, setFatsTarget] = useState("55");
   const [proteinMin, setProteinMin] = useState("50");
   const [proteinMax, setProteinMax] = useState("100");
+  const [proteinTarget, setProteinTarget] = useState("75");
   const [saltMax, setSaltMax] = useState("6");
   const [kcalMin, setKcalMin] = useState("1500");
   const [kcalMax, setKcalMax] = useState("2500");
+  const [kcalTarget, setKcalTarget] = useState("2000");
   const [waterGoalMl, setWaterGoalMl] = useState("2000");
   const [healthGoal, setHealthGoal] = useState("maintain");
 
@@ -72,17 +78,23 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
       // Load nutritional goals
       setFiberMin(profile.fiber_min?.toString() || "25");
       setFiberMax(profile.fiber_max?.toString() || "30");
+      setFiberTarget(profile.fiber_target?.toString() || "27.5");
       setSugarMin(profile.sugar_min?.toString() || "30");
       setSugarMax(profile.sugar_max?.toString() || "50");
+      setSugarTarget(profile.sugar_target?.toString() || "40");
       setCarbsMin(profile.carbs_min?.toString() || "200");
       setCarbsMax(profile.carbs_max?.toString() || "300");
+      setCarbsTarget(profile.carbs_target?.toString() || "250");
       setFatsMin(profile.fats_min?.toString() || "50");
       setFatsMax(profile.fats_max?.toString() || "60");
+      setFatsTarget(profile.fats_target?.toString() || "55");
       setProteinMin(profile.protein_min?.toString() || "50");
       setProteinMax(profile.protein_max?.toString() || "100");
+      setProteinTarget(profile.protein_target?.toString() || "75");
       setSaltMax(profile.salt_max?.toString() || "6");
       setKcalMin(profile.kcal_min?.toString() || "1500");
       setKcalMax(profile.kcal_max?.toString() || "2500");
+      setKcalTarget(profile.kcal_target?.toString() || "2000");
       setWaterGoalMl(profile.water_goal_ml?.toString() || "2000");
       setHealthGoal(profile.health_goal || "maintain");
     }
@@ -249,17 +261,23 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
       await profileService.updateProfile({
         fiber_min: fiberMin ? parseFloat(fiberMin) : null,
         fiber_max: fiberMax ? parseFloat(fiberMax) : null,
+        fiber_target: fiberTarget ? parseFloat(fiberTarget) : null,
         sugar_min: sugarMin ? parseFloat(sugarMin) : null,
         sugar_max: sugarMax ? parseFloat(sugarMax) : null,
+        sugar_target: sugarTarget ? parseFloat(sugarTarget) : null,
         carbs_min: carbsMin ? parseFloat(carbsMin) : null,
         carbs_max: carbsMax ? parseFloat(carbsMax) : null,
+        carbs_target: carbsTarget ? parseFloat(carbsTarget) : null,
         fats_min: fatsMin ? parseFloat(fatsMin) : null,
         fats_max: fatsMax ? parseFloat(fatsMax) : null,
+        fats_target: fatsTarget ? parseFloat(fatsTarget) : null,
         protein_min: proteinMin ? parseFloat(proteinMin) : null,
         protein_max: proteinMax ? parseFloat(proteinMax) : null,
+        protein_target: proteinTarget ? parseFloat(proteinTarget) : null,
         salt_max: saltMax ? parseFloat(saltMax) : null,
         kcal_min: kcalMin ? parseFloat(kcalMin) : null,
         kcal_max: kcalMax ? parseFloat(kcalMax) : null,
+        kcal_target: kcalTarget ? parseFloat(kcalTarget) : null,
         water_goal_ml: waterGoalMl ? parseInt(waterGoalMl) : null,
         health_goal: healthGoal as "lose_weight" | "maintain" | "gain_muscle" | "improve_digestion",
       });
@@ -484,152 +502,237 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
                 <h3 className="font-semibold mb-4">Denné limity nutričných hodnôt</h3>
                 
                 {/* Fiber */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fiberMin">Vláknina min (g)</Label>
-                    <Input
-                      id="fiberMin"
-                      type="number"
-                      value={fiberMin}
-                      onChange={(e) => setFiberMin(e.target.value)}
-                      placeholder="25"
-                      min="0"
-                      max="100"
-                      step="0.1"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="fiberMax">Vláknina max (g)</Label>
-                    <Input
-                      id="fiberMax"
-                      type="number"
-                      value={fiberMax}
-                      onChange={(e) => setFiberMax(e.target.value)}
-                      placeholder="30"
-                      min="0"
-                      max="100"
-                      step="0.1"
-                    />
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium">Vláknina (g)</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="fiberMin" className="text-xs text-muted-foreground">Min</Label>
+                      <Input
+                        id="fiberMin"
+                        type="number"
+                        value={fiberMin}
+                        onChange={(e) => setFiberMin(e.target.value)}
+                        placeholder="25"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="fiberTarget" className="text-xs text-muted-foreground">Cieľ</Label>
+                      <Input
+                        id="fiberTarget"
+                        type="number"
+                        value={fiberTarget}
+                        onChange={(e) => setFiberTarget(e.target.value)}
+                        placeholder="27.5"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        className="border-primary"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="fiberMax" className="text-xs text-muted-foreground">Max</Label>
+                      <Input
+                        id="fiberMax"
+                        type="number"
+                        value={fiberMax}
+                        onChange={(e) => setFiberMax(e.target.value)}
+                        placeholder="30"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Sugar */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="sugarMin">Cukry min (g)</Label>
-                    <Input
-                      id="sugarMin"
-                      type="number"
-                      value={sugarMin}
-                      onChange={(e) => setSugarMin(e.target.value)}
-                      placeholder="30"
-                      min="0"
-                      max="200"
-                      step="0.1"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="sugarMax">Cukry max (g)</Label>
-                    <Input
-                      id="sugarMax"
-                      type="number"
-                      value={sugarMax}
-                      onChange={(e) => setSugarMax(e.target.value)}
-                      placeholder="50"
-                      min="0"
-                      max="200"
-                      step="0.1"
-                    />
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium">Cukry (g)</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="sugarMin" className="text-xs text-muted-foreground">Min</Label>
+                      <Input
+                        id="sugarMin"
+                        type="number"
+                        value={sugarMin}
+                        onChange={(e) => setSugarMin(e.target.value)}
+                        placeholder="30"
+                        min="0"
+                        max="200"
+                        step="0.1"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="sugarTarget" className="text-xs text-muted-foreground">Cieľ</Label>
+                      <Input
+                        id="sugarTarget"
+                        type="number"
+                        value={sugarTarget}
+                        onChange={(e) => setSugarTarget(e.target.value)}
+                        placeholder="40"
+                        min="0"
+                        max="200"
+                        step="0.1"
+                        className="border-primary"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="sugarMax" className="text-xs text-muted-foreground">Max</Label>
+                      <Input
+                        id="sugarMax"
+                        type="number"
+                        value={sugarMax}
+                        onChange={(e) => setSugarMax(e.target.value)}
+                        placeholder="50"
+                        min="0"
+                        max="200"
+                        step="0.1"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Carbs */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="carbsMin">Sacharidy min (g)</Label>
-                    <Input
-                      id="carbsMin"
-                      type="number"
-                      value={carbsMin}
-                      onChange={(e) => setCarbsMin(e.target.value)}
-                      placeholder="200"
-                      min="0"
-                      max="1000"
-                      step="0.1"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="carbsMax">Sacharidy max (g)</Label>
-                    <Input
-                      id="carbsMax"
-                      type="number"
-                      value={carbsMax}
-                      onChange={(e) => setCarbsMax(e.target.value)}
-                      placeholder="300"
-                      min="0"
-                      max="1000"
-                      step="0.1"
-                    />
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium">Sacharidy (g)</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="carbsMin" className="text-xs text-muted-foreground">Min</Label>
+                      <Input
+                        id="carbsMin"
+                        type="number"
+                        value={carbsMin}
+                        onChange={(e) => setCarbsMin(e.target.value)}
+                        placeholder="200"
+                        min="0"
+                        max="1000"
+                        step="0.1"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="carbsTarget" className="text-xs text-muted-foreground">Cieľ</Label>
+                      <Input
+                        id="carbsTarget"
+                        type="number"
+                        value={carbsTarget}
+                        onChange={(e) => setCarbsTarget(e.target.value)}
+                        placeholder="250"
+                        min="0"
+                        max="1000"
+                        step="0.1"
+                        className="border-primary"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="carbsMax" className="text-xs text-muted-foreground">Max</Label>
+                      <Input
+                        id="carbsMax"
+                        type="number"
+                        value={carbsMax}
+                        onChange={(e) => setCarbsMax(e.target.value)}
+                        placeholder="300"
+                        min="0"
+                        max="1000"
+                        step="0.1"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Fats */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fatsMin">Tuky min (g)</Label>
-                    <Input
-                      id="fatsMin"
-                      type="number"
-                      value={fatsMin}
-                      onChange={(e) => setFatsMin(e.target.value)}
-                      placeholder="50"
-                      min="0"
-                      max="500"
-                      step="0.1"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="fatsMax">Tuky max (g)</Label>
-                    <Input
-                      id="fatsMax"
-                      type="number"
-                      value={fatsMax}
-                      onChange={(e) => setFatsMax(e.target.value)}
-                      placeholder="60"
-                      min="0"
-                      max="500"
-                      step="0.1"
-                    />
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium">Tuky (g)</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="fatsMin" className="text-xs text-muted-foreground">Min</Label>
+                      <Input
+                        id="fatsMin"
+                        type="number"
+                        value={fatsMin}
+                        onChange={(e) => setFatsMin(e.target.value)}
+                        placeholder="50"
+                        min="0"
+                        max="500"
+                        step="0.1"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="fatsTarget" className="text-xs text-muted-foreground">Cieľ</Label>
+                      <Input
+                        id="fatsTarget"
+                        type="number"
+                        value={fatsTarget}
+                        onChange={(e) => setFatsTarget(e.target.value)}
+                        placeholder="55"
+                        min="0"
+                        max="500"
+                        step="0.1"
+                        className="border-primary"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="fatsMax" className="text-xs text-muted-foreground">Max</Label>
+                      <Input
+                        id="fatsMax"
+                        type="number"
+                        value={fatsMax}
+                        onChange={(e) => setFatsMax(e.target.value)}
+                        placeholder="60"
+                        min="0"
+                        max="500"
+                        step="0.1"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Protein */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="proteinMin">Bielkoviny min (g)</Label>
-                    <Input
-                      id="proteinMin"
-                      type="number"
-                      value={proteinMin}
-                      onChange={(e) => setProteinMin(e.target.value)}
-                      placeholder="50"
-                      min="0"
-                      max="500"
-                      step="0.1"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="proteinMax">Bielkoviny max (g)</Label>
-                    <Input
-                      id="proteinMax"
-                      type="number"
-                      value={proteinMax}
-                      onChange={(e) => setProteinMax(e.target.value)}
-                      placeholder="100"
-                      min="0"
-                      max="500"
-                      step="0.1"
-                    />
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium">Bielkoviny (g)</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="proteinMin" className="text-xs text-muted-foreground">Min</Label>
+                      <Input
+                        id="proteinMin"
+                        type="number"
+                        value={proteinMin}
+                        onChange={(e) => setProteinMin(e.target.value)}
+                        placeholder="50"
+                        min="0"
+                        max="500"
+                        step="0.1"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="proteinTarget" className="text-xs text-muted-foreground">Cieľ</Label>
+                      <Input
+                        id="proteinTarget"
+                        type="number"
+                        value={proteinTarget}
+                        onChange={(e) => setProteinTarget(e.target.value)}
+                        placeholder="75"
+                        min="0"
+                        max="500"
+                        step="0.1"
+                        className="border-primary"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="proteinMax" className="text-xs text-muted-foreground">Max</Label>
+                      <Input
+                        id="proteinMax"
+                        type="number"
+                        value={proteinMax}
+                        onChange={(e) => setProteinMax(e.target.value)}
+                        placeholder="100"
+                        min="0"
+                        max="500"
+                        step="0.1"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -649,32 +752,49 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
                 </div>
 
                 {/* Calories */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="kcalMin">Kalórie min</Label>
-                    <Input
-                      id="kcalMin"
-                      type="number"
-                      value={kcalMin}
-                      onChange={(e) => setKcalMin(e.target.value)}
-                      placeholder="1500"
-                      min="500"
-                      max="10000"
-                      step="10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="kcalMax">Kalórie max</Label>
-                    <Input
-                      id="kcalMax"
-                      type="number"
-                      value={kcalMax}
-                      onChange={(e) => setKcalMax(e.target.value)}
-                      placeholder="2500"
-                      min="500"
-                      max="10000"
-                      step="10"
-                    />
+                <div className="space-y-2 mb-4">
+                  <Label className="text-sm font-medium">Kalórie</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="kcalMin" className="text-xs text-muted-foreground">Min</Label>
+                      <Input
+                        id="kcalMin"
+                        type="number"
+                        value={kcalMin}
+                        onChange={(e) => setKcalMin(e.target.value)}
+                        placeholder="1500"
+                        min="500"
+                        max="10000"
+                        step="10"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="kcalTarget" className="text-xs text-muted-foreground">Cieľ</Label>
+                      <Input
+                        id="kcalTarget"
+                        type="number"
+                        value={kcalTarget}
+                        onChange={(e) => setKcalTarget(e.target.value)}
+                        placeholder="2000"
+                        min="500"
+                        max="10000"
+                        step="10"
+                        className="border-primary"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="kcalMax" className="text-xs text-muted-foreground">Max</Label>
+                      <Input
+                        id="kcalMax"
+                        type="number"
+                        value={kcalMax}
+                        onChange={(e) => setKcalMax(e.target.value)}
+                        placeholder="2500"
+                        min="500"
+                        max="10000"
+                        step="10"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

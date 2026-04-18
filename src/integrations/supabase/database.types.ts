@@ -288,24 +288,30 @@ export type Database = {
           avatar_url: string | null
           carbs_max: number | null
           carbs_min: number | null
+          carbs_target: number | null
           created_at: string | null
           email: string | null
           fats_max: number | null
           fats_min: number | null
+          fats_target: number | null
           fiber_max: number | null
           fiber_min: number | null
+          fiber_target: number | null
           full_name: string | null
           gender: string | null
           health_goal: string | null
           id: string
           kcal_max: number | null
           kcal_min: number | null
+          kcal_target: number | null
           nickname: string | null
           protein_max: number | null
           protein_min: number | null
+          protein_target: number | null
           salt_max: number | null
           sugar_max: number | null
           sugar_min: number | null
+          sugar_target: number | null
           updated_at: string | null
           water_goal_ml: number | null
           weight: number | null
@@ -315,24 +321,30 @@ export type Database = {
           avatar_url?: string | null
           carbs_max?: number | null
           carbs_min?: number | null
+          carbs_target?: number | null
           created_at?: string | null
           email?: string | null
           fats_max?: number | null
           fats_min?: number | null
+          fats_target?: number | null
           fiber_max?: number | null
           fiber_min?: number | null
+          fiber_target?: number | null
           full_name?: string | null
           gender?: string | null
           health_goal?: string | null
           id: string
           kcal_max?: number | null
           kcal_min?: number | null
+          kcal_target?: number | null
           nickname?: string | null
           protein_max?: number | null
           protein_min?: number | null
+          protein_target?: number | null
           salt_max?: number | null
           sugar_max?: number | null
           sugar_min?: number | null
+          sugar_target?: number | null
           updated_at?: string | null
           water_goal_ml?: number | null
           weight?: number | null
@@ -342,24 +354,30 @@ export type Database = {
           avatar_url?: string | null
           carbs_max?: number | null
           carbs_min?: number | null
+          carbs_target?: number | null
           created_at?: string | null
           email?: string | null
           fats_max?: number | null
           fats_min?: number | null
+          fats_target?: number | null
           fiber_max?: number | null
           fiber_min?: number | null
+          fiber_target?: number | null
           full_name?: string | null
           gender?: string | null
           health_goal?: string | null
           id?: string
           kcal_max?: number | null
           kcal_min?: number | null
+          kcal_target?: number | null
           nickname?: string | null
           protein_max?: number | null
           protein_min?: number | null
+          protein_target?: number | null
           salt_max?: number | null
           sugar_max?: number | null
           sugar_min?: number | null
+          sugar_target?: number | null
           updated_at?: string | null
           water_goal_ml?: number | null
           weight?: number | null
