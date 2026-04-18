@@ -92,15 +92,15 @@ export function DailySummaryCard({
   const lastRestaurantText = formatLastRestaurant(lastRestaurant);
 
   const getProgressColor = (value: number, min: number, max: number) => {
-    if (value < min) return "bg-amber-400"; // Below min - lighter amber
-    if (value > max) return "bg-red-400";   // Above max - lighter red
-    return "bg-primary/70";                  // In range - lighter green (70% opacity)
+    if (value < min) return "bg-orange-500"; // Below min - orange
+    if (value > max) return "bg-red-500";    // Above max - red
+    return "bg-green-400";                    // In range - lighter green
   };
 
   const getProgressTextColor = (value: number, min: number, max: number) => {
-    if (value < min) return "text-amber-600"; // Below min - softer amber text
-    if (value > max) return "text-red-600";   // Above max - softer red text
-    return "text-primary";                     // In range - primary green
+    if (value < min) return "text-orange-700"; // Below min - dark orange
+    if (value > max) return "text-red-700";    // Above max - dark red
+    return "text-green-600";                    // In range - lighter green text
   };
 
   return (
