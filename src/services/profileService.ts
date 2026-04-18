@@ -84,7 +84,8 @@ export const profileService = {
     if (!avatarUrl.includes("avatars")) return;
 
     try {
-      const urlParts = avatarUrl.split("/avatars/");
+      // Extract path from URL (remove cache busting params and domain)
+      const urlParts = avatarUrl.split("?")[0].split("/avatars/");
       if (urlParts.length < 2) return;
       
       const filePath = urlParts[1];

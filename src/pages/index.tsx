@@ -246,7 +246,11 @@ export default function Home() {
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={profile?.avatar_url || ""} alt={profile?.nickname || userEmail || "User"} />
+                  <AvatarImage 
+                    src={profile?.avatar_url ? `${profile.avatar_url}?t=${Date.now()}` : ""} 
+                    alt={profile?.nickname || userEmail || "User"}
+                    className="object-cover"
+                  />
                   <AvatarFallback>
                     {profile?.nickname?.charAt(0).toUpperCase() || 
                      profile?.full_name?.charAt(0).toUpperCase() || 

@@ -30,8 +30,8 @@ export const storageService = {
     if (!photoUrl.includes("food-photos")) return;
 
     try {
-      // Extract path from URL
-      const urlParts = photoUrl.split("/food-photos/");
+      // Extract path from URL (remove cache busting params)
+      const urlParts = photoUrl.split("?")[0].split("/food-photos/");
       if (urlParts.length < 2) return;
       
       const filePath = urlParts[1];

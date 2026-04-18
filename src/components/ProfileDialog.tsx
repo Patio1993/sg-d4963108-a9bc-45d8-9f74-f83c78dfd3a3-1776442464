@@ -22,7 +22,7 @@ interface ProfileDialogProps {
 export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
 
   // Profile form fields
@@ -103,20 +103,37 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
     if (file.size > 2 * 1024 * 1024) {
       toast({
         title: "Chyba",
-        description: "Súbor je príliš veľký. Maximum je 2MB.",
+        description: "Súbor je príliš veľký. Maximálna veľkosť je 2MB.",
         variant: "destructive",
       });
       return;
     }
 
-    setUploadingAvatar(true);
+    setUploading(true);
     try {
+      // Delete old avatar if exists
+      if (avatarUrl) {
+        await profileService.deleteAvatar(avatarUrl);
+      }
+
       const url = await profileService.uploadAvatar(file);
       setAvatarUrl(url);
+      
+      // Update profile immediately
+      await profileService.updateProfile({ avatar_url: url });
+      
+      // Force reload profile to get fresh data
+      if (onProfileUpdated) {
+        await onProfileUpdated();
+      }
+
       toast({
         title: "Úspech",
-        description: "Fotka bola nahraná",
+        description: "Profilová fotka bola nahraná",
       });
+
+      // Clear file input
+      e.target.value = "";
     } catch (error: any) {
       toast({
         title: "Chyba",
@@ -124,26 +141,38 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
         variant: "destructive",
       });
     } finally {
-      setUploadingAvatar(false);
+      setUploading(false);
     }
   };
 
-  const handleRemoveAvatar = async () => {
-    if (avatarUrl) {
-      try {
-        await profileService.deleteAvatar(avatarUrl);
-        setAvatarUrl("");
-        toast({
-          title: "Úspech",
-          description: "Fotka bola odstránená",
-        });
-      } catch (error: any) {
-        toast({
-          title: "Chyba",
-          description: "Nepodarilo sa odstrániť fotku",
-          variant: "destructive",
-        });
+  const handleAvatarDelete = async () => {
+    if (!avatarUrl) return;
+
+    setUploading(true);
+    try {
+      await profileService.deleteAvatar(avatarUrl);
+      setAvatarUrl(null);
+      
+      // Update profile immediately to remove avatar URL
+      await profileService.updateProfile({ avatar_url: null });
+      
+      // Force reload profile to get fresh data
+      if (onProfileUpdated) {
+        await onProfileUpdated();
       }
+
+      toast({
+        title: "Úspech",
+        description: "Profilová fotka bola odstránená",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Chyba",
+        description: error.message || "Nepodarilo sa odstrániť fotku",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -213,24 +242,32 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
           <TabsContent value="profile" className="space-y-4">
             <form onSubmit={handleProfileUpdate} className="space-y-4">
               {/* Avatar Section */}
-              <div className="flex flex-col items-center gap-4 py-4">
+              <div className="flex flex-col items-center gap-4">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src={avatarUrl} alt={nickname || fullName || "User"} />
-                  <AvatarFallback className="text-2xl">{getInitials()}</AvatarFallback>
+                  <AvatarImage 
+                    src={avatarUrl || ""} 
+                    alt={nickname || fullName || "User"} 
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="text-2xl">
+                    {nickname?.charAt(0).toUpperCase() || 
+                     fullName?.charAt(0).toUpperCase() || 
+                     "?"}
+                  </AvatarFallback>
                 </Avatar>
 
                 <div className="flex gap-2">
                   <Label htmlFor="avatar-upload" className="cursor-pointer">
                     <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
                       <Upload className="h-4 w-4" />
-                      <span className="text-sm">{uploadingAvatar ? "Nahráva sa..." : "Nahrať fotku"}</span>
+                      <span className="text-sm">{uploading ? "Nahráva sa..." : "Nahrať fotku"}</span>
                     </div>
                     <Input
                       id="avatar-upload"
                       type="file"
                       accept="image/*"
                       onChange={handleAvatarUpload}
-                      disabled={uploadingAvatar}
+                      disabled={uploading}
                       className="hidden"
                     />
                   </Label>
@@ -240,7 +277,7 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={handleRemoveAvatar}
+                      onClick={handleAvatarDelete}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Odstrániť
