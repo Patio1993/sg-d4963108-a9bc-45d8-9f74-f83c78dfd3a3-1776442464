@@ -364,7 +364,7 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
                   <Input
                     id="email"
                     type="email"
-                    value={email}
+                    value={profile?.email || ""}
                     disabled
                     className="bg-muted"
                   />
