@@ -225,22 +225,22 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px]">
-        <DialogHeader>
-          <DialogTitle>Profil používateľa</DialogTitle>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
+          <DialogTitle>Profil</DialogTitle>
           <DialogDescription>
             Upravte svoje osobné údaje a nastavenia
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="profile" className="flex-1 overflow-hidden flex flex-col">
+          <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
             <TabsTrigger value="profile">Osobné údaje</TabsTrigger>
             <TabsTrigger value="password">Zmena hesla</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="profile" className="space-y-4">
-            <form onSubmit={handleProfileUpdate} className="space-y-4">
+          <TabsContent value="profile" className="flex-1 overflow-y-auto mt-4 space-y-4">
+            <form onSubmit={handleProfileUpdate} className="space-y-6 pb-4">
               {/* Avatar Section */}
               <div className="flex flex-col items-center gap-4">
                 <Avatar className="h-24 w-24">
@@ -257,152 +257,165 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
                 </Avatar>
 
                 <div className="flex gap-2">
-                  <Label htmlFor="avatar-upload" className="cursor-pointer">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
-                      <Upload className="h-4 w-4" />
-                      <span className="text-sm">{uploading ? "Nahráva sa..." : "Nahrať fotku"}</span>
-                    </div>
-                    <Input
-                      id="avatar-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarUpload}
-                      disabled={uploading}
-                      className="hidden"
-                    />
-                  </Label>
-
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById("avatar-upload")?.click()}
+                    disabled={uploading}
+                  >
+                    {uploading ? "Nahrávam..." : "Zmeniť fotku"}
+                  </Button>
                   {avatarUrl && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={handleAvatarDelete}
+                      disabled={uploading}
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
                       Odstrániť
                     </Button>
                   )}
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                  />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Maximálna veľkosť: 2MB. Podporované formáty: JPG, PNG, WebP
+                <p className="text-xs text-muted-foreground text-center">
+                  Max 2MB • JPG, PNG, WebP
                 </p>
               </div>
 
-              {/* Profile Fields */}
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Meno a priezvisko</Label>
-                <Input
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Napr. Ján Novák"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="nickname">Prezývka *</Label>
-                <Input
-                  id="nickname"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  placeholder="Napr. janko123"
-                  required
-                />
-                <p className="text-xs text-muted-foreground">
-                  Prezývka sa zobrazí namiesto emailu v aplikácii
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+              {/* Form Fields */}
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="age">Vek</Label>
+                  <Label htmlFor="fullName">Meno a priezvisko</Label>
                   <Input
-                    id="age"
-                    type="number"
-                    min="1"
-                    max="150"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    placeholder="Napr. 30"
+                    id="fullName"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Ján Novák"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="weight">Váha (kg)</Label>
+                  <Label htmlFor="nickname">
+                    Prezývka <span className="text-destructive">*</span>
+                  </Label>
                   <Input
-                    id="weight"
-                    type="number"
-                    step="0.1"
-                    min="1"
-                    max="500"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    placeholder="Napr. 70.5"
+                    id="nickname"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    placeholder="Johnny"
+                    required
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="age">Vek</Label>
+                    <Input
+                      id="age"
+                      type="number"
+                      value={age}
+                      onChange={(e) => setAge(e.target.value)}
+                      placeholder="30"
+                      min="1"
+                      max="150"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="weight">Váha (kg)</Label>
+                    <Input
+                      id="weight"
+                      type="number"
+                      step="0.1"
+                      value={weight}
+                      onChange={(e) => setWeight(e.target.value)}
+                      placeholder="70.5"
+                      min="1"
+                      max="500"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Pohlavie</Label>
+                  <select
+                    id="gender"
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <option value="">Nevybrané</option>
+                    <option value="male">Muž</option>
+                    <option value="female">Žena</option>
+                    <option value="other">Iné</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    disabled
+                    className="bg-muted"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Email sa nedá zmeniť
+                  </p>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="gender">Pohlavie</Label>
-                <Select value={gender} onValueChange={setGender}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Vyberte pohlavie" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Muž</SelectItem>
-                    <SelectItem value="female">Žena</SelectItem>
-                    <SelectItem value="other">Iné</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Email (len na čítanie)</Label>
-                <Input value={profile?.email || ""} disabled />
-              </div>
-
-              <DialogFooter>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Ukladá sa..." : "Uložiť zmeny"}
-                </Button>
-              </DialogFooter>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Ukladám..." : "Uložiť zmeny"}
+              </Button>
             </form>
           </TabsContent>
 
-          <TabsContent value="password" className="space-y-4">
-            <form onSubmit={handlePasswordChange} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">Nové heslo</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={6}
-                />
+          <TabsContent value="password" className="flex-1 overflow-y-auto mt-4 space-y-4">
+            <form onSubmit={handlePasswordChange} className="space-y-6 pb-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Nové heslo</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Minimálne 6 znakov
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Potvrďte nové heslo</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Potvrďte nové heslo</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={6}
-                />
-              </div>
-
-              <DialogFooter>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Mení sa..." : "Zmeniť heslo"}
-                </Button>
-              </DialogFooter>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Mením heslo..." : "Zmeniť heslo"}
+              </Button>
             </form>
           </TabsContent>
         </Tabs>
