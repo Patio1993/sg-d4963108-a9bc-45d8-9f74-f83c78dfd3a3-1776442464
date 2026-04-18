@@ -286,37 +286,82 @@ export type Database = {
         Row: {
           age: number | null
           avatar_url: string | null
+          carbs_max: number | null
+          carbs_min: number | null
           created_at: string | null
           email: string | null
+          fats_max: number | null
+          fats_min: number | null
+          fiber_max: number | null
+          fiber_min: number | null
           full_name: string | null
           gender: string | null
+          health_goal: string | null
           id: string
+          kcal_max: number | null
+          kcal_min: number | null
           nickname: string | null
+          protein_max: number | null
+          protein_min: number | null
+          salt_max: number | null
+          sugar_max: number | null
+          sugar_min: number | null
           updated_at: string | null
+          water_goal_ml: number | null
           weight: number | null
         }
         Insert: {
           age?: number | null
           avatar_url?: string | null
+          carbs_max?: number | null
+          carbs_min?: number | null
           created_at?: string | null
           email?: string | null
+          fats_max?: number | null
+          fats_min?: number | null
+          fiber_max?: number | null
+          fiber_min?: number | null
           full_name?: string | null
           gender?: string | null
+          health_goal?: string | null
           id: string
+          kcal_max?: number | null
+          kcal_min?: number | null
           nickname?: string | null
+          protein_max?: number | null
+          protein_min?: number | null
+          salt_max?: number | null
+          sugar_max?: number | null
+          sugar_min?: number | null
           updated_at?: string | null
+          water_goal_ml?: number | null
           weight?: number | null
         }
         Update: {
           age?: number | null
           avatar_url?: string | null
+          carbs_max?: number | null
+          carbs_min?: number | null
           created_at?: string | null
           email?: string | null
+          fats_max?: number | null
+          fats_min?: number | null
+          fiber_max?: number | null
+          fiber_min?: number | null
           full_name?: string | null
           gender?: string | null
+          health_goal?: string | null
           id?: string
+          kcal_max?: number | null
+          kcal_min?: number | null
           nickname?: string | null
+          protein_max?: number | null
+          protein_min?: number | null
+          salt_max?: number | null
+          sugar_max?: number | null
+          sugar_min?: number | null
           updated_at?: string | null
+          water_goal_ml?: number | null
           weight?: number | null
         }
         Relationships: []
