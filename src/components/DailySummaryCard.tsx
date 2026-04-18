@@ -104,7 +104,7 @@ export function DailySummaryCard({
   };
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Salad className="h-5 w-5 text-primary" />
