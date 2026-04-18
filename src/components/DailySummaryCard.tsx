@@ -117,7 +117,7 @@ export function DailySummaryCard({
         <div className="bg-green-100/60 rounded-lg p-4 border border-primary/20">
           <div className="text-center">
             <div className="text-5xl font-bold text-foreground">
-              {Math.round(nutrition.kcal)}
+              {Math.round(nutrition.total_kcal)}
             </div>
             <div className="text-sm text-muted-foreground mt-1">kcal dnes</div>
           </div>
@@ -127,19 +127,19 @@ export function DailySummaryCard({
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center">
             <div className="text-2xl font-bold text-foreground">
-              {Math.round(nutrition.protein)}g
+              {Math.round(nutrition.total_protein)}g
             </div>
             <div className="text-xs text-muted-foreground mt-1">Bielkoviny</div>
           </div>
           <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center">
             <div className="text-2xl font-bold text-foreground">
-              {Math.round(nutrition.carbs)}g
+              {Math.round(nutrition.total_carbs)}g
             </div>
             <div className="text-xs text-muted-foreground mt-1">Sacharidy</div>
           </div>
           <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center">
             <div className="text-2xl font-bold text-foreground">
-              {nutrition.salt.toFixed(2)}g
+              {nutrition.total_salt.toFixed(2)}g
             </div>
             <div className="text-xs text-muted-foreground mt-1">Soľ</div>
           </div>
@@ -152,13 +152,13 @@ export function DailySummaryCard({
             {/* Fiber */}
             <div className={cn(
               "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20",
-              getProgressTextColor(nutrition.fiber, 25, 30)
+              getProgressTextColor(nutrition.total_fiber, 25, 30)
             )}>
               <div className="text-xl font-bold mb-1">
                 {getGoalEmoji(goals.fiber)}
               </div>
               <div className="text-xl font-bold">
-                {Math.round(nutrition.fiber)}g
+                {Math.round(nutrition.total_fiber)}g
               </div>
               <div className="text-xs text-muted-foreground mt-1 mb-2">
                 Vláknina
@@ -171,13 +171,13 @@ export function DailySummaryCard({
             {/* Sugar */}
             <div className={cn(
               "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20",
-              getProgressTextColor(nutrition.sugar, 30, 50)
+              getProgressTextColor(nutrition.total_sugar, 30, 50)
             )}>
               <div className="text-xl font-bold mb-1">
                 {getGoalEmoji(goals.sugar)}
               </div>
               <div className="text-xl font-bold">
-                {nutrition.sugar.toFixed(1)}g
+                {nutrition.total_sugar.toFixed(1)}g
               </div>
               <div className="text-xs text-muted-foreground mt-1 mb-2">
                 Cukry
@@ -190,13 +190,13 @@ export function DailySummaryCard({
             {/* Fats */}
             <div className={cn(
               "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20",
-              getProgressTextColor(nutrition.fats, 50, 60)
+              getProgressTextColor(nutrition.total_fats, 50, 60)
             )}>
               <div className="text-xl font-bold mb-1">
                 {getGoalEmoji(goals.fats)}
               </div>
               <div className="text-xl font-bold">
-                {Math.round(nutrition.fats)}g
+                {Math.round(nutrition.total_fats)}g
               </div>
               <div className="text-xs text-muted-foreground mt-1 mb-2">
                 Tuky
