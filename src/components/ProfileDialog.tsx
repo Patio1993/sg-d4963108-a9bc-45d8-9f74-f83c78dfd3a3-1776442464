@@ -21,6 +21,7 @@ interface ProfileDialogProps {
 
 export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileDialogProps) {
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
