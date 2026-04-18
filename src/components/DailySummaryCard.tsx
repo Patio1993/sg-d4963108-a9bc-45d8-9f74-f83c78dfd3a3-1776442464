@@ -212,7 +212,7 @@ export function DailySummaryCard({
         <div className="grid grid-cols-3 gap-3">
           <button
             onClick={onActivityClick}
-            className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/30 transition-colors cursor-pointer"
+            className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center hover:bg-green-100/80 transition-colors cursor-pointer"
           >
             <div className="text-2xl mb-1">🚶</div>
             <div className="text-xs opacity-90">Aktivity</div>
@@ -223,7 +223,7 @@ export function DailySummaryCard({
           
           <button
             onClick={onMedicineClick}
-            className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/30 transition-colors cursor-pointer"
+            className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center hover:bg-green-100/80 transition-colors cursor-pointer"
           >
             <div className="text-2xl mb-1">💊</div>
             <div className="text-xs opacity-90">Lieky</div>
@@ -234,7 +234,7 @@ export function DailySummaryCard({
           
           <button
             onClick={onWCClick}
-            className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center hover:bg-white/30 transition-colors cursor-pointer"
+            className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center hover:bg-green-100/80 transition-colors cursor-pointer"
           >
             <div className="text-2xl mb-1">🚽</div>
             <div className="text-xs opacity-90">WC</div>
@@ -246,13 +246,13 @@ export function DailySummaryCard({
 
         {/* Tracking Cards */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
+          <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20">
             <div className="flex items-center gap-2">
               <Checkbox
                 id="exercise"
                 checked={exercise}
                 onCheckedChange={onExerciseChange}
-                className="border-white data-[state=checked]:bg-white data-[state=checked]:text-emerald-600"
+                className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white"
               />
               <Label htmlFor="exercise" className="text-sm cursor-pointer">
                 🏋️ Cvičenie
@@ -260,7 +260,7 @@ export function DailySummaryCard({
             </div>
           </div>
 
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
+          <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20">
             <div className="space-y-1">
               <Label htmlFor="walk" className="text-xs opacity-90">
                 🚶 Chôdza (min)
@@ -271,19 +271,19 @@ export function DailySummaryCard({
                 min="0"
                 value={walkMinutes}
                 onChange={(e) => onWalkMinutesChange(parseInt(e.target.value) || 0)}
-                className="h-8 bg-white/30 border-white/50 text-white placeholder:text-white/60"
+                className="h-8 bg-white/50 border-primary/30"
               />
             </div>
           </div>
 
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
+          <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="restaurant"
                   checked={restaurant}
                   onCheckedChange={onRestaurantChange}
-                  className="border-white data-[state=checked]:bg-white data-[state=checked]:text-emerald-600"
+                  className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white"
                 />
                 <Label htmlFor="restaurant" className="text-sm cursor-pointer">
                   🍽️ Reštaurácia
@@ -300,12 +300,12 @@ export function DailySummaryCard({
 
         {/* Water & Coffee */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
+          <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center">
             <div className="text-3xl font-bold">{waterTotal}ml</div>
             <div className="text-sm opacity-90">💧 Voda</div>
           </div>
           
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center">
+          <div className="bg-green-100/60 rounded-lg p-3 border border-primary/20 text-center">
             <div className="text-3xl font-bold">{coffeeCount}x</div>
             <div className="text-sm opacity-90">☕ Káva</div>
           </div>
