@@ -237,9 +237,16 @@ export default function Home() {
       />
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
         {/* Header */}
-        <header className="bg-card/80 backdrop-blur-sm border-b sticky top-0 z-10 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-primary">IBS Diary</h1>
+        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container flex h-16 items-center justify-between px-4">
+            <div className="flex items-center gap-3">
+              <img 
+                src="/BCO.37a1abdc-8463-43e4-aa66-804cde14d414.png" 
+                alt="IBS Diary Logo" 
+                className="h-10 w-auto"
+              />
+              <h1 className="text-2xl font-bold text-primary sr-only">IBS Diary</h1>
+            </div>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowProfileDialog(true)}
