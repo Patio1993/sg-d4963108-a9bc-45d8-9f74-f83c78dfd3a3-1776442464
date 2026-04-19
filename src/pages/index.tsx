@@ -243,7 +243,7 @@ export default function Home() {
               <img 
                 src="/BCO.37a1abdc-8463-43e4-aa66-804cde14d414.png" 
                 alt="IBS Diary Logo" 
-                className="h-10 w-auto"
+                className="h-20 w-auto"
               />
               <h1 className="text-2xl font-bold text-primary sr-only">IBS Diary</h1>
             </div>
