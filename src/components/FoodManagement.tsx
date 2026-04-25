@@ -407,33 +407,16 @@ export function FoodManagement() {
             <Card key={food.id}>
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    {food.photo_url ? (
-                      <img src={food.photo_url} alt={food.name} className="w-12 h-12 rounded-md object-cover" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center text-2xl">
-                        {food.emoji || "🍽️"}
-                      </div>
-                    )}
+                  <div className="flex items-center gap-3 flex-1">
+                    <span className="text-2xl">{food.emoji || "🍽️"}</span>
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold leading-none">{food.name}</h3>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleToggleFavorite(food)}
-                        >
-                          <Star
-                            className={`h-4 w-4 ${
-                              food.is_favorite ? "fill-accent text-accent" : "text-muted-foreground"
-                            }`}
-                          />
-                        </Button>
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        na 100{food.unit === "g" ? "g" : "ml"}
-                      </Badge>
+                      <p className="font-medium">
+                        {food.name}
+                        {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {food.kcal} kcal • {food.fiber}g vláknina • {food.sugar}g cukry
+                      </p>
                     </div>
                   </div>
                   <div className="flex gap-1">

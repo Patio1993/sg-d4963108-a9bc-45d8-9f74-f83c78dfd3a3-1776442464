@@ -451,7 +451,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
   const favoriteFoods = foods.filter((f) => f.is_favorite === true);
 
-  const recentFoods = [...foods]
+  const recentlyConsumed = [...foods]
     .filter((f) => f.days_ago !== null && f.days_ago !== undefined)
     .sort((a, b) => {
       if (a.days_ago === null || a.days_ago === undefined) return 1;
@@ -581,29 +581,22 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                         favoriteFoods.map((food) => (
                           <div
                             key={food.id}
-                            className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                            onClick={() => handleSelectFood(food)}
+                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                               selectedFood?.id === food.id
-                                ? "border-primary bg-primary/5"
+                                ? "bg-primary/10 border-primary"
                                 : "hover:bg-muted/50"
                             }`}
-                            onClick={() => handleSelectFood(food)}
                           >
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-center gap-3 flex-1">
-                                {food.photo_url ? (
-                                  <img src={food.photo_url} alt={food.name} className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center text-lg flex-shrink-0">
-                                    {food.emoji || "🍽️"}
-                                  </div>
-                                )}
-                                <div>
-                                  <div className="font-medium leading-none mb-1">{food.name}</div>
-                                  <div className="text-sm text-muted-foreground">
-                                    {food.kcal} kcal • V: {food.fiber}g • C: {food.sugar}g • T: {food.fats}g
-                                  </div>
-                                </div>
-                              </div>
+                            <span className="text-2xl">{food.emoji || "🍽️"}</span>
+                            <div className="flex-1">
+                              <p className="font-medium">
+                                {food.name}
+                                {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {food.kcal} kcal • {food.fiber}g vláknina • {food.sugar}g cukry
+                              </p>
                             </div>
                           </div>
                         ))
@@ -613,12 +606,12 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
                   <TabsContent value="recent" className="mt-4">
                     <div className="grid gap-2 max-h-[400px] overflow-y-auto">
-                      {recentFoods.length === 0 ? (
+                      {recentlyConsumed.length === 0 ? (
                         <p className="text-center text-muted-foreground py-8">
                           Žiadne nedávno konzumované potraviny
                         </p>
                       ) : (
-                        recentFoods.map((food) => (
+                        recentlyConsumed.map((food) => (
                           <div
                             key={food.id}
                             className={`p-3 border rounded-lg cursor-pointer transition-colors ${

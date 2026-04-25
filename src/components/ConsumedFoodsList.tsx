@@ -137,15 +137,17 @@ export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsList
 
                     {/* Second Row: Food Name and Delete */}
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        {food.food?.photo_url ? (
-                          <img src={food.food.photo_url} alt={food.food.name} className="w-10 h-10 rounded-md object-cover bg-white border" />
-                        ) : (
-                          <div className="w-10 h-10 rounded-md bg-muted border flex items-center justify-center text-xl">
-                            {food.food?.emoji || "🍽️"}
-                          </div>
-                        )}
-                        <h3 className="text-xl font-semibold leading-tight">{food.food?.name}</h3>
+                      <div className="flex items-center gap-2 flex-1">
+                        <span className="text-2xl">{food.food.emoji || "🍽️"}</span>
+                        <div>
+                          <p className="font-medium">
+                            {food.food.name}
+                            {food.food.daily_limit && ` - Limit ${food.food.daily_limit} ${food.food.unit}`}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {food.amount}{food.food.unit} • {food.meal_type} • {food.time}
+                          </p>
+                        </div>
                       </div>
                       <Button
                         variant="ghost"
