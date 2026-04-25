@@ -22,6 +22,7 @@ export interface Food {
 
 export interface FoodWithLastConsumed extends Food {
   last_consumed_at?: string | null;
+  days_ago?: number | null;
 }
 
 export type CreateFoodInput = Omit<Food, "id" | "user_id" | "created_at" | "is_favorite" | "emoji" | "photo_url" | "daily_limit"> & {
@@ -43,6 +44,7 @@ export type UpdateFoodInput = {
   is_favorite?: boolean;
   photo_url?: string | null;
   emoji?: string;
+  daily_limit?: number | null;
 };
 
 export const foodService = {

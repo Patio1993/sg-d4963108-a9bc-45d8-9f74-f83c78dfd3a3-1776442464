@@ -339,6 +339,7 @@ export function FoodManagement() {
       daily_limit: food.daily_limit || undefined,
     });
     setEditingFood(food);
+    setShowCreateDialog(true);
   };
 
   const filteredFoods = foods.filter(f => 
