@@ -58,6 +58,7 @@ export function FoodManagement() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoUrlInput, setPhotoUrlInput] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [dailyLimit, setDailyLimit] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     loadFoods();
@@ -91,7 +92,18 @@ export function FoodManagement() {
       daily_limit: undefined,
     });
     setEditingFood(null);
-    setShowForm(false);
+    setName("");
+    setUnit("g");
+    setKcal("");
+    setFiber("");
+    setSugar("");
+    setCarbs("");
+    setFats("");
+    setProtein("");
+    setSalt("");
+    setPhotoUrl(null);
+    setPhotoUrlInput("");
+    setDailyLimit(undefined);
   };
 
   const handleOpenCreate = () => {
@@ -112,6 +124,7 @@ export function FoodManagement() {
     setSalt(food.salt.toString());
     setPhotoUrl(food.photo_url || null);
     setPhotoUrlInput(food.photo_url || "");
+    setDailyLimit(food.daily_limit || undefined);
     setShowCreateDialog(true);
   };
 
@@ -247,6 +260,7 @@ export function FoodManagement() {
         salt: validateNumber(salt),
         photo_url: photoUrl,
         emoji: emojiService.getFoodEmoji(name.trim()),
+        daily_limit: dailyLimit || null,
       };
 
       if (editingFood) {
@@ -325,7 +339,7 @@ export function FoodManagement() {
       daily_limit: food.daily_limit || undefined,
     });
     setEditingFood(food);
-    setShowForm(true);
+    setShowCreateDialog(true);
   };
 
   const filteredFoods = foods.filter(f => 
@@ -553,6 +567,22 @@ export function FoodManagement() {
                   </div>
                 )}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="daily_limit">Denný limit ({unit})</Label>
+              <Input
+                id="daily_limit"
+                type="number"
+                step="0.01"
+                min="0"
+                value={dailyLimit || ""}
+                onChange={(e) => setDailyLimit(e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder={`napr. 100${unit}`}
+              />
+              <p className="text-xs text-muted-foreground">
+                Odporúčané maximálne množstvo na deň
+              </p>
             </div>
 
             {/* Photo Section */}

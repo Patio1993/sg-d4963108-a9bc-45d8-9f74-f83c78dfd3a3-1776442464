@@ -1,13 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
-export type Food = Tables<"foods">;
-
-export type FoodWithLastConsumed = Food & {
-  days_ago?: number | null;
-};
-
-export type CreateFoodInput = {
+export interface Food {
+  id: string;
+  user_id: string;
   name: string;
   unit: "g" | "ml";
   kcal: number;
@@ -17,8 +13,21 @@ export type CreateFoodInput = {
   fats: number;
   protein: number;
   salt: number;
-  photo_url?: string | null;
+  is_favorite: boolean;
   emoji?: string;
+  photo_url?: string | null;
+  daily_limit?: number | null;
+  created_at: string;
+}
+
+export interface FoodWithLastConsumed extends Food {
+  last_consumed_at?: string | null;
+}
+
+export type CreateFoodInput = Omit<Food, "id" | "user_id" | "created_at" | "is_favorite" | "emoji" | "photo_url" | "daily_limit"> & {
+  emoji?: string;
+  photo_url?: string | null;
+  daily_limit?: number | null;
 };
 
 export type UpdateFoodInput = {
