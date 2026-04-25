@@ -586,6 +586,17 @@ export function FoodManagement() {
               />
             </div>
 
+            <div className="space-y-2 pt-2">
+              <Label htmlFor="notes">Poznámka</Label>
+              <textarea
+                id="notes"
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Voliteľná poznámka k potravine..."
+              />
+            </div>
+
             {/* Photo Section */}
             <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
               <Label>Obrázok potraviny</Label>
@@ -756,17 +767,6 @@ export function FoodManagement() {
                   placeholder="0"
                 />
               </div>
-            </div>
-
-            <div className="space-y-2 pt-2">
-              <Label htmlFor="notes">Poznámka</Label>
-              <textarea
-                id="notes"
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Voliteľná poznámka k potravine..."
-              />
             </div>
 
             <DialogFooter className="pt-4 border-t mt-4">
