@@ -149,6 +149,7 @@ export type Database = {
           is_favorite: boolean
           kcal: number
           name: string
+          notes: string | null
           photo_url: string | null
           protein: number
           salt: number
@@ -168,6 +169,7 @@ export type Database = {
           is_favorite?: boolean
           kcal?: number
           name: string
+          notes?: string | null
           photo_url?: string | null
           protein?: number
           salt?: number
@@ -187,6 +189,7 @@ export type Database = {
           is_favorite?: boolean
           kcal?: number
           name?: string
+          notes?: string | null
           photo_url?: string | null
           protein?: number
           salt?: number

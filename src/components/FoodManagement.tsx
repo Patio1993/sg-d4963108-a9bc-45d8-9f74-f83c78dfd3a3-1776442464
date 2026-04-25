@@ -59,6 +59,7 @@ export function FoodManagement() {
   const [photoUrlInput, setPhotoUrlInput] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [dailyLimit, setDailyLimit] = useState<number | undefined>(undefined);
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     loadFoods();
@@ -104,6 +105,7 @@ export function FoodManagement() {
     setPhotoUrl(null);
     setPhotoUrlInput("");
     setDailyLimit(undefined);
+    setNotes("");
   };
 
   const handleOpenCreate = () => {
@@ -125,6 +127,7 @@ export function FoodManagement() {
     setPhotoUrl(food.photo_url || null);
     setPhotoUrlInput(food.photo_url || "");
     setDailyLimit(food.daily_limit || undefined);
+    setNotes(food.notes || "");
     setShowCreateDialog(true);
   };
 
@@ -261,6 +264,7 @@ export function FoodManagement() {
         photo_url: photoUrl,
         emoji: emojiService.getFoodEmoji(name.trim()),
         daily_limit: dailyLimit || null,
+        notes: notes.trim() || null,
       };
 
       if (editingFood) {
@@ -337,6 +341,7 @@ export function FoodManagement() {
       is_favorite: food.is_favorite,
       emoji: food.emoji || "🍽️",
       daily_limit: food.daily_limit || undefined,
+      notes: food.notes || "",
     });
     setEditingFood(food);
     setShowCreateDialog(true);
@@ -755,6 +760,17 @@ export function FoodManagement() {
                   placeholder="0"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2 pt-2">
+              <Label htmlFor="notes">Poznámka</Label>
+              <textarea
+                id="notes"
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Voliteľná poznámka k potravine..."
+              />
             </div>
 
             <DialogFooter className="pt-4 border-t mt-4">

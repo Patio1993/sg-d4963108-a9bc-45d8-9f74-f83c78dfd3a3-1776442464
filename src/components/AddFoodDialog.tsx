@@ -379,7 +379,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
         emoji: emojiService.getFoodEmoji(newFoodName.trim())
       };
       
-      await foodService.createFood(foodData);
+      const createdFood = await foodService.createFood(foodData);
       toast({
         title: "Úspech",
         description: "Nová potravina vytvorená",
