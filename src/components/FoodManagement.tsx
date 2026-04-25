@@ -127,6 +127,7 @@ export function FoodManagement() {
     setPhotoUrl(food.photo_url || null);
     setPhotoUrlInput(food.photo_url || "");
     setDailyLimit(food.daily_limit?.toString() || "");
+    setNotes(food.notes || "");
     setShowCreateDialog(true);
   };
 
@@ -263,6 +264,7 @@ export function FoodManagement() {
         photo_url: photoUrl,
         emoji: emojiService.getFoodEmoji(name.trim()),
         daily_limit: dailyLimit ? parseFloat(dailyLimit) : null,
+        notes: notes.trim() || null,
       };
 
       if (editingFood) {

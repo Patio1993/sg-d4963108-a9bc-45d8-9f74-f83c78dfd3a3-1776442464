@@ -383,6 +383,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
         photo_url: newFoodPhotoUrl,
         emoji: emojiService.getFoodEmoji(newFoodName.trim()),
         daily_limit: newFoodDailyLimit ? parseFloat(newFoodDailyLimit) : null,
+        notes: newFoodNotes.trim() || null,
       };
       
       const createdFood = await foodService.createFood(foodData);
