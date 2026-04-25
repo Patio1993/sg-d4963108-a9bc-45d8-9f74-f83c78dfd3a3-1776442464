@@ -1,18 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { foodService, type FoodWithLastConsumed, type CreateFoodInput } from "@/services/foodService";
-import { consumedFoodService, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
-import { openFoodFactsService, type OpenFoodFactsProduct } from "@/services/openFoodFactsService";
-import { storageService } from "@/services/storageService";
-import { emojiService } from "@/services/emojiService";
-import { Plus, Search, Download, Image as ImageIcon, Upload, Link as LinkIcon, Trash2 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Plus, Search, Download, Image as ImageIcon, Upload, Link as LinkIcon, Trash2, Star, Clock, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AddFoodDialogProps {
