@@ -369,7 +369,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
     try {
       const foodData: CreateFoodInput = {
         name: newFoodName.trim(),
-        unit: "g",
+        unit: "g" as "g" | "ml",
         kcal: parseFloat(newFoodKcal) || 0,
         fiber: parseFloat(newFoodFiber) || 0,
         sugar: parseFloat(newFoodSugar) || 0,
