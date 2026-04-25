@@ -32,6 +32,20 @@ export function FoodManagement() {
   const [isSearchingOff, setIsSearchingOff] = useState(false);
 
   // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    unit: "g" as "g" | "ml",
+    kcal: 0,
+    fiber: 0,
+    sugar: 0,
+    carbs: 0,
+    fats: 0,
+    protein: 0,
+    salt: 0,
+    is_favorite: false,
+    emoji: "🍽️",
+    daily_limit: undefined as number | undefined,
+  });
   const [name, setName] = useState("");
   const [unit, setUnit] = useState<"g" | "ml">("g");
   const [kcal, setKcal] = useState("");
@@ -62,18 +76,22 @@ export function FoodManagement() {
   };
 
   const resetForm = () => {
-    setName("");
-    setUnit("g");
-    setKcal("");
-    setFiber("");
-    setSugar("");
-    setCarbs("");
-    setFats("");
-    setProtein("");
-    setSalt("");
-    setPhotoUrl(null);
-    setPhotoUrlInput("");
+    setFormData({
+      name: "",
+      unit: "g",
+      kcal: 0,
+      fiber: 0,
+      sugar: 0,
+      carbs: 0,
+      fats: 0,
+      protein: 0,
+      salt: 0,
+      is_favorite: false,
+      emoji: "🍽️",
+      daily_limit: undefined,
+    });
     setEditingFood(null);
+    setShowForm(false);
   };
 
   const handleOpenCreate = () => {
@@ -289,6 +307,25 @@ export function FoodManagement() {
         variant: "destructive",
       });
     }
+  };
+
+  const handleEdit = (food: Food) => {
+    setFormData({
+      name: food.name,
+      unit: food.unit,
+      kcal: food.kcal,
+      fiber: food.fiber,
+      sugar: food.sugar,
+      carbs: food.carbs,
+      fats: food.fats,
+      protein: food.protein,
+      salt: food.salt,
+      is_favorite: food.is_favorite,
+      emoji: food.emoji || "🍽️",
+      daily_limit: food.daily_limit || undefined,
+    });
+    setEditingFood(food);
+    setShowForm(true);
   };
 
   const filteredFoods = foods.filter(f => 

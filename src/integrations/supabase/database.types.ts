@@ -141,6 +141,7 @@ export type Database = {
         Row: {
           carbs: number
           created_at: string | null
+          daily_limit: number | null
           emoji: string | null
           fats: number
           fiber: number
@@ -159,6 +160,7 @@ export type Database = {
         Insert: {
           carbs?: number
           created_at?: string | null
+          daily_limit?: number | null
           emoji?: string | null
           fats?: number
           fiber?: number
@@ -177,6 +179,7 @@ export type Database = {
         Update: {
           carbs?: number
           created_at?: string | null
+          daily_limit?: number | null
           emoji?: string | null
           fats?: number
           fiber?: number
