@@ -341,7 +341,6 @@ export function FoodManagement() {
       is_favorite: food.is_favorite,
       emoji: food.emoji || "🍽️",
       daily_limit: food.daily_limit || undefined,
-      notes: food.notes || "",
     });
     setEditingFood(food);
     setShowCreateDialog(true);
