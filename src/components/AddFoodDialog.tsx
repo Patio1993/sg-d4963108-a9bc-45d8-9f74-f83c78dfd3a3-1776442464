@@ -937,6 +937,15 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                 placeholder="napr. zelenina, cukorová čajová číška, ..."
               />
             </div>
+
+            <DialogFooter className="pt-4 border-t mt-4">
+              <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+                Zrušiť
+              </Button>
+              <Button type="submit" disabled={!newFoodName.trim()}>
+                Vytvoriť potravinu
+              </Button>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
@@ -1009,6 +1018,67 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateFood} className="space-y-4">
+            {/* Photo Section */}
+            <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+              <Label>Obrázok potraviny</Label>
+              
+              {newFoodPhotoUrl && (
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <img src={newFoodPhotoUrl} alt="Náhľad" className="w-32 h-32 rounded-lg object-cover shadow-sm" />
+                    <Button 
+                      type="button" 
+                      variant="destructive" 
+                      size="icon" 
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                      onClick={handleRemoveNewFoodPhoto}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <Tabs defaultValue="url" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="url">
+                    <LinkIcon className="h-4 w-4 mr-2" />
+                    URL
+                  </TabsTrigger>
+                  <TabsTrigger value="upload">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Nahrať
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="url" className="space-y-2">
+                  <Input
+                    placeholder="https://example.com/photo.jpg alebo Google Photos URL"
+                    value={newFoodPhotoUrlInput}
+                    onChange={(e) => handleNewFoodPhotoUrlChange(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Vložte URL obrázka (napr. z Google Photos alebo iného zdroja)
+                  </p>
+                </TabsContent>
+                
+                <TabsContent value="upload" className="space-y-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleNewFoodPhotoUpload}
+                    disabled={uploadingNewFoodPhoto}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Maximálna veľkosť: 5MB. Podporované formáty: JPG, PNG, WebP
+                  </p>
+                  {uploadingNewFoodPhoto && (
+                    <p className="text-sm text-blue-600">Nahráva sa...</p>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="new-food-name">Názov potraviny *</Label>
               <div className="flex gap-2">
