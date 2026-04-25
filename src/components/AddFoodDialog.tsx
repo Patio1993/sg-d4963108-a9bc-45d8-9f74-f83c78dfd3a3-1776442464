@@ -390,12 +390,13 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
       });
       
       // Auto-select the newly created food
-      setSelectedFood({
+      const foodWithLastConsumed: FoodWithLastConsumed = {
         ...createdFood,
         unit: createdFood.unit as "g" | "ml",
         last_consumed_at: null,
         days_ago: null,
-      });
+      };
+      setSelectedFood(foodWithLastConsumed);
       setAmount("100");
       
       // Reset form
