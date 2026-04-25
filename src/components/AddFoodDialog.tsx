@@ -118,7 +118,10 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
   useEffect(() => {
     if (editingFood && open) {
-      setSelectedFood(editingFood.food);
+      setSelectedFood({
+        ...editingFood.food,
+        unit: editingFood.food.unit as "g" | "ml",
+      });
       setAmount(editingFood.amount.toString());
       setMealType(mapMealTypeFromDb(editingFood.meal_type));
       setReaction(mapReactionFromDb(editingFood.reaction));
