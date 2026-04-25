@@ -118,7 +118,7 @@ export function FoodManagement() {
   const handleOpenEdit = (food: Food) => {
     setEditingFood(food);
     setName(food.name);
-    setUnit(food.unit as "g" | "ml");
+    setUnit(food.unit);
     setKcal(food.kcal.toString());
     setFiber(food.fiber.toString());
     setSugar(food.sugar.toString());
