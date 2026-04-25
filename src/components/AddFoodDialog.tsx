@@ -103,6 +103,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   const [newFoodPhotoUrl, setNewFoodPhotoUrl] = useState<string | null>(null);
   const [newFoodPhotoUrlInput, setNewFoodPhotoUrlInput] = useState("");
   const [uploadingNewFoodPhoto, setUploadingNewFoodPhoto] = useState(false);
+  const [newFoodDailyLimit, setNewFoodDailyLimit] = useState<number | undefined>(undefined);
+  const [newFoodNotes, setNewFoodNotes] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -376,7 +378,9 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
         protein: parseFloat(newFoodProtein) || 0,
         salt: parseFloat(newFoodSalt) || 0,
         photo_url: newFoodPhotoUrl,
-        emoji: emojiService.getFoodEmoji(newFoodName.trim())
+        emoji: emojiService.getFoodEmoji(newFoodName.trim()),
+        daily_limit: newFoodDailyLimit || null,
+        notes: newFoodNotes.trim() || null
       };
       
       const createdFood = await foodService.createFood(foodData);
@@ -395,6 +399,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
       setNewFoodSalt("");
       setNewFoodPhotoUrl(null);
       setNewFoodPhotoUrlInput("");
+      setNewFoodDailyLimit(undefined);
+      setNewFoodNotes("");
       setShowCreateDialog(false);
       // Reload foods
       await loadFoods();
@@ -475,6 +481,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                         setNewFoodProtein("");
                         setNewFoodSalt("");
                         setNewFoodPhotoUrl(null);
+                        setNewFoodDailyLimit(undefined);
+                        setNewFoodNotes("");
                         setShowCreateDialog(true);
                       }}
                     >
@@ -865,6 +873,22 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
               </div>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="new-daily-limit">Denný limit (g)</Label>
+              <Input
+                id="new-daily-limit"
+                type="number"
+                step="0.01"
+                min="0"
+                value={newFoodDailyLimit || ""}
+                onChange={(e) => setNewFoodDailyLimit(e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="napr. 100g"
+              />
+              <p className="text-xs text-muted-foreground">
+                Odporúčané maximálne množstvo na deň
+              </p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="new-kcal">Kcal/100g</Label>
@@ -958,7 +982,18 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
               </div>
             </div>
 
-            <div className="flex justify-end gap-2">
+            <div className="space-y-2 pt-2">
+              <Label htmlFor="new-notes">Poznámka</Label>
+              <textarea
+                id="new-notes"
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                value={newFoodNotes}
+                onChange={(e) => setNewFoodNotes(e.target.value)}
+                placeholder="Voliteľná poznámka k potravine..."
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 mt-4">
               <Button
                 type="button"
                 variant="outline"
