@@ -8,8 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Search, Download, Image as ImageIcon, Upload, Link as LinkIcon, Trash2, Star, Clock, Heart } from "lucide-react";
+import { Calendar, Clock, Heart, Plus, Search, Star, Trash2, Upload, LinkIcon, Download, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { foodService, type FoodWithLastConsumed, type CreateFoodInput } from "@/services/foodService";
+import { consumedFoodService, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
+import { openFoodFactsService, type OpenFoodFactsProduct } from "@/services/openFoodFactsService";
+import { storageService } from "@/services/storageService";
+import { emojiService } from "@/services/emojiService";
 
 interface AddFoodDialogProps {
   open: boolean;
