@@ -59,7 +59,7 @@ export function FoodManagement() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoUrlInput, setPhotoUrlInput] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [dailyLimit, setDailyLimit] = useState<number | undefined>(undefined);
+  const [dailyLimit, setDailyLimit] = useState("");
   const [notes, setNotes] = useState("");
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export function FoodManagement() {
     setSalt("");
     setPhotoUrl(null);
     setPhotoUrlInput("");
-    setDailyLimit(undefined);
+    setDailyLimit("");
     setNotes("");
   };
 
@@ -128,8 +128,7 @@ export function FoodManagement() {
     setSalt(food.salt.toString());
     setPhotoUrl(food.photo_url || null);
     setPhotoUrlInput(food.photo_url || "");
-    setDailyLimit(food.daily_limit || undefined);
-    setNotes(food.notes || "");
+    setDailyLimit(food.daily_limit?.toString() || "");
     setShowCreateDialog(true);
   };
 
@@ -265,8 +264,7 @@ export function FoodManagement() {
         salt: validateNumber(salt),
         photo_url: photoUrl,
         emoji: emojiService.getFoodEmoji(name.trim()),
-        daily_limit: dailyLimit || null,
-        notes: notes.trim() || null,
+        daily_limit: dailyLimit ? parseFloat(dailyLimit) : null,
       };
 
       if (editingFood) {
@@ -577,19 +575,16 @@ export function FoodManagement() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="daily_limit">Denný limit ({unit})</Label>
+              <Label htmlFor="daily_limit">Limit</Label>
               <Input
                 id="daily_limit"
                 type="number"
                 step="0.01"
                 min="0"
-                value={dailyLimit || ""}
-                onChange={(e) => setDailyLimit(e.target.value ? parseFloat(e.target.value) : undefined)}
-                placeholder={`napr. 100${unit}`}
+                value={dailyLimit}
+                onChange={(e) => setDailyLimit(e.target.value)}
+                placeholder="0.00"
               />
-              <p className="text-xs text-muted-foreground">
-                Odporúčané maximálne množstvo na deň
-              </p>
             </div>
 
             {/* Photo Section */}

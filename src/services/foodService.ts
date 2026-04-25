@@ -17,7 +17,6 @@ export interface Food {
   emoji?: string;
   photo_url?: string | null;
   daily_limit?: number | null;
-  notes?: string | null;
   created_at: string;
 }
 
@@ -26,11 +25,10 @@ export interface FoodWithLastConsumed extends Food {
   days_ago?: number | null;
 }
 
-export type CreateFoodInput = Omit<Food, "id" | "user_id" | "created_at" | "is_favorite" | "emoji" | "photo_url" | "daily_limit" | "notes"> & {
+export type CreateFoodInput = Omit<Food, "id" | "user_id" | "created_at" | "is_favorite" | "emoji" | "photo_url" | "daily_limit"> & {
   emoji?: string;
   photo_url?: string | null;
   daily_limit?: number | null;
-  notes?: string | null;
 };
 
 export type UpdateFoodInput = {
@@ -47,7 +45,6 @@ export type UpdateFoodInput = {
   photo_url?: string | null;
   emoji?: string;
   daily_limit?: number | null;
-  notes?: string | null;
 };
 
 export const foodService = {
@@ -112,7 +109,6 @@ export const foodService = {
         photo_url: input.photo_url || null,
         emoji: input.emoji || "🍽️",
         daily_limit: input.daily_limit || null,
-        notes: input.notes || null,
       })
       .select()
       .single();
