@@ -737,13 +737,20 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
             {selectedFood && (
               <div className="space-y-4 pt-4 border-t">
-                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                  <span className="text-2xl">{selectedFood.emoji || "🍽️"}</span>
+                <div className="p-4 border rounded-lg bg-muted/50 flex items-center gap-4">
+                  {selectedFood.photo_url ? (
+                    <img src={selectedFood.photo_url} alt={selectedFood.name} className="w-16 h-16 rounded-md object-cover bg-white" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-md bg-white border flex items-center justify-center text-3xl">
+                      {selectedFood.emoji || "🍽️"}
+                    </div>
+                  )}
                   <div className="flex-1">
-                    <p className="font-medium">{selectedFood.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedFood.kcal} kcal • {selectedFood.fiber}g vláknina • {selectedFood.sugar}g cukry
-                    </p>
+                    <div className="font-medium mb-1">Vybraná potravina:</div>
+                    <div className="font-semibold text-lg">{selectedFood.name}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {selectedFood.kcal} kcal/{selectedFood.unit === "ml" ? "100ml" : "100g"} • V: {selectedFood.fiber}g • C: {selectedFood.sugar}g • T: {selectedFood.fats}g
+                    </div>
                   </div>
                   <Button
                     type="button"
