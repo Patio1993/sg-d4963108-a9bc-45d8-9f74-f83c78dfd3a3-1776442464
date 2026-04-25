@@ -391,8 +391,23 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
       
       // Auto-select the newly created food
       const foodWithLastConsumed: FoodWithLastConsumed = {
-        ...createdFood,
+        id: createdFood.id,
+        user_id: createdFood.user_id,
+        name: createdFood.name,
         unit: createdFood.unit as "g" | "ml",
+        kcal: createdFood.kcal,
+        fiber: createdFood.fiber,
+        sugar: createdFood.sugar,
+        carbs: createdFood.carbs,
+        fats: createdFood.fats,
+        protein: createdFood.protein,
+        salt: createdFood.salt,
+        is_favorite: createdFood.is_favorite,
+        emoji: createdFood.emoji,
+        photo_url: createdFood.photo_url,
+        daily_limit: createdFood.daily_limit,
+        notes: createdFood.notes,
+        created_at: createdFood.created_at,
         last_consumed_at: null,
         days_ago: null,
       };
