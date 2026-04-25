@@ -741,13 +741,200 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
               </div>
             )}
 
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Zrušiť
-              </Button>
-              <Button type="submit" disabled={!selectedFood && !editingFood}>
-                {editingFood ? "Uložiť" : "Pridať"}
-              </Button>
+            {/* Photo Section */}
+            <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+              <Label>Obrázok potraviny</Label>
+              
+              {newFoodPhotoUrl && (
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <img src={newFoodPhotoUrl} alt="Náhľad" className="w-32 h-32 rounded-lg object-cover shadow-sm" />
+                    <Button 
+                      type="button" 
+                      variant="destructive" 
+                      size="icon" 
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                      onClick={handleRemoveNewFoodPhoto}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <Tabs defaultValue="url" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="url">
+                    <LinkIcon className="h-4 w-4 mr-2" />
+                    URL
+                  </TabsTrigger>
+                  <TabsTrigger value="upload">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Nahrať
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="url" className="space-y-2">
+                  <Input
+                    placeholder="https://example.com/photo.jpg alebo Google Photos URL"
+                    value={newFoodPhotoUrlInput}
+                    onChange={(e) => handleNewFoodPhotoUrlChange(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Vložte URL obrázka (napr. z Google Photos alebo iného zdroja)
+                  </p>
+                </TabsContent>
+                
+                <TabsContent value="upload" className="space-y-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleNewFoodPhotoUpload}
+                    disabled={uploadingNewFoodPhoto}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Maximálna veľkosť: 5MB. Podporované formáty: JPG, PNG, WebP
+                  </p>
+                  {uploadingNewFoodPhoto && (
+                    <p className="text-sm text-blue-600">Nahráva sa...</p>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-food-name">Názov potraviny *</Label>
+                <div className="flex gap-2">
+                  <Input
+                    ref={newFoodNameInputRef}
+                    id="new-food-name"
+                    value={newFoodName}
+                    onChange={(e) => setNewFoodName(e.target.value)}
+                    placeholder="napr. Jablko"
+                    required
+                  />
+                  {!newFoodPhotoUrl && (
+                    <div className="w-10 h-10 border rounded-md flex items-center justify-center bg-muted text-xl flex-shrink-0" title="Automatický emotikon">
+                      {newFoodName.trim() ? emojiService.getFoodEmoji(newFoodName.trim()) : "🍽️"}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-daily-limit">Limit</Label>
+                <Input
+                  id="new-daily-limit"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={newFoodDailyLimit}
+                  onChange={(e) => setNewFoodDailyLimit(e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-kcal">Kcal/100g</Label>
+                <Input
+                  id="new-kcal"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodKcal}
+                  onChange={(e) => setNewFoodKcal(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-fiber">Vláknina/100g (g)</Label>
+                <Input
+                  id="new-fiber"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodFiber}
+                  onChange={(e) => setNewFoodFiber(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-sugar">Sukríny/100g (g)</Label>
+                <Input
+                  id="new-sugar"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodSugar}
+                  onChange={(e) => setNewFoodSugar(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-carbs">Sústava/100g (g)</Label>
+                <Input
+                  id="new-carbs"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodCarbs}
+                  onChange={(e) => setNewFoodCarbs(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-fats">Tuky/100g (g)</Label>
+                <Input
+                  id="new-fats"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodFats}
+                  onChange={(e) => setNewFoodFats(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-protein">Bielek/100g (g)</Label>
+                <Input
+                  id="new-protein"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodProtein}
+                  onChange={(e) => setNewFoodProtein(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-salt">Sůl/100g (g)</Label>
+                <Input
+                  id="new-salt"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={newFoodSalt}
+                  onChange={(e) => setNewFoodSalt(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="new-notes">Poznámky</Label>
+              <Textarea
+                id="new-notes"
+                value={newFoodNotes}
+                onChange={(e) => setNewFoodNotes(e.target.value)}
+                placeholder="napr. zelenina, cukorová čajová číška, ..."
+              />
             </div>
           </form>
         </DialogContent>
@@ -821,67 +1008,6 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateFood} className="space-y-4">
-            {/* Photo Section */}
-            <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
-              <Label>Obrázok potraviny</Label>
-              
-              {newFoodPhotoUrl && (
-                <div className="flex justify-center">
-                  <div className="relative">
-                    <img src={newFoodPhotoUrl} alt="Náhľad" className="w-32 h-32 rounded-lg object-cover shadow-sm" />
-                    <Button 
-                      type="button" 
-                      variant="destructive" 
-                      size="icon" 
-                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                      onClick={handleRemoveNewFoodPhoto}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              <Tabs defaultValue="url" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="url">
-                    <LinkIcon className="h-4 w-4 mr-2" />
-                    URL
-                  </TabsTrigger>
-                  <TabsTrigger value="upload">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Nahrať
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="url" className="space-y-2">
-                  <Input
-                    placeholder="https://example.com/photo.jpg alebo Google Photos URL"
-                    value={newFoodPhotoUrlInput}
-                    onChange={(e) => handleNewFoodPhotoUrlChange(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Vložte URL obrázka (napr. z Google Photos alebo iného zdroja)
-                  </p>
-                </TabsContent>
-                
-                <TabsContent value="upload" className="space-y-2">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleNewFoodPhotoUpload}
-                    disabled={uploadingNewFoodPhoto}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Maximálna veľkosť: 5MB. Podporované formáty: JPG, PNG, WebP
-                  </p>
-                  {uploadingNewFoodPhoto && (
-                    <p className="text-sm text-blue-600">Nahráva sa...</p>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="new-food-name">Názov potraviny *</Label>
               <div className="flex gap-2">
@@ -942,7 +1068,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="new-sugar">Cukor/100g (g)</Label>
+                <Label htmlFor="new-sugar">Sukríny/100g (g)</Label>
                 <Input
                   id="new-sugar"
                   type="number"
@@ -955,7 +1081,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="new-carbs">Sacharidy/100g (g)</Label>
+                <Label htmlFor="new-carbs">Sústava/100g (g)</Label>
                 <Input
                   id="new-carbs"
                   type="number"
@@ -981,7 +1107,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="new-protein">Bielkoviny/100g (g)</Label>
+                <Label htmlFor="new-protein">Bielek/100g (g)</Label>
                 <Input
                   id="new-protein"
                   type="number"
@@ -993,8 +1119,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                 />
               </div>
 
-              <div className="space-y-2 col-span-2">
-                <Label htmlFor="new-salt">Soľ/100g (g)</Label>
+              <div className="space-y-2">
+                <Label htmlFor="new-salt">Sůl/100g (g)</Label>
                 <Input
                   id="new-salt"
                   type="number"
@@ -1007,28 +1133,14 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
               </div>
             </div>
 
-            <div className="space-y-2 pt-2">
-              <Label htmlFor="new-notes">Poznámka</Label>
-              <textarea
+            <div className="space-y-2">
+              <Label htmlFor="new-notes">Poznámky</Label>
+              <Textarea
                 id="new-notes"
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 value={newFoodNotes}
                 onChange={(e) => setNewFoodNotes(e.target.value)}
-                placeholder="Voliteľná poznámka k potravine..."
+                placeholder="napr. zelenina, cukorová čajová číška, ..."
               />
-            </div>
-
-            <div className="flex justify-end gap-2 mt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowCreateDialog(false)}
-              >
-                Zrušiť
-              </Button>
-              <Button type="submit">
-                Vytvoriť
-              </Button>
             </div>
           </form>
         </DialogContent>
