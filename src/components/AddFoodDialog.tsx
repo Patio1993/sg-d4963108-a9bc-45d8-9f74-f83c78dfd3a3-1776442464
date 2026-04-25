@@ -388,6 +388,16 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
         title: "Úspech",
         description: "Nová potravina vytvorená",
       });
+      
+      // Auto-select the newly created food
+      setSelectedFood({
+        ...createdFood,
+        unit: createdFood.unit as "g" | "ml",
+        last_consumed_at: null,
+        days_ago: null,
+      });
+      setAmount("100");
+      
       // Reset form
       setNewFoodName("");
       setNewFoodKcal("");
