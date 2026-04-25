@@ -45,7 +45,6 @@ export function FoodManagement() {
     is_favorite: false,
     emoji: "🍽️",
     daily_limit: undefined as number | undefined,
-    notes: "",
   });
   const [name, setName] = useState("");
   const [unit, setUnit] = useState<"g" | "ml">("g");
@@ -92,7 +91,6 @@ export function FoodManagement() {
       is_favorite: false,
       emoji: "🍽️",
       daily_limit: undefined,
-      notes: "",
     });
     setEditingFood(null);
     setName("");
