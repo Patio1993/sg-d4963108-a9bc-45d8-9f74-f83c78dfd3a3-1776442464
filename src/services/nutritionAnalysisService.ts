@@ -81,6 +81,16 @@ export const nutritionAnalysisService = {
     }
 
     // Aggregate totals
+    const totals = {
+      kcal: 0,
+      protein: 0,
+      carbs: 0,
+      sugar: 0,
+      fats: 0,
+      fiber: 0,
+      salt: 0,
+    };
+
     if (consumedFoods) {
       consumedFoods.forEach((entry) => {
         if (!entry.food) return;
@@ -102,13 +112,13 @@ export const nutritionAnalysisService = {
     const days = daysDiff > 0 ? daysDiff : 1;
 
     // Calculate averages
-    const avgKcal = totalKcal / days;
-    const avgProtein = totalProtein / days;
-    const avgCarbs = totalCarbs / days;
-    const avgSugar = totalSugar / days;
-    const avgFats = totalFats / days;
-    const avgFiber = totalFiber / days;
-    const avgSalt = totalSalt / days;
+    const avgKcal = totals.kcal / days;
+    const avgProtein = totals.protein / days;
+    const avgCarbs = totals.carbs / days;
+    const avgSugar = totals.sugar / days;
+    const avgFats = totals.fats / days;
+    const avgFiber = totals.fiber / days;
+    const avgSalt = totals.salt / days;
 
     // Define goals
     const goals = {
