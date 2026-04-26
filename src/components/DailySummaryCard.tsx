@@ -9,6 +9,8 @@ import { sk } from "date-fns/locale";
 import { Salad, Droplets, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { NutrientDetailDialog } from "./NutrientDetailDialog";
+import { useState } from "react";
 
 interface CircularProgressProps {
   value: number;
@@ -109,6 +111,11 @@ export function DailySummaryCard({
   onMedicineClick,
   onWCClick,
 }: DailySummaryCardProps) {
+  const [selectedNutrient, setSelectedNutrient] = useState<string | null>(null);
+
+  const handleNutrientClick = (nutrientType: string) => {
+    setSelectedNutrient(nutrientType);
+  };
 
   // Define default values if goals are not set
   const nutrients = [
@@ -147,7 +154,10 @@ export function DailySummaryCard({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Calories */}
-        <div className="bg-green-50 rounded-lg p-4 border">
+        <div 
+          className="bg-green-50 rounded-lg p-4 border cursor-pointer hover:bg-green-100 transition-colors"
+          onClick={() => handleNutrientClick("kcal")}
+        >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="text-lg">🔥</span>
@@ -179,10 +189,21 @@ export function DailySummaryCard({
               const belowRange = percentage < 80;
               const aboveRange = percentage > 110;
 
+              // Map Slovak labels to English nutrient types
+              const nutrientTypeMap: Record<string, string> = {
+                "Bielkoviny": "protein",
+                "Sacharidy": "carbs",
+                "Tuky": "fats",
+                "Vláknina": "fiber",
+                "Cukry": "sugar",
+                "Soľ": "salt",
+              };
+
               return (
                 <div
                   key={nutrient.label}
-                  className="bg-green-50 rounded-lg p-3 border"
+                  className="bg-green-50 rounded-lg p-3 border cursor-pointer hover:bg-green-100 transition-colors"
+                  onClick={() => handleNutrientClick(nutrientTypeMap[nutrient.label])}
                 >
                   <div className="flex flex-col items-center gap-2">
                     <div className="text-xs font-medium text-muted-foreground">{nutrient.label}</div>
@@ -304,6 +325,13 @@ export function DailySummaryCard({
         </div>
 
       </CardContent>
+
+      <NutrientDetailDialog
+        date={date}
+        nutrientType={selectedNutrient}
+        isOpen={selectedNutrient !== null}
+        onClose={() => setSelectedNutrient(null)}
+      />
     </Card>
   );
 }
