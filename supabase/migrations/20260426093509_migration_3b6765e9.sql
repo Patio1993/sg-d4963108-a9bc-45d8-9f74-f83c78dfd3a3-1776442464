@@ -1,0 +1,1 @@
+ALTER TABLE daily_summary ADD COLUMN IF NOT EXISTS weight numeric(5,1) NULL;

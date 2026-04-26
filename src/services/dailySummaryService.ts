@@ -36,6 +36,7 @@ export const dailySummaryService = {
           exercise: false,
           walk_minutes: 0,
           restaurant: false,
+          weight: null,
         })
         .select()
         .single();
@@ -49,7 +50,7 @@ export const dailySummaryService = {
 
   async updateDailySummary(
     date: string,
-    updates: Partial<Pick<DailySummary, "exercise" | "walk_minutes" | "restaurant">>
+    updates: Partial<Pick<DailySummary, "exercise" | "walk_minutes" | "restaurant" | "weight">>
   ): Promise<void> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
