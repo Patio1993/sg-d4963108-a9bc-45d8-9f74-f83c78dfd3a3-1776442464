@@ -300,10 +300,7 @@ export function DailySummaryCard({
         </div>
 
         {/* Nutrients with Progress */}
-        <div className="space-y-2">
-          <div className="text-sm font-medium text-muted-foreground px-1">Denné ciele:</div>
-          <div className="grid grid-cols-3 gap-3">
-          </div>
+        <div className="grid grid-cols-3 gap-3">
         </div>
 
       </CardContent>
