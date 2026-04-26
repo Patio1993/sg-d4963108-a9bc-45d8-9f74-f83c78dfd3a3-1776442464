@@ -18,7 +18,7 @@ export interface NutritionAnalysisData {
 export const nutritionAnalysisService = {
   async getNutritionAnalysis(
     range: "week" | "month" | "3months" | "year",
-    mealType: "all" | "breakfast" | "lunch" | "dinner" | "snack"
+    mealType: "all" | "breakfast" | "lunch" | "dinner" | "snack" | "olovrant"
   ): Promise<NutritionAnalysisData> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {

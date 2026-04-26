@@ -6,7 +6,7 @@ import { nutritionAnalysisService, type NutrientData } from "@/services/nutritio
 
 export function NutritionAnalysisChart() {
   const [range, setRange] = useState<"week" | "month" | "3months" | "year">("week");
-  const [mealType, setMealType] = useState<"all" | "breakfast" | "lunch" | "dinner" | "snack">("all");
+  const [mealType, setMealType] = useState<"all" | "breakfast" | "lunch" | "dinner" | "snack" | "olovrant">("all");
   const [nutrients, setNutrients] = useState<NutrientData[]>([]);
   const [dateRange, setDateRange] = useState("");
   const [loading, setLoading] = useState(true);
@@ -34,6 +34,7 @@ export function NutritionAnalysisChart() {
     lunch: "Obed",
     dinner: "Večera",
     snack: "Desiata",
+    olovrant: "Olovrant",
   };
 
   // Prepare data for pie chart (exclude energy as it's shown separately)
@@ -86,6 +87,7 @@ export function NutritionAnalysisChart() {
                   <SelectItem value="lunch">Obed</SelectItem>
                   <SelectItem value="dinner">Večera</SelectItem>
                   <SelectItem value="snack">Desiata</SelectItem>
+                  <SelectItem value="olovrant">Olovrant</SelectItem>
                 </SelectContent>
               </Select>
             </div>
