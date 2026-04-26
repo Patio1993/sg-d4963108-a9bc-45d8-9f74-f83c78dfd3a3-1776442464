@@ -336,7 +336,12 @@ export default function Home() {
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="foods">Správa potravín</TabsTrigger>
-              <TabsTrigger value="statistics">Štatistiky</TabsTrigger>
+              <TabsTrigger value="statistics" className="flex items-center gap-2">
+                <span>📊</span> Štatistiky
+              </TabsTrigger>
+              <TabsTrigger value="notes" className="flex items-center gap-2">
+                <span>📝</span> Poznámky
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="dashboard" className="space-y-6 mt-6">
@@ -419,6 +424,21 @@ export default function Home() {
                 <WaterChart />
                 <NutritionAnalysisChart />
               </div>
+            </TabsContent>
+
+            <TabsContent value="notes" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                    <span>📝</span> Poznámky
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-center text-muted-foreground py-8">
+                    Obsah poznámok bude pridaný neskôr
+                  </p>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </main>
