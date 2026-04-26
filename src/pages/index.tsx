@@ -433,11 +433,6 @@ export default function Home() {
 
             <TabsContent value="statistics" className="mt-6">
               <div className="space-y-6">
-                <WeightChart />
-                <CaloriesChart />
-                <WaterChart />
-                <NutritionAnalysisChart />
-              </div>
             </TabsContent>
 
             <TabsContent value="notes" className="mt-6">
