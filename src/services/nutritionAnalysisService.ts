@@ -58,7 +58,7 @@ export const nutritionAnalysisService = {
         date,
         amount,
         meal_type,
-        food:foods(kcal, fiber, sugar, carbs, fats, proteins, salt)
+        food:foods(kcal, fiber, sugar, carbs, fats, protein, salt)
       `)
       .eq("user_id", user.id)
       .gte("date", startDateStr)
@@ -80,26 +80,20 @@ export const nutritionAnalysisService = {
       };
     }
 
-    // Calculate totals
-    let totalKcal = 0;
-    let totalProtein = 0;
-    let totalCarbs = 0;
-    let totalSugar = 0;
-    let totalFats = 0;
-    let totalFiber = 0;
-    let totalSalt = 0;
-
+    // Aggregate totals
     if (consumedFoods) {
       consumedFoods.forEach((entry) => {
         if (!entry.food) return;
+        
         const ratio = entry.amount / 100;
-        totalKcal += entry.food.kcal * ratio;
-        totalProtein += entry.food.protein * ratio;
-        totalCarbs += entry.food.carbs * ratio;
-        totalSugar += entry.food.sugar * ratio;
-        totalFats += entry.food.fats * ratio;
-        totalFiber += entry.food.fiber * ratio;
-        totalSalt += entry.food.salt * ratio;
+        
+        totals.kcal += entry.food.kcal * ratio;
+        totals.protein += entry.food.protein * ratio;
+        totals.carbs += entry.food.carbs * ratio;
+        totals.sugar += entry.food.sugar * ratio;
+        totals.fats += entry.food.fats * ratio;
+        totals.fiber += entry.food.fiber * ratio;
+        totals.salt += entry.food.salt * ratio;
       });
     }
 
