@@ -18,7 +18,7 @@ import { ProfileDialog } from "@/components/ProfileDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User, Plus, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
-import { format, addDays, subDays, parseISO } from "date-fns";
+import { format, addDays, subDays, parseISO, isToday, startOfWeek, endOfWeek } from "date-fns";
 import { sk } from "date-fns/locale";
 import { consumedFoodService } from "@/services/consumedFoodService";
 import { waterService } from "@/services/waterService";
@@ -39,7 +39,6 @@ import { WaterChart } from "@/components/WaterChart";
 import { NutritionAnalysisChart } from "@/components/NutritionAnalysisChart";
 import type { Food } from "@/services/foodService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format, isToday, subDays, startOfWeek, endOfWeek, parseISO } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Profile = Tables<"profiles">;
