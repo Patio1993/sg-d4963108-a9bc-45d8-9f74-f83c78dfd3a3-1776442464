@@ -35,6 +35,7 @@ import type { NutritionGoalStatus } from "@/services/dailySummaryService";
 import type { Tables } from "@/integrations/supabase/types";
 import { WeightChart } from "@/components/WeightChart";
 import { CaloriesChart } from "@/components/CaloriesChart";
+import { WaterChart } from "@/components/WaterChart";
 import type { Food } from "@/services/foodService";
 
 type Profile = Tables<"profiles">;
@@ -414,6 +415,7 @@ export default function Home() {
               <div className="space-y-6">
                 <WeightChart />
                 <CaloriesChart />
+                <WaterChart />
               </div>
             </TabsContent>
           </Tabs>
