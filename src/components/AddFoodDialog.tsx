@@ -547,32 +547,22 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                         filteredFoods.map((food) => (
                           <div
                             key={food.id}
-                            className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                            onClick={() => handleSelectFood(food)}
+                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                               selectedFood?.id === food.id
-                                ? "border-primary bg-primary/5"
+                                ? "bg-primary/10 border-primary"
                                 : "hover:bg-muted/50"
                             }`}
-                            onClick={() => handleSelectFood(food)}
                           >
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-center gap-3 flex-1">
-                                {food.photo_url ? (
-                                  <img src={food.photo_url} alt={food.name} className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center text-lg flex-shrink-0">
-                                    {food.emoji || "🍽️"}
-                                  </div>
-                                )}
-                                <div>
-                                  <div className="font-medium leading-none mb-1">{food.name}</div>
-                                  <div className="text-sm text-muted-foreground">
-                                    {food.kcal} kcal • V: {food.fiber}g • C: {food.sugar}g • T: {food.fats}g
-                                  </div>
-                                </div>
-                              </div>
-                              {food.is_favorite && (
-                                <Badge variant="secondary" className="ml-2">⭐</Badge>
-                              )}
+                            <span className="text-2xl">{food.emoji || "🍽️"}</span>
+                            <div className="flex-1">
+                              <p className="font-medium">
+                                {food.name}
+                                {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {food.kcal} kcal • {food.fiber}g vláknina • {food.sugar}g cukry
+                              </p>
                             </div>
                           </div>
                         ))
@@ -623,37 +613,22 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                         recentlyConsumed.map((food) => (
                           <div
                             key={food.id}
-                            className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                            onClick={() => handleSelectFood(food)}
+                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                               selectedFood?.id === food.id
-                                ? "border-primary bg-primary/5"
+                                ? "bg-primary/10 border-primary"
                                 : "hover:bg-muted/50"
                             }`}
-                            onClick={() => handleSelectFood(food)}
                           >
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-center gap-3 flex-1">
-                                {food.photo_url ? (
-                                  <img src={food.photo_url} alt={food.name} className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center text-lg flex-shrink-0">
-                                    {food.emoji || "🍽️"}
-                                  </div>
-                                )}
-                                <div>
-                                  <div className="font-medium leading-none mb-1">{food.name}</div>
-                                  <div className="text-sm text-muted-foreground">
-                                    {food.kcal} kcal • V: {food.fiber}g • C: {food.sugar}g • T: {food.fats}g
-                                  </div>
-                                  {food.days_ago !== null && food.days_ago !== undefined && (
-                                    <div className="text-xs text-muted-foreground mt-1">
-                                      Naposledy: pred {food.days_ago} dňami
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                              {food.is_favorite && (
-                                <Badge variant="secondary" className="ml-2">⭐</Badge>
-                              )}
+                            <span className="text-2xl">{food.emoji || "🍽️"}</span>
+                            <div className="flex-1">
+                              <p className="font-medium">
+                                {food.name}
+                                {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {food.kcal} kcal • Naposledy: {food.days_ago === 0 ? "Dnes" : `pred ${food.days_ago} dňami`}
+                              </p>
                             </div>
                           </div>
                         ))
@@ -792,31 +767,28 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
             )}
             
             {offResults.map((product) => (
-              <div key={product.code} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                {openFoodFactsService.getImageUrl(product) ? (
-                  <img 
-                    src={openFoodFactsService.getImageUrl(product)!} 
-                    alt={openFoodFactsService.getDisplayName(product)} 
-                    className="w-16 h-16 rounded object-cover bg-white" 
+              <div
+                key={product.code}
+                onClick={() => handleSelectOffProduct(product)}
+                className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer"
+              >
+                {product.image_url && (
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-12 h-12 rounded object-cover"
                   />
-                ) : (
-                  <div className="w-16 h-16 rounded bg-muted flex items-center justify-center">
-                    <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                  </div>
                 )}
-                
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold truncate">{openFoodFactsService.getDisplayName(product)}</h4>
-                  <div className="text-sm text-muted-foreground mt-1 flex gap-3">
-                    <span>{product.nutriments?.["energy-kcal_100g"] || product.nutriments?.["energy-kcal"] || 0} kcal</span>
-                    <span>B: {product.nutriments?.proteins_100g || 0}g</span>
-                    <span>S: {product.nutriments?.carbohydrates_100g || 0}g</span>
-                  </div>
+                <div className="flex-1">
+                  <p className="font-medium">
+                    {product.name}
+                    {product.daily_limit && ` - Limit ${product.daily_limit} ${product.unit || 'g'}`}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {product.brands && `${product.brands} • `}
+                    {product.kcal} kcal • {product.fiber}g vláknina • {product.sugar}g cukry
+                  </p>
                 </div>
-                
-                <Button variant="secondary" onClick={() => handleImportOff(product)}>
-                  Vybrať
-                </Button>
               </div>
             ))}
           </div>
