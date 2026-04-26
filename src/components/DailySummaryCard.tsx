@@ -313,13 +313,12 @@ export function DailySummaryCard({
             </Label>
             <div className="flex items-center gap-1">
               <Input
-                id="walk"
                 type="number"
-                min="0"
+                placeholder="0"
                 value={walkMinutesState}
                 onChange={(e) => setWalkMinutes(e.target.value)}
                 onBlur={handleWalkUpdate}
-                className="h-7 w-12 text-center px-1 py-0 text-[13px] border-gray-200 font-medium"
+                className="w-20 text-center"
               />
               <span className="text-[10px] text-muted-foreground font-bold">min</span>
             </div>
