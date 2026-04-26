@@ -2,16 +2,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Utensils } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { sk } from "date-fns/locale";
-import { consumedFoodService, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
+import { type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
 import { FoodImagePreview } from "@/components/FoodImagePreview";
 import { useState } from "react";
-import { useToast } from "@/hooks/useToast";
 
 interface ConsumedFoodsListProps {
-  selectedDate: string;
-  onFoodDeleted: () => void;
+  date: string;
+  foods: ConsumedFoodWithDetails[];
+  onEdit: (food: ConsumedFoodWithDetails) => void;
+  onDelete: (id: string) => Promise<void>;
 }
 
 const MEAL_TYPE_ICONS: Record<string, string> = {
@@ -32,13 +33,8 @@ const MEAL_TYPE_LABELS: Record<string, string> = {
   coffee: "Káva",
 };
 
-export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoodsListProps) {
-  const [foods, setFoods] = useState<ConsumedFoodWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null);
-  const [editAmount, setEditAmount] = useState("");
+export function ConsumedFoodsList({ date, foods, onEdit, onDelete }: ConsumedFoodsListProps) {
   const [imagePreview, setImagePreview] = useState<{ url: string; name: string } | null>(null);
-  const { toast } = useToast();
 
   if (foods.length === 0) {
     return (
@@ -47,7 +43,7 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
           <CardTitle className="text-lg">Skonzumované potraviny</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Žiadne záznamy</p>
+          <p className="text-sm text-muted-foreground">Žiadne záznamy pre tento deň</p>
         </CardContent>
       </Card>
     );
@@ -75,6 +71,14 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
     };
   };
 
+  const renderNutrient = (label: string, value: string) => {
+    const numValue = parseFloat(value);
+    const valueClass = numValue > 0 ? "text-blue-600 font-medium" : "";
+    return (
+      <span>{label}: <span className={valueClass}>{value}g</span></span>
+    );
+  };
+
   const formatLastConsumed = (food: ConsumedFoodWithDetails) => {
     const daysAgo = (food.food as any)?.days_ago;
     if (daysAgo === undefined || daysAgo === null || daysAgo === 0) return null;
@@ -87,14 +91,6 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
     if (daysAgo === 1) return `včera - ${dayName} (${dateStr})`;
     if (daysAgo === 2) return `predvčerom - ${dayName} (${dateStr})`;
     return `pred ${daysAgo} dňami - ${dayName} (${dateStr})`;
-  };
-
-  const renderNutrient = (label: string, value: string) => {
-    const numValue = parseFloat(value);
-    const valueClass = numValue > 0 ? "text-blue-600 font-medium" : "";
-    return (
-      <span>{label}: <span className={valueClass}>{value}g</span></span>
-    );
   };
 
   return (
@@ -125,7 +121,6 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
                     key={food.id}
                     className="p-4 border rounded-xl bg-card hover:bg-muted/30 transition-colors shadow-sm"
                   >
-                    {/* Top Row: Meal Type, Time, Edit */}
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Utensils className="h-4 w-4" />
@@ -137,13 +132,12 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-blue-500 hover:text-blue-700"
-                        onClick={() => setEditingFood(food)}
+                        onClick={() => onEdit(food)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
                     </div>
 
-                    {/* Second Row: Food Name and Delete */}
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         {food.food?.photo_url ? (
@@ -178,15 +172,12 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-red-500 hover:text-red-700 -mt-2"
-                        onClick={() => {
-                          onFoodDeleted();
-                        }}
+                        onClick={() => onDelete(food.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
 
-                    {/* Third Row: Amount and Badge */}
                     <div className="flex items-center gap-2 mt-2 mb-3">
                       <span className="text-muted-foreground">
                         {food.amount}{food.food?.unit === "ml" ? "ml" : "g"}
@@ -198,12 +189,10 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
                       )}
                     </div>
 
-                    {/* Fourth Row: Calories */}
                     <div className="text-emerald-600 font-semibold mb-2">
                       {nutrients.kcal} kcal
                     </div>
 
-                    {/* Fifth/Sixth Row: Nutrients */}
                     <div className="space-y-1 text-sm text-muted-foreground">
                       <div className="flex flex-wrap gap-x-4 gap-y-1">
                         {renderNutrient("Vláknina", nutrients.fiber)}
@@ -216,8 +205,7 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
                         {renderNutrient("Soľ", nutrients.salt)}
                       </div>
                     </div>
-
-                    {/* Last Consumed */}
+                    
                     {lastConsumed && (
                       <div className="text-sm text-purple-600 mt-2">
                         Naposledy: {lastConsumed}
