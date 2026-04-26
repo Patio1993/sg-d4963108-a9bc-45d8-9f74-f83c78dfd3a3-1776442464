@@ -38,6 +38,9 @@ import { CaloriesChart } from "@/components/CaloriesChart";
 import { WaterChart } from "@/components/WaterChart";
 import { NutritionAnalysisChart } from "@/components/NutritionAnalysisChart";
 import type { Food } from "@/services/foodService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { format, isToday, subDays, startOfWeek, endOfWeek, parseISO } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Profile = Tables<"profiles">;
 
