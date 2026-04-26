@@ -163,9 +163,6 @@ export function ConsumedFoodsList({ date, foods, onEdit, onDelete }: ConsumedFoo
                             {food.food.name}
                             {food.food.daily_limit && ` - Limit ${food.food.daily_limit} ${food.food.unit}`}
                           </p>
-                          <p className="text-sm text-muted-foreground">
-                            {food.amount}{food.food.unit} • {food.meal_type} • {food.time}
-                          </p>
                         </div>
                       </div>
                       <Button
