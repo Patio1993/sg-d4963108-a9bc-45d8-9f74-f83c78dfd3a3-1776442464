@@ -40,6 +40,7 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
   const [loading, setLoading] = useState(false);
   const [medicineTime, setMedicineTime] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDate, setSelectedDate] = useState(date); // Added selectedDate state
 
   // Create form state
   const [newMedicineName, setNewMedicineName] = useState("");
@@ -107,11 +108,11 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
     if (!selectedMedicine || !medicineTime) return;
 
     try {
-      await medicineService.addMedicineTaken({
-        medicine_id: selectedMedicine.id,
-        time: medicineTime,
-        date: date,
-      });
+      await medicineService.addUserMedicine(
+        selectedMedicine.id,
+        selectedDate,
+        medicineTime
+      );
 
       setSelectedMedicine(null);
       setMedicineTime("");
