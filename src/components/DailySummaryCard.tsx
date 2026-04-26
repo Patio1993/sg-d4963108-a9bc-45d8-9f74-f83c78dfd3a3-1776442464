@@ -14,16 +14,23 @@ interface CircularProgressProps {
   max: number;
   size?: number;
   strokeWidth?: number;
-  color: string;
+  showPercentage?: boolean;
+  color?: string;
 }
 
-function CircularProgress({ value, max, size = 60, strokeWidth = 6, color }: CircularProgressProps) {
-  const validMax = max > 0 ? max : 1;
-  const percentage = Math.min((value / validMax) * 100, 100);
-  const actualPercentage = (value / validMax) * 100;
+function CircularProgress({ value, max, size = 60, strokeWidth = 6, showPercentage = true, color }: CircularProgressProps) {
+  const percentage = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (percentage / 100) * circumference;
+
+  // Color logic: green if within range (80-110%), orange if below, red if above
+  const getColor = () => {
+    if (color) return color; // use explicitly provided color
+    if (percentage >= 80 && percentage <= 110) return "#8BC34A"; // green
+    if (percentage < 80) return "#FF9800"; // orange
+    return "#F44336"; // red
+  };
 
   return (
     <div className="relative inline-flex items-center justify-center">
@@ -33,7 +40,7 @@ function CircularProgress({ value, max, size = 60, strokeWidth = 6, color }: Cir
           cx={size / 2} 
           cy={size / 2} 
           r={radius} 
-          stroke={color} 
+          stroke={getColor()} 
           strokeWidth={strokeWidth} 
           fill="none" 
           strokeDasharray={circumference} 
@@ -43,8 +50,8 @@ function CircularProgress({ value, max, size = 60, strokeWidth = 6, color }: Cir
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-[10px] font-bold" style={{ color }}>
-          {Math.round(actualPercentage)}%
+        <span className="text-[10px] font-bold" style={{ color: getColor() }}>
+          {showPercentage ? Math.round(percentage) + "%" : ""}
         </span>
       </div>
     </div>
@@ -157,12 +164,7 @@ export function DailySummaryCard({
               return (
                 <div
                   key={nutrient.label}
-                  className={cn(
-                    "rounded-lg p-3 border-2 transition-colors",
-                    inRange && "bg-green-50 border-green-500",
-                    belowRange && "bg-orange-50 border-orange-500",
-                    aboveRange && "bg-red-50 border-red-500"
-                  )}
+                  className="bg-green-50 rounded-lg p-3 border"
                 >
                   <div className="flex flex-col items-center gap-2">
                     <div className="text-xs font-medium text-muted-foreground">{nutrient.label}</div>
