@@ -111,10 +111,21 @@ export function DailySummaryCard({
   onMedicineClick,
   onWCClick,
 }: DailySummaryCardProps) {
-  const [selectedNutrient, setSelectedNutrient] = useState<string | null>(null);
+  const [selectedNutrient, setSelectedNutrient] = useState<"fiber" | "sugar" | "fats" | null>(null);
+
+  const handleToggle = (field: "exercise" | "restaurant", value: boolean) => {
+    onToggle(field, value);
+  };
+
+  const handleWalkUpdate = () => {
+    const minutes = parseInt(walkMinutes) || 0;
+    onWalkUpdate(minutes);
+  };
 
   const handleNutrientClick = (nutrientType: string) => {
-    setSelectedNutrient(nutrientType);
+    if (["fiber", "sugar", "fats"].includes(nutrientType)) {
+      setSelectedNutrient(nutrientType as "fiber" | "sugar" | "fats");
+    }
   };
 
   // Define default values if goals are not set
