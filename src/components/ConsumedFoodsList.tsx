@@ -6,12 +6,12 @@ import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
 import { consumedFoodService, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
 import { FoodImagePreview } from "@/components/FoodImagePreview";
-import { useState } from "react"; // Added import for useState
-import { useToast } from "@/hooks/useToast"; // Added import for useToast
+import { useState } from "react";
+import { useToast } from "@/hooks/useToast";
 
 interface ConsumedFoodsListProps {
-  selectedDate: string; // Updated prop name
-  onFoodDeleted: () => void; // Updated prop type
+  selectedDate: string;
+  onFoodDeleted: () => void;
 }
 
 const MEAL_TYPE_ICONS: Record<string, string> = {
@@ -33,12 +33,12 @@ const MEAL_TYPE_LABELS: Record<string, string> = {
 };
 
 export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoodsListProps) {
-  const [foods, setFoods] = useState<ConsumedFoodWithDetails[]>([]); // Added state for foods
-  const [loading, setLoading] = useState(true); // Added loading state
-  const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null); // Added editingFood state
-  const [editAmount, setEditAmount] = useState(""); // Added editAmount state
-  const [imagePreview, setImagePreview] = useState<{ url: string; name: string } | null>(null); // Added imagePreview state
-  const { toast } = useToast(); // Added toast context
+  const [foods, setFoods] = useState<ConsumedFoodWithDetails[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [imagePreview, setImagePreview] = useState<{ url: string; name: string } | null>(null);
+  const { toast } = useToast();
 
   if (foods.length === 0) {
     return (
@@ -137,7 +137,7 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-blue-500 hover:text-blue-700"
-                        onClick={() => setEditingFood(food)} // Changed to use setEditingFood
+                        onClick={() => setEditingFood(food)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -180,7 +180,7 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
                         className="h-8 w-8 text-red-500 hover:text-red-700 -mt-2"
                         onClick={() => {
                           onFoodDeleted();
-                        }} // Updated to use onFoodDeleted prop
+                        }}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -229,7 +229,6 @@ export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoods
             </CardContent>
           </Card>
         ))}
-      </div>
 
       <FoodImagePreview
         open={!!imagePreview}
