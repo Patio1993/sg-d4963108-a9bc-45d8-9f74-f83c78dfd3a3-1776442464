@@ -8,6 +8,8 @@ import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
 import { Salad } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface DailySummaryCardProps {
   date: string;
@@ -29,6 +31,54 @@ interface DailySummaryCardProps {
   onActivityClick: () => void;
   onMedicineClick: () => void;
   onWCClick: () => void;
+}
+
+function CircularProgress({ value, max, size = 60, strokeWidth = 6, showPercentage = true }: CircularProgressProps) {
+  const percentage = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  // Color logic: green if within range (80-110%), orange if below, red if above
+  const getColor = () => {
+    if (percentage >= 80 && percentage <= 110) return "#8BC34A"; // green
+    if (percentage < 80) return "#FF9800"; // orange
+    return "#F44336"; // red
+  };
+
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#E5E7EB"
+          strokeWidth={strokeWidth}
+          fill="none"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={getColor()}
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="transition-all duration-500"
+        />
+      </svg>
+      {showPercentage && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xs font-semibold" style={{ color: getColor() }}>
+            {Math.round(percentage)}%
+          </span>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function DailySummaryCard({
@@ -149,71 +199,32 @@ export function DailySummaryCard({
         <div>
           <h3 className="text-sm font-semibold mb-3 text-center">Denné ciele:</h3>
           <div className="grid grid-cols-3 gap-3">
-            {/* Fiber */}
-            <button
-              onClick={() => onNutrientClick("fiber")}
-              className={cn(
-                "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20 hover:bg-green-100/80 cursor-pointer",
-                getProgressTextColor(nutrition.total_fiber, 25, 30)
-              )}
-            >
-              <div className="text-xl font-bold mb-1">
-                {getGoalEmoji(goals.fiber)}
+            <div className="bg-card rounded-lg p-3 border">
+              <div className="flex flex-col items-center gap-2">
+                <div className="text-xs font-medium text-muted-foreground">Vláknina</div>
+                <CircularProgress value={nutrition.total_fiber} max={30} size={50} strokeWidth={5} />
+                <div className="text-sm font-semibold">{nutrition.total_fiber.toFixed(1)}g</div>
+                <div className="text-xs text-muted-foreground">z 25-30g</div>
               </div>
-              <div className="text-xl font-bold">
-                {Math.round(nutrition.total_fiber)}g
-              </div>
-              <div className="text-xs text-muted-foreground mt-1 mb-2">
-                Vláknina
-              </div>
-              <div className="text-xs font-medium">
-                25-30g
-              </div>
-            </button>
+            </div>
 
-            {/* Sugar */}
-            <button
-              onClick={() => onNutrientClick("sugar")}
-              className={cn(
-                "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20 hover:bg-green-100/80 cursor-pointer",
-                getProgressTextColor(nutrition.total_sugar, 30, 50)
-              )}
-            >
-              <div className="text-xl font-bold mb-1">
-                {getGoalEmoji(goals.sugar)}
+            <div className="bg-card rounded-lg p-3 border">
+              <div className="flex flex-col items-center gap-2">
+                <div className="text-xs font-medium text-muted-foreground">Cukry</div>
+                <CircularProgress value={nutrition.total_sugar} max={50} size={50} strokeWidth={5} />
+                <div className="text-sm font-semibold">{nutrition.total_sugar.toFixed(1)}g</div>
+                <div className="text-xs text-muted-foreground">z 30-50g</div>
               </div>
-              <div className="text-xl font-bold">
-                {nutrition.total_sugar.toFixed(1)}g
-              </div>
-              <div className="text-xs text-muted-foreground mt-1 mb-2">
-                Cukry
-              </div>
-              <div className="text-xs font-medium">
-                30-50g
-              </div>
-            </button>
+            </div>
 
-            {/* Fats */}
-            <button
-              onClick={() => onNutrientClick("fats")}
-              className={cn(
-                "bg-green-100/60 rounded-lg p-4 text-center transition-colors border border-primary/20 hover:bg-green-100/80 cursor-pointer",
-                getProgressTextColor(nutrition.total_fats, 50, 60)
-              )}
-            >
-              <div className="text-xl font-bold mb-1">
-                {getGoalEmoji(goals.fats)}
+            <div className="bg-card rounded-lg p-3 border">
+              <div className="flex flex-col items-center gap-2">
+                <div className="text-xs font-medium text-muted-foreground">Tuky</div>
+                <CircularProgress value={nutrition.total_fats} max={60} size={50} strokeWidth={5} />
+                <div className="text-sm font-semibold">{nutrition.total_fats.toFixed(1)}g</div>
+                <div className="text-xs text-muted-foreground">z 50-60g</div>
               </div>
-              <div className="text-xl font-bold">
-                {Math.round(nutrition.total_fats)}g
-              </div>
-              <div className="text-xs text-muted-foreground mt-1 mb-2">
-                Tuky
-              </div>
-              <div className="text-xs font-medium">
-                50-60g
-              </div>
-            </button>
+            </div>
           </div>
         </div>
 
@@ -305,6 +316,45 @@ export function DailySummaryCard({
               )}
             </div>
           </div>
+        </div>
+
+        {/* Water Intake */}
+        <div className="bg-card rounded-lg p-4 border">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">💧</span>
+              <div>
+                <div className="font-medium">Pitný režim</div>
+                <div className="text-xs text-muted-foreground">Denná hydratácia</div>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowWaterDetails(!showWaterDetails)}
+            >
+              {showWaterDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </div>
+          
+          <div className="flex items-center justify-center gap-4">
+            <CircularProgress value={totalWater} max={2000} size={70} strokeWidth={7} />
+            <div className="flex flex-col">
+              <div className="text-2xl font-bold">{totalWater} ml</div>
+              <div className="text-sm text-muted-foreground">z 2000 ml</div>
+            </div>
+          </div>
+
+          {showWaterDetails && waterEntries.length > 0 && (
+            <div className="mt-3 pt-3 border-t space-y-2">
+              {waterEntries.map((entry) => (
+                <div key={entry.id} className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{entry.time}</span>
+                  <span className="font-medium">{entry.amount} ml</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Water & Coffee */}
