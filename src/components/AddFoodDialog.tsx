@@ -652,25 +652,6 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                     </div>
                   </TabsContent>
                 </Tabs>
-
-                {selectedFood && (
-                  <div className="p-4 border rounded-lg bg-muted/50 flex items-center gap-4">
-                    {selectedFood.photo_url ? (
-                      <img src={selectedFood.photo_url} alt={selectedFood.name} className="w-16 h-16 rounded-md object-cover bg-white" />
-                    ) : (
-                      <div className="w-16 h-16 rounded-md bg-white border flex items-center justify-center text-3xl">
-                        {selectedFood.emoji || "🍽️"}
-                      </div>
-                    )}
-                    <div>
-                      <div className="font-medium mb-1">Vybraná potravina:</div>
-                      <div className="font-semibold text-lg">{selectedFood.name}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {selectedFood.kcal} kcal/{selectedFood.unit === "ml" ? "100ml" : "100g"} • V: {selectedFood.fiber}g • C: {selectedFood.sugar}g • T: {selectedFood.fats}g
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
