@@ -20,10 +20,10 @@ interface CircularProgressProps {
 }
 
 function CircularProgress({ value, max, size = 60, strokeWidth = 6, showPercentage = true, color }: CircularProgressProps) {
-  const percentage = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+  const percentage = max > 0 ? (value / max) * 100 : 0;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (percentage / 100) * circumference;
+  const offset = circumference - (Math.min(percentage, 100) / 100) * circumference;
 
   // Color logic: green if within range (80-110%), orange if below, red if above
   const getColor = () => {
@@ -146,13 +146,25 @@ export function DailySummaryCard({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        
-        {/* Kcal Box */}
+        {/* Calories */}
         <div className="bg-green-50 rounded-lg p-4 border">
-          <div className="text-4xl font-extrabold text-foreground">
-            {Math.round(nutrition.total_kcal)}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🔥</span>
+              <div>
+                <div className="font-medium">Kalórie</div>
+                <div className="text-xs text-muted-foreground">Denný príjem</div>
+              </div>
+            </div>
           </div>
-          <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-1">kcal dnes</div>
+          
+          <div className="flex items-center justify-center gap-4">
+            <CircularProgress value={nutrition.total_kcal} max={2000} size={70} strokeWidth={7} />
+            <div className="flex flex-col">
+              <div className="text-2xl font-bold">{Math.round(nutrition.total_kcal)} kcal</div>
+              <div className="text-sm text-muted-foreground">z 2000 kcal</div>
+            </div>
+          </div>
         </div>
 
         {/* Nutrients Box with Circular Charts */}
