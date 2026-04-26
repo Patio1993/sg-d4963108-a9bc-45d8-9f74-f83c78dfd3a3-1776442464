@@ -547,14 +547,23 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                         filteredFoods.map((food) => (
                           <div
                             key={food.id}
-                            onClick={() => handleSelectFood(food)}
-                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                              selectedFood?.id === food.id
-                                ? "bg-primary/10 border-primary"
-                                : "hover:bg-muted/50"
-                            }`}
+                            onClick={() => {
+                              setSelectedFood(food);
+                              setAmount("100");
+                            }}
+                            className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
                           >
-                            <span className="text-2xl">{food.emoji || "🍽️"}</span>
+                            {food.photo_url ? (
+                              <img
+                                src={food.photo_url}
+                                alt={food.name}
+                                className="w-12 h-12 object-cover rounded-lg"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 flex items-center justify-center text-2xl bg-muted rounded-lg">
+                                {food.emoji || "🍽️"}
+                              </div>
+                            )}
                             <div className="flex-1">
                               <p className="font-medium">
                                 {food.name}
@@ -583,14 +592,13 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                               key={food.id}
                               onClick={() => {
                                 setSelectedFood(food);
-                                setAmount(100);
+                                setAmount("100");
                               }}
                               className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
                             >
                               <img
                                 src={
                                   food.photo_url || 
-                                  food.image_url || 
                                   "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop"
                                 }
                                 alt={food.name}
@@ -625,14 +633,13 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                               key={food.id}
                               onClick={() => {
                                 setSelectedFood(food);
-                                setAmount(100);
+                                setAmount("100");
                               }}
                               className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
                             >
                               <img
                                 src={
                                   food.photo_url || 
-                                  food.image_url || 
                                   "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop"
                                 }
                                 alt={food.name}
@@ -660,15 +667,17 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
             {selectedFood && (
               <div className="space-y-4 pt-4 border-t" ref={selectedFoodCardRef}>
                 <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
-                  <img
-                    src={
-                      selectedFood.photo_url || 
-                      selectedFood.image_url || 
-                      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop"
-                    }
-                    alt={selectedFood.name}
-                    className="w-20 h-20 object-cover rounded-lg"
-                  />
+                  {selectedFood.photo_url ? (
+                    <img
+                      src={selectedFood.photo_url}
+                      alt={selectedFood.name}
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 flex items-center justify-center text-4xl bg-background rounded-lg">
+                      {selectedFood.emoji || "🍽️"}
+                    </div>
+                  )}
                   <div className="flex-1">
                     <div className="font-medium mb-1">Vybraná potravina:</div>
                     <div className="font-semibold text-lg">{selectedFood.name}</div>

@@ -139,15 +139,17 @@ export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsList
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2 flex-1">
                         <div className="flex items-center gap-3">
-                          <img
-                            src={
-                              food.food?.photo_url || 
-                              food.food?.image_url || 
-                              "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop"
-                            }
-                            alt={food.food?.name || ""}
-                            className="w-12 h-12 object-cover rounded-lg"
-                          />
+                          {food.food?.photo_url ? (
+                            <img
+                              src={food.food.photo_url}
+                              alt={food.food?.name || ""}
+                              className="w-12 h-12 object-cover rounded-lg"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 flex items-center justify-center text-2xl bg-muted rounded-lg">
+                              {food.food?.emoji || "🍽️"}
+                            </div>
+                          )}
                           <div className="flex-1">
                             <p className="font-medium">
                               {food.food.name}
