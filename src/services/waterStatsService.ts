@@ -38,7 +38,7 @@ export const waterStatsService = {
     // Get all water intake records in the date range
     const { data: waterRecords, error } = await supabase
       .from("water_intake")
-      .select("date, amount")
+      .select("date, amount_ml")
       .eq("user_id", user.id)
       .gte("date", startDateStr)
       .lte("date", endDateStr)
@@ -55,7 +55,7 @@ export const waterStatsService = {
     if (waterRecords) {
       waterRecords.forEach((entry) => {
         const current = waterByDate.get(entry.date) || 0;
-        waterByDate.set(entry.date, current + entry.amount);
+        waterByDate.set(entry.date, current + entry.amount_ml);
       });
     }
 
