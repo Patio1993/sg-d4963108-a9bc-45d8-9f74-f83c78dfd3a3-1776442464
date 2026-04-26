@@ -85,6 +85,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   
   // Refs for auto-focus
   const newFoodNameInputRef = useRef<HTMLInputElement>(null);
+  const selectedFoodCardRef = useRef<HTMLDivElement>(null);
+  const amountInputRef = useRef<HTMLInputElement>(null);
   
   // OFF State
   const [showOffDialog, setShowOffDialog] = useState(false);
@@ -168,6 +170,13 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
     if (foodName.includes("káva") || foodName.includes("kava")) {
       setMealType("káva");
     }
+
+    // Scroll to selected food card and focus amount input
+    setTimeout(() => {
+      selectedFoodCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      amountInputRef.current?.focus();
+      amountInputRef.current?.select();
+    }, 100);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -656,7 +665,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
             )}
 
             {selectedFood && (
-              <div className="space-y-4 pt-4 border-t">
+              <div className="space-y-4 pt-4 border-t" ref={selectedFoodCardRef}>
                 <div className="p-4 border rounded-lg bg-muted/50 flex items-center gap-4">
                   {selectedFood.photo_url ? (
                     <img src={selectedFood.photo_url} alt={selectedFood.name} className="w-16 h-16 rounded-md object-cover bg-white" />
@@ -686,6 +695,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                   <div className="space-y-2">
                     <Label htmlFor="amount">Množstvo ({selectedFood.unit}) *</Label>
                     <Input
+                      ref={amountInputRef}
                       id="amount"
                       type="number"
                       step="0.1"
