@@ -766,31 +766,42 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
               <p className="text-center text-muted-foreground py-8">Žiadne výsledky</p>
             )}
             
-            {offResults.map((product) => (
-              <div
-                key={product.code}
-                onClick={() => handleSelectOffProduct(product)}
-                className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer"
-              >
-                {product.image_url && (
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-12 h-12 rounded object-cover"
-                  />
-                )}
-                <div className="flex-1">
-                  <p className="font-medium">
-                    {product.name}
-                    {product.daily_limit && ` - Limit ${product.daily_limit} ${product.unit || 'g'}`}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {product.brands && `${product.brands} • `}
-                    {product.kcal} kcal • {product.fiber}g vláknina • {product.sugar}g cukry
-                  </p>
-                </div>
-              </div>
-            ))}
+            {offResults && offResults.length > 0 ? (
+              offResults.map((product) => {
+                const displayName = openFoodFactsService.getDisplayName(product);
+                const imageUrl = openFoodFactsService.getImageUrl(product);
+                const nutrients = openFoodFactsService.extractNutrients(product);
+                
+                return (
+                  <div
+                    key={product.code}
+                    onClick={() => handleImportOff(product)}
+                    className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer"
+                  >
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={displayName}
+                        className="w-12 h-12 rounded object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded bg-muted flex items-center justify-center text-xl">
+                        🍽️
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-medium">{displayName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {product.brands && `${product.brands} • `}
+                        {nutrients.kcal} kcal • {nutrients.fiber}g vláknina • {nutrients.sugar}g cukry
+                      </p>
+                    </div>
+                  </div>
+                );
+              })
+            ) : offSearchQuery && !isSearchingOff ? (
+              <p className="text-center text-muted-foreground py-8">Žiadne výsledky</p>
+            ) : null}
           </div>
         </DialogContent>
       </Dialog>
