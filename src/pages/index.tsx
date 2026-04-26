@@ -82,6 +82,7 @@ export default function Home() {
   const [activityCount, setActivityCount] = useState(0);
   const [medicineCount, setMedicineCount] = useState(0);
   const [wcCount, setWcCount] = useState(0);
+  const [showFoodManagement, setShowFoodManagement] = useState(false);
 
   const formatDateDisplay = (dateStr: string) => {
     const d = parseISO(dateStr);
@@ -339,7 +340,14 @@ export default function Home() {
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <span>📊</span> Dashboard
               </TabsTrigger>
-              <TabsTrigger value="food_management" className="flex items-center gap-2">
+              <TabsTrigger 
+                value="food_management" 
+                className="flex items-center gap-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowFoodManagement(true);
+                }}
+              >
                 <span>🍎</span> Správa potravín
               </TabsTrigger>
               <TabsTrigger value="statistics" className="flex items-center gap-2">
@@ -350,15 +358,7 @@ export default function Home() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsList className="grid w-full grid-cols-5 mb-6">
-              <TabsTrigger value="meals">🍽️ Jedálniček</TabsTrigger>
-              <TabsTrigger value="activities">🏃 Aktivity</TabsTrigger>
-              <TabsTrigger value="medicines">💊 Lieky</TabsTrigger>
-              <TabsTrigger value="wc">🚽 WC</TabsTrigger>
-              <TabsTrigger value="water">💧 Pitný režim</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="dashboard" className="space-y-6 mt-6">
+            <TabsContent value="dashboard" className="mt-6">
               <DailySummaryCard
                 date={date}
                 nutrition={nutrition}
@@ -427,7 +427,7 @@ export default function Home() {
               />
             </TabsContent>
 
-            <TabsContent value="foods" className="mt-6">
+            <TabsContent value="food_management" className="mt-6">
               <FoodManagement />
             </TabsContent>
 
