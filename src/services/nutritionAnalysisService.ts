@@ -51,28 +51,23 @@ export const nutritionAnalysisService = {
     const startDateStr = format(startDate, "yyyy-MM-dd");
     const endDateStr = format(today, "yyyy-MM-dd");
 
-    // Build query with optional meal type filter
+    // Apply meal type filter
     let query = supabase
       .from("consumed_foods")
       .select(`
+        date,
         amount,
         meal_type,
-        food:foods(
-          kcal,
-          protein,
-          carbs,
-          sugar,
-          fats,
-          fiber,
-          salt
-        )
+        food:foods(kcal, fiber, sugar, carbs, fats, proteins, salt)
       `)
       .eq("user_id", user.id)
       .gte("date", startDateStr)
       .lte("date", endDateStr);
 
     if (mealType !== "all") {
-      query = query.eq("meal_type", mealType);
+      // Map frontend mealType to database meal_type value
+      const dbMealType = mealType === "olovrant" ? "afternoon_snack" : mealType;
+      query = query.eq("meal_type", dbMealType);
     }
 
     const { data: consumedFoods, error } = await query;
