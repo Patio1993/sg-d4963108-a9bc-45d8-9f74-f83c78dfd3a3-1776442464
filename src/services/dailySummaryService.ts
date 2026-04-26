@@ -64,6 +64,39 @@ export const dailySummaryService = {
     if (error) throw error;
   },
 
+  async getLastKnownWeight(date: string): Promise<number | null> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    // 1. Check previous days for weight
+    const { data } = await supabase
+      .from("daily_summary")
+      .select("weight")
+      .eq("user_id", user.id)
+      .lt("date", date)
+      .not("weight", "is", null)
+      .order("date", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (data && data.weight !== null) {
+      return data.weight;
+    }
+
+    // 2. Fallback to user profile weight
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("weight")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profile && profile.weight !== null) {
+      return profile.weight;
+    }
+
+    return null;
+  },
+
   async getLastRestaurantVisit(): Promise<{ date: string; days_ago: number } | null> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");

@@ -9,7 +9,7 @@ import { sk } from "date-fns/locale";
 import { Salad, Droplets, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface CircularProgressProps {
   value: number;
@@ -117,6 +117,14 @@ export function DailySummaryCard({
   const [showWaterDetails, setShowWaterDetails] = useState(false);
   const [walkMinutesState, setWalkMinutes] = useState(walkMinutes.toString());
   const [weightState, setWeightState] = useState(weight ? weight.toString() : "");
+
+  useEffect(() => {
+    setWalkMinutes(walkMinutes.toString());
+  }, [walkMinutes]);
+
+  useEffect(() => {
+    setWeightState(weight !== null ? weight.toString() : "");
+  }, [weight]);
 
   const handleToggle = (field: "exercise" | "restaurant", value: boolean) => {
     if (field === "exercise") onExerciseChange(value);

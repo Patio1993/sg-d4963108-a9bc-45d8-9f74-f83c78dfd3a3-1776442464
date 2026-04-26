@@ -155,7 +155,13 @@ export default function Home() {
       const summary = await dailySummaryService.getOrCreateDailySummary(date);
       setExercise(summary.exercise || false);
       setWalkMinutes(summary.walk_minutes || 0);
-      setWeight(summary.weight || null);
+      
+      let displayWeight = summary.weight;
+      if (displayWeight === null) {
+        displayWeight = await dailySummaryService.getLastKnownWeight(date);
+      }
+      setWeight(displayWeight);
+      
       setRestaurant(summary.restaurant || false);
 
       const newGoals = dailySummaryService.evaluateNutritionGoals(
