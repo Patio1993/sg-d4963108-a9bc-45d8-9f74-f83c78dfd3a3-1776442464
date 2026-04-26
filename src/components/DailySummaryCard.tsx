@@ -105,9 +105,9 @@ export function DailySummaryCard({
   const nutrients = [
     { label: "Bielkoviny", value: nutrition.total_protein, max: 80 },
     { label: "Sacharidy", value: nutrition.total_carbs, max: 220 },
-    { label: "Tuky", value: nutrition.total_fats, max: goals?.limits?.fats || 60 },
-    { label: "Vláknina", value: nutrition.total_fiber, max: goals?.limits?.fiber || 30 },
-    { label: "Cukry", value: nutrition.total_sugar, max: goals?.limits?.sugar || 50 },
+    { label: "Tuky", value: nutrition.total_fats, max: 60 },
+    { label: "Vláknina", value: nutrition.total_fiber, max: 30 },
+    { label: "Cukry", value: nutrition.total_sugar, max: 50 },
     { label: "Soľ", value: nutrition.total_salt, max: 5 },
   ];
 
