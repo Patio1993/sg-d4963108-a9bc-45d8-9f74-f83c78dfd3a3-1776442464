@@ -9,7 +9,6 @@ import { sk } from "date-fns/locale";
 import { Salad, Droplets, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { NutrientDetailDialog } from "./NutrientDetailDialog";
 import { useState } from "react";
 
 interface CircularProgressProps {
@@ -111,21 +110,16 @@ export function DailySummaryCard({
   onMedicineClick,
   onWCClick,
 }: DailySummaryCardProps) {
-  const [selectedNutrient, setSelectedNutrient] = useState<"fiber" | "sugar" | "fats" | null>(null);
+  const [showWaterDetails, setShowWaterDetails] = useState(false);
+  const [walkMinutesState, setWalkMinutes] = useState(walkMinutes.toString());
 
   const handleToggle = (field: "exercise" | "restaurant", value: boolean) => {
     onToggle(field, value);
   };
 
   const handleWalkUpdate = () => {
-    const minutes = parseInt(walkMinutes) || 0;
+    const minutes = parseInt(walkMinutesState) || 0;
     onWalkUpdate(minutes);
-  };
-
-  const handleNutrientClick = (nutrientType: string) => {
-    if (["fiber", "sugar", "fats"].includes(nutrientType)) {
-      setSelectedNutrient(nutrientType as "fiber" | "sugar" | "fats");
-    }
   };
 
   // Define default values if goals are not set
@@ -167,7 +161,7 @@ export function DailySummaryCard({
         {/* Calories */}
         <div 
           className="bg-green-50 rounded-lg p-4 border cursor-pointer hover:bg-green-100 transition-colors"
-          onClick={() => handleNutrientClick("kcal")}
+          onClick={() => onNutrientClick && onNutrientClick("kcal")}
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -214,7 +208,7 @@ export function DailySummaryCard({
                 <div
                   key={nutrient.label}
                   className="bg-green-50 rounded-lg p-3 border cursor-pointer hover:bg-green-100 transition-colors"
-                  onClick={() => handleNutrientClick(nutrientTypeMap[nutrient.label])}
+                  onClick={() => onNutrientClick && onNutrientClick(nutrientTypeMap[nutrient.label])}
                 >
                   <div className="flex flex-col items-center gap-2">
                     <div className="text-xs font-medium text-muted-foreground">{nutrient.label}</div>
@@ -303,8 +297,8 @@ export function DailySummaryCard({
                 id="walk"
                 type="number"
                 min="0"
-                value={walkMinutes}
-                onChange={(e) => onWalkMinutesChange(parseInt(e.target.value) || 0)}
+                value={walkMinutesState}
+                onChange={(e) => setWalkMinutes(e.target.value)}
                 className="h-7 w-12 text-center px-1 py-0 text-[13px] border-gray-200 font-medium"
               />
               <span className="text-[10px] text-muted-foreground font-bold">min</span>
@@ -336,13 +330,6 @@ export function DailySummaryCard({
         </div>
 
       </CardContent>
-
-      <NutrientDetailDialog
-        date={date}
-        nutrientType={selectedNutrient}
-        isOpen={selectedNutrient !== null}
-        onClose={() => setSelectedNutrient(null)}
-      />
     </Card>
   );
 }
