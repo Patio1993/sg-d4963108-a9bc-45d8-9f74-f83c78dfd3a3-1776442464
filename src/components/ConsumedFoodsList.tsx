@@ -4,13 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Utensils } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
-import type { ConsumedFoodWithDetails } from "@/services/consumedFoodService";
+import { consumedFoodService, type ConsumedFoodWithDetails } from "@/services/consumedFoodService";
+import { FoodImagePreview } from "@/components/FoodImagePreview";
+import { useState } from "react"; // Added import for useState
+import { useToast } from "@/hooks/useToast"; // Added import for useToast
 
 interface ConsumedFoodsListProps {
-  date?: string;
-  foods: ConsumedFoodWithDetails[];
-  onEdit: (food: ConsumedFoodWithDetails) => void | Promise<void>;
-  onDelete: (id: string) => void | Promise<void>;
+  selectedDate: string; // Updated prop name
+  onFoodDeleted: () => void; // Updated prop type
 }
 
 const MEAL_TYPE_ICONS: Record<string, string> = {
@@ -31,7 +32,14 @@ const MEAL_TYPE_LABELS: Record<string, string> = {
   coffee: "Káva",
 };
 
-export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsListProps) {
+export function ConsumedFoodsList({ selectedDate, onFoodDeleted }: ConsumedFoodsListProps) {
+  const [foods, setFoods] = useState<ConsumedFoodWithDetails[]>([]); // Added state for foods
+  const [loading, setLoading] = useState(true); // Added loading state
+  const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null); // Added editingFood state
+  const [editAmount, setEditAmount] = useState(""); // Added editAmount state
+  const [imagePreview, setImagePreview] = useState<{ url: string; name: string } | null>(null); // Added imagePreview state
+  const { toast } = useToast(); // Added toast context
+
   if (foods.length === 0) {
     return (
       <Card>
@@ -129,7 +137,7 @@ export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsList
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-blue-500 hover:text-blue-700"
-                        onClick={() => onEdit(food)}
+                        onClick={() => setEditingFood(food)} // Changed to use setEditingFood
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -137,35 +145,42 @@ export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsList
 
                     {/* Second Row: Food Name and Delete */}
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2 flex-1">
-                        <div className="flex items-center gap-3">
-                          {food.food?.photo_url ? (
-                            <img
-                              src={food.food.photo_url}
-                              alt={food.food?.name || ""}
-                              className="w-12 h-12 object-cover rounded-lg"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 flex items-center justify-center text-2xl bg-muted rounded-lg">
-                              {food.food?.emoji || "🍽️"}
-                            </div>
-                          )}
-                          <div className="flex-1">
-                            <p className="font-medium">
-                              {food.food.name}
-                              {food.food.daily_limit && ` - Limit ${food.food.daily_limit} ${food.food.unit}`}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {food.amount}{food.food.unit} • {food.meal_type} • {food.time}
-                            </p>
+                      <div className="flex items-center gap-3">
+                        {food.food?.photo_url ? (
+                          <img
+                            src={food.food.photo_url}
+                            alt={food.food?.name || ""}
+                            className="w-12 h-12 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setImagePreview({
+                                url: food.food!.photo_url!,
+                                name: food.food!.name,
+                              });
+                            }}
+                          />
+                        ) : (
+                          <div className="w-12 h-12 flex items-center justify-center text-2xl bg-muted rounded-lg">
+                            {food.food?.emoji || "🍽️"}
                           </div>
+                        )}
+                        <div className="flex-1">
+                          <p className="font-medium">
+                            {food.food.name}
+                            {food.food.daily_limit && ` - Limit ${food.food.daily_limit} ${food.food.unit}`}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {food.amount}{food.food.unit} • {food.meal_type} • {food.time}
+                          </p>
                         </div>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-red-500 hover:text-red-700 -mt-2"
-                        onClick={() => onDelete(food.id)}
+                        onClick={() => {
+                          onFoodDeleted();
+                        }} // Updated to use onFoodDeleted prop
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -214,6 +229,14 @@ export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsList
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      <FoodImagePreview
+        open={!!imagePreview}
+        onOpenChange={() => setImagePreview(null)}
+        imageUrl={imagePreview?.url || null}
+        foodName={imagePreview?.name || ""}
+      />
     </div>
   );
 }

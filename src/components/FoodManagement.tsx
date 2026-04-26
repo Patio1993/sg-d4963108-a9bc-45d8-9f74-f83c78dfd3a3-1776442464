@@ -6,21 +6,24 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, Star, Plus, Search, Download, Image as ImageIcon, Upload, Link as LinkIcon } from "lucide-react";
+import { Trash2, Edit, Star, Plus, Search, Download, Image as ImageIcon, Upload, Link as LinkIcon, Pencil, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { foodService, type Food, type FoodWithLastConsumed } from "@/services/foodService";
 import { openFoodFactsService, type OpenFoodFactsProduct } from "@/services/openFoodFactsService";
 import { storageService } from "@/services/storageService";
 import { emojiService } from "@/services/emojiService";
 import { useToast } from "@/hooks/use-toast";
+import FoodImagePreview from "@/components/FoodImagePreview"; // Import the new component
 
 export function FoodManagement() {
   const { toast } = useToast();
-  const [foods, setFoods] = useState<FoodWithLastConsumed[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [foods, setFoods] = useState<Food[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingFood, setEditingFood] = useState<Food | null>(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [imagePreview, setImagePreview] = useState<{ url: string; name: string } | null>(null);
 
   // Refs for auto-focus
   const foodNameInputRef = useRef<HTMLInputElement>(null);
@@ -347,7 +350,7 @@ export function FoodManagement() {
   };
 
   const filteredFoods = foods.filter(f => 
-    f.name.toLowerCase().includes(searchQuery.toLowerCase())
+    f.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Auto-focus on food name input when dialog opens for creation
@@ -366,8 +369,8 @@ export function FoodManagement() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Hľadať potraviny..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
           />
         </div>
@@ -389,7 +392,7 @@ export function FoodManagement() {
         <Card>
           <CardContent className="py-8 text-center">
             <p className="text-muted-foreground mb-4">
-              {searchQuery ? "Nenašli sa žiadne potraviny" : "Nemáte žiadne vlastné potraviny"}
+              {searchTerm ? "Nenašli sa žiadne potraviny" : "Nemáte žiadne vlastné potraviny"}
             </p>
             <div className="flex justify-center gap-2">
               <Button variant="outline" onClick={() => setShowOffDialog(true)}>
@@ -408,7 +411,21 @@ export function FoodManagement() {
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3 flex-1">
-                    <span className="text-2xl">{food.emoji || "🍽️"}</span>
+                    {food.photo_url ? (
+                      <img
+                        src={food.photo_url}
+                        alt={food.name}
+                        className="w-12 h-12 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setImagePreview({ url: food.photo_url!, name: food.name });
+                        }}
+                      />
+                    ) : (
+                      <div className="w-12 h-12 flex items-center justify-center text-2xl bg-muted rounded-lg">
+                        {food.emoji || "🍽️"}
+                      </div>
+                    )}
                     <div>
                       <p className="font-medium">
                         {food.name}
@@ -770,6 +787,13 @@ export function FoodManagement() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <FoodImagePreview
+        open={!!imagePreview}
+        onOpenChange={() => setImagePreview(null)}
+        imageUrl={imagePreview?.url || null}
+        foodName={imagePreview?.name || ""}
+      />
     </div>
   );
 }

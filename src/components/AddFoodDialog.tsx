@@ -15,6 +15,7 @@ import { consumedFoodService, type ConsumedFoodWithDetails } from "@/services/co
 import { openFoodFactsService, type OpenFoodFactsProduct } from "@/services/openFoodFactsService";
 import { storageService } from "@/services/storageService";
 import { emojiService } from "@/services/emojiService";
+import { FoodImagePreview } from "@/components/FoodImagePreview";
 
 interface AddFoodDialogProps {
   open: boolean;
@@ -72,13 +73,12 @@ const mapReactionFromDb = (dbReaction: string): string => {
 };
 
 export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess }: AddFoodDialogProps) {
-  const { toast } = useToast();
   const [foods, setFoods] = useState<FoodWithLastConsumed[]>([]);
-  const [selectedFood, setSelectedFood] = useState<FoodWithLastConsumed | null>(null);
+  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [amount, setAmount] = useState("");
-  const [mealType, setMealType] = useState<string>("obed");
-  const [reaction, setReaction] = useState<string>("v pohode");
+  const [amount, setAmount] = useState<string>("100");
+  const [mealType, setMealType] = useState<string>("lunch");
+  const [reaction, setReaction] = useState<string>("");
   const [time, setTime] = useState("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -108,6 +108,10 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   const [uploadingNewFoodPhoto, setUploadingNewFoodPhoto] = useState(false);
   const [newFoodDailyLimit, setNewFoodDailyLimit] = useState("");
   const [newFoodNotes, setNewFoodNotes] = useState("");
+  const [imagePreview, setImagePreview] = useState<{ url: string; name: string } | null>(null);
+
+  // Toast
+  const { toast } = useToast();
 
   useEffect(() => {
     if (open) {
@@ -155,9 +159,9 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
   const resetForm = () => {
     setSelectedFood(null);
     setSearchQuery("");
-    setAmount("");
-    setMealType("obed");
-    setReaction("v pohode");
+    setAmount("100");
+    setMealType("lunch");
+    setReaction("");
     setTime("");
   };
 
@@ -557,7 +561,11 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                               <img
                                 src={food.photo_url}
                                 alt={food.name}
-                                className="w-12 h-12 object-cover rounded-lg"
+                                className="w-12 h-12 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setImagePreview({ url: food.photo_url!, name: food.name });
+                                }}
                               />
                             ) : (
                               <div className="w-12 h-12 flex items-center justify-center text-2xl bg-muted rounded-lg">
@@ -671,7 +679,8 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                     <img
                       src={selectedFood.photo_url}
                       alt={selectedFood.name}
-                      className="w-20 h-20 object-cover rounded-lg"
+                      className="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => setImagePreview({ url: selectedFood.photo_url!, name: selectedFood.name })}
                     />
                   ) : (
                     <div className="w-20 h-20 flex items-center justify-center text-4xl bg-background rounded-lg">
@@ -1043,6 +1052,13 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
           </form>
         </DialogContent>
       </Dialog>
+
+      <FoodImagePreview
+        open={!!imagePreview}
+        onOpenChange={() => setImagePreview(null)}
+        imageUrl={imagePreview?.url || null}
+        foodName={imagePreview?.name || ""}
+      />
     </>
   );
 }
