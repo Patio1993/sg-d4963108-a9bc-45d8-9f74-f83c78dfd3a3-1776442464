@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
 import { caloriesStatsService, type CaloriesDataPoint } from "@/services/caloriesStatsService";
 import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
@@ -33,6 +33,13 @@ export function CaloriesChart() {
     } catch {
       return dateStr;
     }
+  };
+
+  // Function to determine bar color based on ±10% range
+  const getBarColor = (calories: number, goal: number) => {
+    const lowerBound = goal * 0.9;
+    const upperBound = goal * 1.1;
+    return calories >= lowerBound && calories <= upperBound ? "#7CB342" : "#FF6B35";
   };
 
   return (
@@ -92,27 +99,31 @@ export function CaloriesChart() {
                   padding: "8px 12px"
                 }}
                 labelFormatter={(label) => formatDate(label as string)}
-                formatter={(value: number, name: string) => {
-                  const label = name === "calories" ? "Energia" : "Cieľ";
-                  return [`${value} kcal`, label];
-                }}
+                formatter={(value: number) => [`${value} kcal`, "Energia"]}
               />
               <Legend 
                 wrapperStyle={{ paddingTop: "20px" }}
-                formatter={(value) => value === "calories" ? "Energia" : "Cieľ"}
+                formatter={() => "Energia"}
               />
-              <Bar
-                dataKey="calories"
-                fill="#FF6B35"
-                radius={[4, 4, 0, 0]}
-                name="calories"
+              <ReferenceLine
+                y={data[0]?.goal || 2000}
+                stroke="#9E9E9E"
+                strokeWidth={2}
+                strokeDasharray="5 5"
+                label={{ 
+                  value: `Cieľ: ${data[0]?.goal || 2000} kcal`, 
+                  position: "insideTopRight", 
+                  fill: "#666", 
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  offset: 10
+                }}
               />
-              <Bar
-                dataKey="goal"
-                fill="#7CB342"
-                radius={[4, 4, 0, 0]}
-                name="goal"
-              />
+              <Bar dataKey="calories" name="calories" radius={[4, 4, 0, 0]}>
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getBarColor(entry.calories, entry.goal)} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         )}
