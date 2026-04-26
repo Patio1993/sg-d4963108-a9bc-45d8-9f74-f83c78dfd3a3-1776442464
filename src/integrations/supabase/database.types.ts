@@ -308,6 +308,7 @@ export type Database = {
           fiber_target: number | null
           full_name: string | null
           gender: string | null
+          goal_weight: number | null
           health_goal: string | null
           id: string
           kcal_max: number | null
@@ -341,6 +342,7 @@ export type Database = {
           fiber_target?: number | null
           full_name?: string | null
           gender?: string | null
+          goal_weight?: number | null
           health_goal?: string | null
           id: string
           kcal_max?: number | null
@@ -374,6 +376,7 @@ export type Database = {
           fiber_target?: number | null
           full_name?: string | null
           gender?: string | null
+          goal_weight?: number | null
           health_goal?: string | null
           id?: string
           kcal_max?: number | null

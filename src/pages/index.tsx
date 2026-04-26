@@ -33,6 +33,8 @@ import type {
 } from "@/services/consumedFoodService";
 import type { NutritionGoalStatus } from "@/services/dailySummaryService";
 import type { Tables } from "@/integrations/supabase/types";
+import { WeightChart } from "@/components/WeightChart";
+import type { Food } from "@/services/foodService";
 
 type Profile = Tables<"profiles">;
 
@@ -408,13 +410,7 @@ export default function Home() {
             </TabsContent>
 
             <TabsContent value="statistics" className="mt-6">
-              <div className="bg-card rounded-lg p-12 border text-center space-y-3">
-                <span className="text-4xl">📊</span>
-                <h2 className="text-xl font-semibold">Štatistiky pripravujeme</h2>
-                <p className="text-muted-foreground">
-                  Čoskoro tu pribudnú podrobné grafy a historické štatistiky tvojich záznamov.
-                </p>
-              </div>
+              <WeightChart />
             </TabsContent>
           </Tabs>
         </main>
