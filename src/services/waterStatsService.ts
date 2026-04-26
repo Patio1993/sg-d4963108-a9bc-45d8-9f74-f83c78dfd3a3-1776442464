@@ -35,6 +35,15 @@ export const waterStatsService = {
     const startDateStr = format(startDate, "yyyy-MM-dd");
     const endDateStr = format(today, "yyyy-MM-dd");
 
+    // Get user's water goal from profile
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("water_goal_ml")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const waterGoalLiters = profile?.water_goal_ml ? profile.water_goal_ml / 1000 : 2.0;
+
     // Get all water intake records in the date range
     const { data: waterRecords, error } = await supabase
       .from("water_intake")
@@ -65,11 +74,11 @@ export const waterStatsService = {
     // Build result with goal
     const result: WaterDataPoint[] = allDays.map((day) => {
       const dateStr = format(day, "yyyy-MM-dd");
-      const water = waterByDate.get(dateStr) || 0;
+      const waterMl = waterByDate.get(dateStr) || 0;
       return {
         date: dateStr,
-        water: Math.round(water) / 1000, // Convert ml to liters with 1 decimal
-        goal: 2.5, // Default goal: 2.5 liters
+        water: waterMl / 1000, // Convert ml to liters with 1 decimal
+        goal: waterGoalLiters,
       };
     });
 

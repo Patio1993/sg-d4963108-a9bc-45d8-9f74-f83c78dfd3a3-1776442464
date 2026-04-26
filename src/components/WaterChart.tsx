@@ -100,11 +100,11 @@ export function WaterChart() {
                 formatter={(value) => value === "water" ? "Pitný režim" : "Cieľ"}
               />
               <ReferenceLine
-                y={2.5}
+                y={data[0]?.goal || 2.0}
                 stroke="#9E9E9E"
                 strokeWidth={2}
                 strokeDasharray="5 5"
-                label={{ value: "Cieľ: 2.5 L", position: "right", fill: "#666", fontSize: 12 }}
+                label={{ value: `Cieľ: ${(data[0]?.goal || 2.0).toFixed(1)} L`, position: "right", fill: "#666", fontSize: 12 }}
               />
               <Bar
                 dataKey="water"
