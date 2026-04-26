@@ -138,15 +138,25 @@ export function ConsumedFoodsList({ foods, onEdit, onDelete }: ConsumedFoodsList
                     {/* Second Row: Food Name and Delete */}
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2 flex-1">
-                        <span className="text-2xl">{food.food.emoji || "🍽️"}</span>
-                        <div>
-                          <p className="font-medium">
-                            {food.food.name}
-                            {food.food.daily_limit && ` - Limit ${food.food.daily_limit} ${food.food.unit}`}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {food.amount}{food.food.unit} • {food.meal_type} • {food.time}
-                          </p>
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={
+                              food.food?.photo_url || 
+                              food.food?.image_url || 
+                              "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop"
+                            }
+                            alt={food.food?.name || ""}
+                            className="w-12 h-12 object-cover rounded-lg"
+                          />
+                          <div className="flex-1">
+                            <p className="font-medium">
+                              {food.food.name}
+                              {food.food.daily_limit && ` - Limit ${food.food.daily_limit} ${food.food.unit}`}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {food.amount}{food.food.unit} • {food.meal_type} • {food.time}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       <Button

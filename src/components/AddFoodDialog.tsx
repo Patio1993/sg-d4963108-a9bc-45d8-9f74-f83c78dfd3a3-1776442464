@@ -577,28 +577,37 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                           Žiadne obľúbené potraviny
                         </p>
                       ) : (
-                        favoriteFoods.map((food) => (
-                          <div
-                            key={food.id}
-                            onClick={() => handleSelectFood(food)}
-                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                              selectedFood?.id === food.id
-                                ? "bg-primary/10 border-primary"
-                                : "hover:bg-muted/50"
-                            }`}
-                          >
-                            <span className="text-2xl">{food.emoji || "🍽️"}</span>
-                            <div className="flex-1">
-                              <p className="font-medium">
-                                {food.name}
-                                {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {food.kcal} kcal • {food.fiber}g vláknina • {food.sugar}g cukry
-                              </p>
+                        <div className="space-y-2">
+                          {favoriteFoods.map((food) => (
+                            <div
+                              key={food.id}
+                              onClick={() => {
+                                setSelectedFood(food);
+                                setAmount(100);
+                              }}
+                              className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
+                            >
+                              <img
+                                src={
+                                  food.photo_url || 
+                                  food.image_url || 
+                                  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop"
+                                }
+                                alt={food.name}
+                                className="w-12 h-12 object-cover rounded-lg"
+                              />
+                              <div className="flex-1">
+                                <p className="font-medium">
+                                  {food.name}
+                                  {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {food.kcal} kcal • {food.fiber}g vláknina • {food.sugar}g cukry
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        ))
+                          ))}
+                        </div>
                       )}
                     </div>
                   </TabsContent>
@@ -610,28 +619,37 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                           Žiadne nedávno konzumované potraviny
                         </p>
                       ) : (
-                        recentlyConsumed.map((food) => (
-                          <div
-                            key={food.id}
-                            onClick={() => handleSelectFood(food)}
-                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                              selectedFood?.id === food.id
-                                ? "bg-primary/10 border-primary"
-                                : "hover:bg-muted/50"
-                            }`}
-                          >
-                            <span className="text-2xl">{food.emoji || "🍽️"}</span>
-                            <div className="flex-1">
-                              <p className="font-medium">
-                                {food.name}
-                                {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {food.kcal} kcal • Naposledy: {food.days_ago === 0 ? "Dnes" : `pred ${food.days_ago} dňami`}
-                              </p>
+                        <div className="space-y-2">
+                          {recentlyConsumed.map((food) => (
+                            <div
+                              key={food.id}
+                              onClick={() => {
+                                setSelectedFood(food);
+                                setAmount(100);
+                              }}
+                              className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
+                            >
+                              <img
+                                src={
+                                  food.photo_url || 
+                                  food.image_url || 
+                                  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop"
+                                }
+                                alt={food.name}
+                                className="w-12 h-12 object-cover rounded-lg"
+                              />
+                              <div className="flex-1">
+                                <p className="font-medium">
+                                  {food.name}
+                                  {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {food.kcal} kcal • Naposledy: {food.days_ago === 0 ? "Dnes" : `pred ${food.days_ago} dňami`}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        ))
+                          ))}
+                        </div>
                       )}
                     </div>
                   </TabsContent>
@@ -641,14 +659,16 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
             {selectedFood && (
               <div className="space-y-4 pt-4 border-t" ref={selectedFoodCardRef}>
-                <div className="p-4 border rounded-lg bg-muted/50 flex items-center gap-4">
-                  {selectedFood.photo_url ? (
-                    <img src={selectedFood.photo_url} alt={selectedFood.name} className="w-16 h-16 rounded-md object-cover bg-white" />
-                  ) : (
-                    <div className="w-16 h-16 rounded-md bg-white border flex items-center justify-center text-3xl">
-                      {selectedFood.emoji || "🍽️"}
-                    </div>
-                  )}
+                <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+                  <img
+                    src={
+                      selectedFood.photo_url || 
+                      selectedFood.image_url || 
+                      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop"
+                    }
+                    alt={selectedFood.name}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
                   <div className="flex-1">
                     <div className="font-medium mb-1">Vybraná potravina:</div>
                     <div className="font-semibold text-lg">{selectedFood.name}</div>
