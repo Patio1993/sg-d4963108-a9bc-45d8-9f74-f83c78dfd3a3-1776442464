@@ -334,16 +334,13 @@ export default function Home() {
             </div>
           </div>
 
-          <Tabs defaultValue="dashboard" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="foods">Správa potravín</TabsTrigger>
-              <TabsTrigger value="statistics" className="flex items-center gap-2">
-                <span>📊</span> Štatistiky
-              </TabsTrigger>
-              <TabsTrigger value="notes" className="flex items-center gap-2">
-                <span>📝</span> Poznámky
-              </TabsTrigger>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-7 mb-6">
+              <TabsTrigger value="meals">🍽️ Jedálniček</TabsTrigger>
+              <TabsTrigger value="activities">🏃 Aktivity</TabsTrigger>
+              <TabsTrigger value="medicines">💊 Lieky</TabsTrigger>
+              <TabsTrigger value="wc">🚽 WC</TabsTrigger>
+              <TabsTrigger value="water">💧 Pitný režim</TabsTrigger>
             </TabsList>
 
             <TabsContent value="dashboard" className="space-y-6 mt-6">
