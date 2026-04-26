@@ -299,25 +299,10 @@ export function DailySummaryCard({
           </div>
         </div>
 
-        {/* Macros Summary */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-green-50 rounded-lg p-3 border">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{nutrition.total_protein.toFixed(0)}g</div>
-              <div className="text-xs text-muted-foreground">Bielkoviny</div>
-            </div>
-          </div>
-          <div className="bg-green-50 rounded-lg p-3 border">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{nutrition.total_carbs.toFixed(0)}g</div>
-              <div className="text-xs text-muted-foreground">Sacharidy</div>
-            </div>
-          </div>
-          <div className="bg-green-50 rounded-lg p-3 border">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{nutrition.total_salt.toFixed(1)}g</div>
-              <div className="text-xs text-muted-foreground">Soľ</div>
-            </div>
+        {/* Nutrients with Progress */}
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-muted-foreground px-1">Denné ciele:</div>
+          <div className="grid grid-cols-3 gap-3">
           </div>
         </div>
 
