@@ -64,6 +64,7 @@ export default function Home() {
   const [waterTotal, setWaterTotal] = useState(0);
   const [exercise, setExercise] = useState(false);
   const [walkMinutes, setWalkMinutes] = useState(0);
+  const [weight, setWeight] = useState<number | null>(null);
   const [restaurant, setRestaurant] = useState(false);
   const [goals, setGoals] = useState<NutritionGoalStatus>({
     fiber: "warning",
@@ -154,6 +155,7 @@ export default function Home() {
       const summary = await dailySummaryService.getOrCreateDailySummary(date);
       setExercise(summary.exercise || false);
       setWalkMinutes(summary.walk_minutes || 0);
+      setWeight(summary.weight || null);
       setRestaurant(summary.restaurant || false);
 
       const newGoals = dailySummaryService.evaluateNutritionGoals(
@@ -320,9 +322,10 @@ export default function Home() {
           </div>
 
           <Tabs defaultValue="dashboard" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="foods">Správa potravín</TabsTrigger>
+              <TabsTrigger value="statistics">Štatistiky</TabsTrigger>
             </TabsList>
 
             <TabsContent value="dashboard" className="space-y-6 mt-6">
@@ -337,6 +340,7 @@ export default function Home() {
                 wcCount={wcCount}
                 exercise={exercise}
                 walkMinutes={walkMinutes}
+                weight={weight}
                 restaurant={restaurant}
                 lastRestaurant={lastRestaurant}
                 onExerciseChange={async (v) => { 
@@ -346,6 +350,10 @@ export default function Home() {
                 onWalkMinutesChange={async (v) => { 
                   setWalkMinutes(v); 
                   await dailySummaryService.updateDailySummary(date, { walk_minutes: v }); 
+                }}
+                onWeightChange={async (v) => { 
+                  setWeight(v); 
+                  await dailySummaryService.updateDailySummary(date, { weight: v }); 
                 }}
                 onRestaurantChange={async (v) => { 
                   setRestaurant(v); 
@@ -391,6 +399,16 @@ export default function Home() {
 
             <TabsContent value="foods" className="mt-6">
               <FoodManagement />
+            </TabsContent>
+
+            <TabsContent value="statistics" className="mt-6">
+              <div className="bg-card rounded-lg p-12 border text-center space-y-3">
+                <span className="text-4xl">📊</span>
+                <h2 className="text-xl font-semibold">Štatistiky pripravujeme</h2>
+                <p className="text-muted-foreground">
+                  Čoskoro tu pribudnú podrobné grafy a historické štatistiky tvojich záznamov.
+                </p>
+              </div>
             </TabsContent>
           </Tabs>
         </main>

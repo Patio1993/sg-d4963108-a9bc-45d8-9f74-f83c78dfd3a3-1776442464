@@ -73,6 +73,7 @@ interface DailySummaryCardProps {
   goals: NutritionGoalStatus;
   exercise: boolean;
   walkMinutes: number;
+  weight: number | null;
   restaurant: boolean;
   waterTotal: number;
   coffeeCount: number;
@@ -82,6 +83,7 @@ interface DailySummaryCardProps {
   lastRestaurant: { date: string; days_ago: number } | null;
   onExerciseChange: (checked: boolean) => void;
   onWalkMinutesChange: (value: number) => void;
+  onWeightChange: (value: number | null) => void;
   onRestaurantChange: (checked: boolean) => void;
   onNutrientClick: (nutrient: string) => void;
   onActivityClick: () => void;
@@ -95,6 +97,7 @@ export function DailySummaryCard({
   goals,
   exercise,
   walkMinutes,
+  weight,
   restaurant,
   waterTotal,
   coffeeCount,
@@ -104,6 +107,7 @@ export function DailySummaryCard({
   lastRestaurant,
   onExerciseChange,
   onWalkMinutesChange,
+  onWeightChange,
   onRestaurantChange,
   onNutrientClick,
   onActivityClick,
@@ -112,14 +116,21 @@ export function DailySummaryCard({
 }: DailySummaryCardProps) {
   const [showWaterDetails, setShowWaterDetails] = useState(false);
   const [walkMinutesState, setWalkMinutes] = useState(walkMinutes.toString());
+  const [weightState, setWeightState] = useState(weight ? weight.toString() : "");
 
   const handleToggle = (field: "exercise" | "restaurant", value: boolean) => {
-    onToggle(field, value);
+    if (field === "exercise") onExerciseChange(value);
+    if (field === "restaurant") onRestaurantChange(value);
   };
 
   const handleWalkUpdate = () => {
     const minutes = parseInt(walkMinutesState) || 0;
-    onWalkUpdate(minutes);
+    onWalkMinutesChange(minutes);
+  };
+
+  const handleWeightUpdate = () => {
+    const w = parseFloat(weightState);
+    onWeightChange(isNaN(w) ? null : w);
   };
 
   // Define default values if goals are not set
@@ -275,7 +286,7 @@ export function DailySummaryCard({
         </div>
 
         {/* Tracking Checkboxes */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div className="bg-green-50 rounded-lg p-4 border">
             <Label htmlFor="exercise" className="text-xs font-semibold cursor-pointer flex items-center gap-2">
               <span>🏋️</span> Cvičenie
@@ -284,12 +295,12 @@ export function DailySummaryCard({
               id="exercise"
               checked={exercise}
               onCheckedChange={onExerciseChange}
-              className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white h-5 w-5"
+              className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white h-5 w-5 mt-2"
             />
           </div>
 
           <div className="bg-green-50 rounded-lg p-4 border">
-            <Label htmlFor="walk" className="text-xs font-semibold whitespace-nowrap flex items-center gap-2">
+            <Label htmlFor="walk" className="text-xs font-semibold whitespace-nowrap flex items-center gap-2 mb-2">
               <span>🚶</span> Chôdza
             </Label>
             <div className="flex items-center gap-1">
@@ -299,9 +310,29 @@ export function DailySummaryCard({
                 min="0"
                 value={walkMinutesState}
                 onChange={(e) => setWalkMinutes(e.target.value)}
+                onBlur={handleWalkUpdate}
                 className="h-7 w-12 text-center px-1 py-0 text-[13px] border-gray-200 font-medium"
               />
               <span className="text-[10px] text-muted-foreground font-bold">min</span>
+            </div>
+          </div>
+
+          <div className="bg-green-50 rounded-lg p-4 border">
+            <Label htmlFor="weight" className="text-xs font-semibold whitespace-nowrap flex items-center gap-2 mb-2">
+              <span>⚖️</span> Váha
+            </Label>
+            <div className="flex items-center gap-1">
+              <Input
+                id="weight"
+                type="number"
+                step="0.1"
+                min="0"
+                value={weightState}
+                onChange={(e) => setWeightState(e.target.value)}
+                onBlur={handleWeightUpdate}
+                className="h-7 w-16 text-center px-1 py-0 text-[13px] border-gray-200 font-medium"
+              />
+              <span className="text-[10px] text-muted-foreground font-bold">kg</span>
             </div>
           </div>
 
