@@ -7,6 +7,7 @@ import type { NutritionGoalStatus } from "@/services/dailySummaryService";
 import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
 import { Salad, Droplets } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CircularProgressProps {
   value: number;
@@ -146,15 +147,36 @@ export function DailySummaryCard({
           <h3 className="font-semibold text-sm mb-5 text-foreground flex items-center justify-between">
             <span>Nutrienty</span>
           </h3>
-          <div className="grid grid-cols-3 gap-y-7 gap-x-2">
-            {nutrients.map((item, idx) => {
-              const color = getNutrientColor(item.value, item.max);
+          <div className="grid grid-cols-3 gap-3">
+            {nutrients.map((nutrient) => {
+              const percentage = nutrient.max > 0 ? (nutrient.value / nutrient.max) * 100 : 0;
+              const inRange = percentage >= 80 && percentage <= 110;
+              const belowRange = percentage < 80;
+              const aboveRange = percentage > 110;
+
               return (
-                <div key={idx} className="flex flex-col items-center text-center cursor-pointer hover:bg-gray-50 p-1 rounded-lg transition-colors" onClick={() => onNutrientClick(item.label.toLowerCase())}>
-                  <span className="text-[12px] font-bold text-foreground mb-1.5">{item.label}</span>
-                  <span className="text-[13px] font-bold mb-2.5" style={{ color }}>{item.value.toFixed(1)} g</span>
-                  <CircularProgress value={item.value} max={item.max} size={56} strokeWidth={4.5} color={color} />
-                  <span className="text-[11px] text-muted-foreground mt-2 font-medium">z {item.max.toFixed(1)} g</span>
+                <div
+                  key={nutrient.label}
+                  className={cn(
+                    "rounded-lg p-3 border-2 transition-colors",
+                    inRange && "bg-green-50 border-green-500",
+                    belowRange && "bg-orange-50 border-orange-500",
+                    aboveRange && "bg-red-50 border-red-500"
+                  )}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="text-xs font-medium text-muted-foreground">{nutrient.label}</div>
+                    <CircularProgress value={nutrient.value} max={nutrient.max} size={50} strokeWidth={5} />
+                    <div className={cn(
+                      "text-sm font-semibold",
+                      inRange && "text-green-700",
+                      belowRange && "text-orange-700",
+                      aboveRange && "text-red-700"
+                    )}>
+                      {nutrient.value.toFixed(1)}g
+                    </div>
+                    <div className="text-xs text-muted-foreground">z {nutrient.max}g</div>
+                  </div>
                 </div>
               );
             })}
