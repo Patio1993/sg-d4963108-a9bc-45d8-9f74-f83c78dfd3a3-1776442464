@@ -6,8 +6,9 @@ import type { DailyNutritionSummary } from "@/services/consumedFoodService";
 import type { NutritionGoalStatus } from "@/services/dailySummaryService";
 import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
-import { Salad, Droplets } from "lucide-react";
+import { Salad, Droplets, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface CircularProgressProps {
   value: number;
@@ -132,17 +133,22 @@ export function DailySummaryCard({
   const lastRestaurantText = formatLastRestaurant(lastRestaurant);
 
   return (
-    <Card className="bg-[#FAF9F6] border-primary/20 shadow-sm">
-      <CardHeader className="pb-3 border-b bg-white/50 rounded-t-xl">
-        <CardTitle className="flex items-center gap-2">
-          <Salad className="h-5 w-5 text-primary" />
-          Denný súhrn
-        </CardTitle>
+    <Card className="bg-green-50/30">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Denný súhrn
+          </CardTitle>
+          <Badge variant="outline" className="font-normal">
+            {format(new Date(date), "EEEE, d. MMMM yyyy", { locale: sk })}
+          </Badge>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-6 pt-6">
+      <CardContent className="space-y-4">
         
         {/* Kcal Box */}
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+        <div className="bg-green-50 rounded-lg p-4 border">
           <div className="text-4xl font-extrabold text-foreground">
             {Math.round(nutrition.total_kcal)}
           </div>
@@ -150,7 +156,7 @@ export function DailySummaryCard({
         </div>
 
         {/* Nutrients Box with Circular Charts */}
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+        <div className="bg-green-50 rounded-lg p-4 border">
           <h3 className="font-semibold text-sm mb-5 text-foreground flex items-center justify-between">
             <span>Nutrienty</span>
           </h3>
@@ -186,7 +192,7 @@ export function DailySummaryCard({
         </div>
 
         {/* Water with Circular Chart */}
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
+        <div className="bg-blue-50 rounded-lg p-4 border flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
               <Droplets className="h-6 w-6 fill-current opacity-80" />
@@ -208,22 +214,22 @@ export function DailySummaryCard({
 
         {/* Quick Actions & Coffee */}
         <div className="grid grid-cols-4 gap-2">
-          <button onClick={onActivityClick} className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
+          <button onClick={onActivityClick} className="bg-green-50 rounded-xl p-3 border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
             <span className="text-2xl">🚶</span>
             <span className="text-[10px] font-semibold text-foreground">Aktivity</span>
             {activityCount > 0 && <span className="text-[10px] bg-primary/10 text-primary font-bold px-2 py-0.5 rounded-full">{activityCount}x</span>}
           </button>
-          <button onClick={onMedicineClick} className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
+          <button onClick={onMedicineClick} className="bg-green-50 rounded-xl p-3 border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
             <span className="text-2xl">💊</span>
             <span className="text-[10px] font-semibold text-foreground">Lieky</span>
             {medicineCount > 0 && <span className="text-[10px] bg-primary/10 text-primary font-bold px-2 py-0.5 rounded-full">{medicineCount}x</span>}
           </button>
-          <button onClick={onWCClick} className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
+          <button onClick={onWCClick} className="bg-green-50 rounded-xl p-3 border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
             <span className="text-2xl">🚽</span>
             <span className="text-[10px] font-semibold text-foreground">WC</span>
             {wcCount > 0 && <span className="text-[10px] bg-primary/10 text-primary font-bold px-2 py-0.5 rounded-full">{wcCount}x</span>}
           </button>
-          <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-1.5">
+          <div className="bg-green-50 rounded-xl p-3 border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-1.5">
             <span className="text-2xl">☕</span>
             <span className="text-[10px] font-semibold text-foreground">Káva</span>
             <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">{coffeeCount}x</span>
@@ -232,7 +238,7 @@ export function DailySummaryCard({
 
         {/* Tracking Checkboxes */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-colors">
+          <div className="bg-green-50 rounded-lg p-4 border">
             <Label htmlFor="exercise" className="text-xs font-semibold cursor-pointer flex items-center gap-2">
               <span>🏋️</span> Cvičenie
             </Label>
@@ -244,7 +250,7 @@ export function DailySummaryCard({
             />
           </div>
 
-          <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-colors">
+          <div className="bg-green-50 rounded-lg p-4 border">
             <Label htmlFor="walk" className="text-xs font-semibold whitespace-nowrap flex items-center gap-2">
               <span>🚶</span> Chôdza
             </Label>
@@ -261,7 +267,7 @@ export function DailySummaryCard({
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm flex flex-col justify-center hover:bg-gray-50 transition-colors">
+          <div className="bg-green-50 rounded-lg p-4 border">
             <div className="flex items-center justify-between">
               <Label htmlFor="restaurant" className="text-xs font-semibold cursor-pointer flex items-center gap-2">
                 <span>🍽️</span> Reštika
@@ -278,6 +284,28 @@ export function DailySummaryCard({
                 Naposledy: {lastRestaurantText}
               </p>
             )}
+          </div>
+        </div>
+
+        {/* Macros Summary */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-green-50 rounded-lg p-3 border">
+            <div className="text-center">
+              <div className="text-2xl font-bold">{nutrition.total_protein.toFixed(0)}g</div>
+              <div className="text-xs text-muted-foreground">Bielkoviny</div>
+            </div>
+          </div>
+          <div className="bg-green-50 rounded-lg p-3 border">
+            <div className="text-center">
+              <div className="text-2xl font-bold">{nutrition.total_carbs.toFixed(0)}g</div>
+              <div className="text-xs text-muted-foreground">Sacharidy</div>
+            </div>
+          </div>
+          <div className="bg-green-50 rounded-lg p-3 border">
+            <div className="text-center">
+              <div className="text-2xl font-bold">{nutrition.total_salt.toFixed(1)}g</div>
+              <div className="text-xs text-muted-foreground">Soľ</div>
+            </div>
           </div>
         </div>
 
