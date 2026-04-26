@@ -13,7 +13,7 @@ import { openFoodFactsService, type OpenFoodFactsProduct } from "@/services/open
 import { storageService } from "@/services/storageService";
 import { emojiService } from "@/services/emojiService";
 import { useToast } from "@/hooks/use-toast";
-import FoodImagePreview from "@/components/FoodImagePreview"; // Import the new component
+import { FoodImagePreview } from "@/components/FoodImagePreview";
 
 export function FoodManagement() {
   const { toast } = useToast();

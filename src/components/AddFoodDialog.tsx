@@ -16,6 +16,7 @@ import { openFoodFactsService, type OpenFoodFactsProduct } from "@/services/open
 import { storageService } from "@/services/storageService";
 import { emojiService } from "@/services/emojiService";
 import { FoodImagePreview } from "@/components/FoodImagePreview";
+import type { Food } from "@/services/foodService";
 
 interface AddFoodDialogProps {
   open: boolean;
