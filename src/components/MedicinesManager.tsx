@@ -38,7 +38,7 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
   const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null);
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
   const [loading, setLoading] = useState(false);
-  const [time, setTime] = useState("");
+  const [medicineTime, setMedicineTime] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Create form state
@@ -62,14 +62,14 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
     onOpenChange?.(newOpen);
     if (!newOpen) {
       setSelectedMedicine(null);
-      setTime("");
+      setMedicineTime("");
     }
   };
 
   useEffect(() => {
     if (showSelectDialog) {
       const now = new Date();
-      setTime(now.toTimeString().slice(0, 5));
+      setMedicineTime(now.toTimeString().slice(0, 5));
     }
   }, [showSelectDialog]);
 
@@ -96,33 +96,35 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
 
   const handleSelectMedicine = (medicine: Medicine) => {
     setSelectedMedicine(medicine);
+    // Set current time as default
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    setMedicineTime(`${hours}:${minutes}`);
   };
 
   const handleAddMedicine = async () => {
-    if (!selectedMedicine || !time) {
-      toast({
-        title: "Chyba",
-        description: "Vyberte liek a zadajte čas",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!selectedMedicine || !medicineTime) return;
 
     try {
-      await medicineService.addUserMedicine(selectedMedicine.id, date, time);
-      toast({
-        title: "Úspech",
-        description: "Liek pridaný",
+      await medicineService.addMedicineTaken({
+        medicine_id: selectedMedicine.id,
+        time: medicineTime,
+        date: date,
       });
-      await loadUserMedicines();
-      setShowSelectDialog(false);
+
       setSelectedMedicine(null);
-      setTime("");
+      setMedicineTime("");
+      loadUserMedicines(); // Assuming this should be called to refresh user medicines
+      toast({
+        title: "Liek pridaný",
+        description: `${selectedMedicine.name} bol zaznamenaný.`,
+      });
     } catch (error) {
-      console.error("Failed to add medicine:", error);
+      console.error("Error adding medicine:", error);
       toast({
         title: "Chyba",
-        description: "Nepodarilo sa pridať liek",
+        description: "Nepodarilo sa pridať liek.",
         variant: "destructive",
       });
     }
@@ -357,18 +359,51 @@ export function MedicinesManager({ date, open, onOpenChange }: MedicinesManagerP
               </div>
             </ScrollArea>
 
+            {selectedMedicine && (
+              <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold">{selectedMedicine.name}</p>
+                    <p className="text-sm text-muted-foreground">{selectedMedicine.dosage}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedMedicine(null);
+                      setMedicineTime("");
+                    }}
+                  >
+                    Zrušiť
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Čas užitia</label>
+                  <Input
+                    type="time"
+                    value={medicineTime}
+                    onChange={(e) => setMedicineTime(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <Button onClick={handleAddMedicine} className="w-full">
+                  Potvrdiť
+                </Button>
+              </div>
+            )}
+
             <div className="flex justify-end gap-2 pt-4 border-t">
               <Button
                 variant="outline"
                 onClick={() => {
                   setShowSelectDialog(false);
                   setSelectedMedicine(null);
-                  setTime("");
+                  setMedicineTime("");
                 }}
               >
                 Zrušiť
               </Button>
-              <Button onClick={handleAddMedicine} disabled={!selectedMedicine || !time}>
+              <Button onClick={handleAddMedicine} disabled={!selectedMedicine || !medicineTime}>
                 Pridať
               </Button>
             </div>
