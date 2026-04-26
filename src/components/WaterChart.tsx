@@ -97,14 +97,21 @@ export function WaterChart() {
               />
               <Legend 
                 wrapperStyle={{ paddingTop: "20px" }}
-                formatter={(value) => value === "water" ? "Pitný režim" : "Cieľ"}
+                formatter={(value) => value === "water" ? "Pitný režim" : `Cieľ (${(data[0]?.goal || 2.0).toFixed(1)} L)`}
               />
               <ReferenceLine
                 y={data[0]?.goal || 2.0}
                 stroke="#9E9E9E"
                 strokeWidth={2}
                 strokeDasharray="5 5"
-                label={{ value: `Cieľ: ${(data[0]?.goal || 2.0).toFixed(1)} L`, position: "right", fill: "#666", fontSize: 12 }}
+                label={{ 
+                  value: `Cieľ: ${(data[0]?.goal || 2.0).toFixed(1)} L`, 
+                  position: "insideTopRight", 
+                  fill: "#666", 
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  offset: 10
+                }}
               />
               <Bar
                 dataKey="water"
