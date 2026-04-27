@@ -120,6 +120,7 @@ export function DailySummaryCard({
   const [walkMinutesState, setWalkMinutesState] = useState(walkMinutes.toString());
   const [weightState, setWeightState] = useState(weight !== null ? weight.toString() : "");
   const weightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const walkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setWalkMinutesState(walkMinutes.toString());
@@ -141,7 +142,28 @@ export function DailySummaryCard({
     if (field === "restaurant") onRestaurantChange(value);
   };
 
+  const handleWalkChange = (value: string) => {
+    setWalkMinutesState(value);
+    
+    // Clear existing timeout
+    if (walkTimeoutRef.current) {
+      clearTimeout(walkTimeoutRef.current);
+    }
+    
+    // Set new timeout to update after 1 second of no changes
+    walkTimeoutRef.current = setTimeout(() => {
+      const minutes = parseInt(value) || 0;
+      onWalkMinutesChange(minutes);
+    }, 1000);
+  };
+
   const handleWalkUpdate = () => {
+    // Clear any pending timeout
+    if (walkTimeoutRef.current) {
+      clearTimeout(walkTimeoutRef.current);
+      walkTimeoutRef.current = null;
+    }
+    
     const minutes = parseInt(walkMinutesState) || 0;
     onWalkMinutesChange(minutes);
   };
@@ -344,12 +366,13 @@ export function DailySummaryCard({
             </Label>
             <div className="flex items-center gap-1">
               <Input
+                id="walk"
                 type="number"
-                placeholder="0"
+                min="0"
                 value={walkMinutesState}
-                onChange={(e) => setWalkMinutesState(e.target.value)}
+                onChange={(e) => handleWalkChange(e.target.value)}
                 onBlur={handleWalkUpdate}
-                className="w-20 text-center"
+                className="h-7 w-14 text-center px-1 py-0 text-[13px] border-gray-200 font-medium"
               />
               <span className="text-[10px] text-muted-foreground font-bold">min</span>
             </div>
