@@ -14,6 +14,7 @@ import { WeightChart } from "./WeightChart";
 import { CaloriesChart } from "./CaloriesChart";
 import { WaterChart } from "./WaterChart";
 import { backupService } from "@/services/backupService";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Profile = Tables<"profiles">;
 
