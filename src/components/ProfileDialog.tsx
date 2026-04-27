@@ -8,8 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { profileService } from "@/services/profileService";
-import { Upload, Trash2, User } from "lucide-react";
+import { Upload, Trash2, User, Download } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+import { WeightChart } from "./WeightChart";
+import { CaloriesChart } from "./CaloriesChart";
+import { WaterChart } from "./WaterChart";
+import { backupService } from "@/services/backupService";
 
 type Profile = Tables<"profiles">;
 
@@ -24,6 +28,9 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [exportingBackup, setExportingBackup] = useState(false);
+  const [importingBackup, setImportingBackup] = useState(false);
+  const [selectedBackupFile, setSelectedBackupFile] = useState<File | null>(null);
 
   // Nutritional goals state
   const [fiberMin, setFiberMin] = useState("25");
@@ -301,6 +308,57 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
     }
   };
 
+  const handleExportBackup = async () => {
+    setExportingBackup(true);
+    try {
+      await backupService.exportBackup();
+      toast({
+        title: "Záloha exportovaná",
+        description: "Záloha bola úspešne stiahnutá do Downloads priečinka.",
+      });
+    } catch (error) {
+      console.error("Export backup error:", error);
+      toast({
+        title: "Chyba",
+        description: "Nepodarilo sa exportovať zálohu.",
+        variant: "destructive",
+      });
+    } finally {
+      setExportingBackup(false);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setSelectedBackupFile(file || null);
+  };
+
+  const handleImportBackup = async () => {
+    if (!selectedBackupFile) return;
+
+    setImportingBackup(true);
+    try {
+      await backupService.importBackup(selectedBackupFile);
+      toast({
+        title: "Záloha importovaná",
+        description: "Vaše dáta boli úspešne obnovené zo zálohy.",
+      });
+      setSelectedBackupFile(null);
+      onOpenChange(false);
+      // Reload page to show restored data
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (error) {
+      console.error("Import backup error:", error);
+      toast({
+        title: "Chyba",
+        description: "Nepodarilo sa importovať zálohu.",
+        variant: "destructive",
+      });
+    } finally {
+      setImportingBackup(false);
+    }
+  };
+
   const getInitials = () => {
     if (nickname) return nickname.charAt(0).toUpperCase();
     if (fullName) return fullName.charAt(0).toUpperCase();
@@ -318,10 +376,12 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="flex-1 overflow-hidden flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
-            <TabsTrigger value="profile">Osobné údaje</TabsTrigger>
-            <TabsTrigger value="goals">Nutričné ciele</TabsTrigger>
-            <TabsTrigger value="password">Zmena hesla</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="profile">Profil</TabsTrigger>
+            <TabsTrigger value="weight">Hmotnosť</TabsTrigger>
+            <TabsTrigger value="calories">Kalórie</TabsTrigger>
+            <TabsTrigger value="water">Voda</TabsTrigger>
+            <TabsTrigger value="backup">Zálohovanie</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="flex-1 overflow-y-auto mt-4 space-y-4">
@@ -842,6 +902,78 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
                 {loading ? "Mením heslo..." : "Zmeniť heslo"}
               </Button>
             </form>
+          </TabsContent>
+
+          <TabsContent value="backup" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Export zálohy</CardTitle>
+                <CardDescription>
+                  Stiahnite kompletnú zálohu svojich dát (databáza + súbory)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Záloha obsahuje všetky vaše potraviny, jedálničky, aktivity, lieky, WC záznamy,
+                  pitný režim, denné súhrny a nahrané obrázky.
+                </p>
+                <Button
+                  onClick={handleExportBackup}
+                  disabled={exportingBackup}
+                  className="w-full"
+                >
+                  {exportingBackup ? (
+                    <>
+                      <span className="mr-2">Exportuje sa...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Download className="mr-2 h-4 w-4" />
+                      Exportovať zálohu
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Import zálohy</CardTitle>
+                <CardDescription>
+                  Obnovte svoje dáta zo zálohy
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Vyberte súbor zálohy (.zip) zo zariadenia. Existujúce dáta budú nahradené.
+                </p>
+                <div className="space-y-2">
+                  <Input
+                    type="file"
+                    accept=".zip"
+                    onChange={handleFileSelect}
+                    disabled={importingBackup}
+                  />
+                  <Button
+                    onClick={handleImportBackup}
+                    disabled={!selectedBackupFile || importingBackup}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    {importingBackup ? (
+                      <>
+                        <span className="mr-2">Importuje sa...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Importovať zálohu
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </DialogContent>
