@@ -9,7 +9,7 @@ import { sk } from "date-fns/locale";
 import { Salad, Droplets, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { dailySummaryService } from "@/services/dailySummaryService";
 import { profileService } from "@/services/profileService";
 
@@ -119,6 +119,7 @@ export function DailySummaryCard({
   const [showWaterDetails, setShowWaterDetails] = useState(false);
   const [walkMinutesState, setWalkMinutesState] = useState(walkMinutes.toString());
   const [weightState, setWeightState] = useState(weight !== null ? weight.toString() : "");
+  const weightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setWalkMinutesState(walkMinutes.toString());
@@ -145,7 +146,28 @@ export function DailySummaryCard({
     onWalkMinutesChange(minutes);
   };
 
+  const handleWeightChange = (value: string) => {
+    setWeightState(value);
+    
+    // Clear existing timeout
+    if (weightTimeoutRef.current) {
+      clearTimeout(weightTimeoutRef.current);
+    }
+    
+    // Set new timeout to update after 1 second of no changes
+    weightTimeoutRef.current = setTimeout(() => {
+      const w = parseFloat(value);
+      onWeightChange(isNaN(w) ? null : w);
+    }, 1000);
+  };
+
   const handleWeightUpdate = () => {
+    // Clear any pending timeout
+    if (weightTimeoutRef.current) {
+      clearTimeout(weightTimeoutRef.current);
+      weightTimeoutRef.current = null;
+    }
+    
     const w = parseFloat(weightState);
     onWeightChange(isNaN(w) ? null : w);
   };
@@ -344,7 +366,7 @@ export function DailySummaryCard({
                 step="0.1"
                 min="0"
                 value={weightState}
-                onChange={(e) => setWeightState(e.target.value)}
+                onChange={(e) => handleWeightChange(e.target.value)}
                 onBlur={handleWeightUpdate}
                 className="h-7 w-16 text-center px-1 py-0 text-[13px] border-gray-200 font-medium"
               />
