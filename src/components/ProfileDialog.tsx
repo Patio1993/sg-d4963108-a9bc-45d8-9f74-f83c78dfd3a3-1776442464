@@ -10,9 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { profileService } from "@/services/profileService";
 import { Upload, Trash2, User, Download } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
-import { WeightChart } from "./WeightChart";
-import { CaloriesChart } from "./CaloriesChart";
-import { WaterChart } from "./WaterChart";
 import { backupService } from "@/services/backupService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -377,11 +374,10 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="flex-1 overflow-hidden flex flex-col">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="profile">Profil</TabsTrigger>
-            <TabsTrigger value="weight">Hmotnosť</TabsTrigger>
-            <TabsTrigger value="calories">Kalórie</TabsTrigger>
-            <TabsTrigger value="water">Voda</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="profile">Osobné údaje</TabsTrigger>
+            <TabsTrigger value="goals">Nutričné ciele</TabsTrigger>
+            <TabsTrigger value="password">Zmena hesla</TabsTrigger>
             <TabsTrigger value="backup">Zálohovanie</TabsTrigger>
           </TabsList>
 
