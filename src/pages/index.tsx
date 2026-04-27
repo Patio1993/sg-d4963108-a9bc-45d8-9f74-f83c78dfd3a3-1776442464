@@ -408,7 +408,7 @@ export default function Home() {
                     await loadDailyData();
                   } catch (error) {
                     console.error("Failed to update weight:", error);
-                    useToast({
+                    toast({
                       title: "Chyba",
                       description: "Nepodarilo sa uložiť váhu",
                       variant: "destructive",
