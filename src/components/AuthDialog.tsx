@@ -94,16 +94,19 @@ export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {isForgotPassword ? "Obnovenie hesla" : "Vitajte v IBS Diary"}
-          </DialogTitle>
-          <DialogDescription>
-            {isForgotPassword
-              ? "Zadajte svoj email a pošleme vám odkaz na obnovenie hesla"
-              : "Prihláste sa alebo sa zaregistrujte"}
-          </DialogDescription>
+          <div className="flex flex-col items-center space-y-4">
+            <img 
+              src="/og-image.png" 
+              alt="IBS Diary Logo" 
+              className="w-full max-w-[280px] h-auto"
+            />
+            <DialogTitle className="text-2xl font-bold text-center">IBS Diary</DialogTitle>
+            <DialogDescription className="text-center">
+              Prihlásenie vyžadované
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
