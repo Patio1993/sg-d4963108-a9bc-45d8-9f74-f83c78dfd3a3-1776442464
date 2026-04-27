@@ -232,7 +232,12 @@ export default function Home() {
       <>
         <SEO title="IBS Diary - Prihlásenie" />
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-6">
+            <img 
+              src="/Logo_IBS_Diary.png" 
+              alt="IBS Diary Logo" 
+              className="w-full max-w-[280px] h-auto mx-auto"
+            />
             <h1 className="text-4xl font-bold">IBS Diary</h1>
             <p className="text-muted-foreground">Prihlásenie vyžadované</p>
             <Button onClick={() => setShowAuthDialog(true)}>
