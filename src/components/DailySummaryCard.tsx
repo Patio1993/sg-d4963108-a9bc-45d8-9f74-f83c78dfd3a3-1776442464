@@ -117,11 +117,11 @@ export function DailySummaryCard({
   onWCClick,
 }: DailySummaryCardProps) {
   const [showWaterDetails, setShowWaterDetails] = useState(false);
-  const [walkMinutesState, setWalkMinutes] = useState(walkMinutes.toString());
-  const [weightState, setWeightState] = useState(weight ? weight.toString() : "");
+  const [walkMinutesState, setWalkMinutesState] = useState(walkMinutes.toString());
+  const [weightState, setWeightState] = useState(weight !== null ? weight.toString() : "");
 
   useEffect(() => {
-    setWalkMinutes(walkMinutes.toString());
+    setWalkMinutesState(walkMinutes.toString());
   }, [walkMinutes]);
 
   useEffect(() => {
@@ -318,7 +318,7 @@ export function DailySummaryCard({
                 type="number"
                 placeholder="0"
                 value={walkMinutesState}
-                onChange={(e) => setWalkMinutes(e.target.value)}
+                onChange={(e) => setWalkMinutesState(e.target.value)}
                 onBlur={handleWalkUpdate}
                 className="w-20 text-center"
               />
