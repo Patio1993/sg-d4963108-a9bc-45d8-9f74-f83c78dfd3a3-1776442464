@@ -125,6 +125,13 @@ export function DailySummaryCard({
   }, [walkMinutes]);
 
   useEffect(() => {
+    // Only update state if the numeric value actually changed
+    const currentWeight = parseFloat(weightState);
+    const newWeight = weight !== null ? weight : NaN;
+    
+    if (isNaN(currentWeight) && weight === null) return;
+    if (!isNaN(currentWeight) && Math.abs(currentWeight - newWeight) < 0.01) return;
+    
     setWeightState(weight !== null ? weight.toString() : "");
   }, [weight]);
 
