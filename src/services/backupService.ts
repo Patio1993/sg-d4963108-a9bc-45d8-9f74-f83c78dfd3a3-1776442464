@@ -13,7 +13,7 @@ export interface BackupData {
     activities: any[];
     userActivities: any[];
     medicines: any[];
-    userMedicines: any[];
+    medicineLogs: any[];
     wcEntries: any[];
     waterIntake: any[];
     dailySummary: any[];
@@ -48,7 +48,7 @@ class BackupService {
         supabase.from("activities").select("*"),
         supabase.from("user_activities").select("*").eq("user_id", user.id),
         supabase.from("medicines").select("*").eq("user_id", user.id),
-        supabase.from("user_medicines").select("*").eq("user_id", user.id),
+        supabase.from("medicine_logs").select("*").eq("user_id", user.id),
         supabase.from("wc_entries").select("*").eq("user_id", user.id),
         supabase.from("water_intake").select("*").eq("user_id", user.id),
         supabase.from("daily_summary").select("*").eq("user_id", user.id),
@@ -85,7 +85,7 @@ class BackupService {
           activities: activitiesData.data || [],
           userActivities: userActivitiesData.data || [],
           medicines: medicinesData.data || [],
-          userMedicines: userMedicinesData.data || [],
+          medicineLogs: userMedicinesData.data || [],
           wcEntries: wcEntriesData.data || [],
           waterIntake: waterIntakeData.data || [],
           dailySummary: dailySummaryData.data || [],
@@ -147,7 +147,7 @@ class BackupService {
           });
           
           try {
-            await storageService.uploadFile(file, user.id);
+            await storageService.uploadFoodPhoto(file);
           } catch (error) {
             console.error(`Failed to upload image: ${filename}`, error);
           }
@@ -189,11 +189,20 @@ class BackupService {
           .upsert({ ...medicine, user_id: user.id }, { onConflict: "id" });
       }
 
-      // Restore user medicines
-      for (const userMedicine of backup.data.userMedicines) {
-        await supabase
-          .from("user_medicines")
-          .upsert({ ...userMedicine, user_id: user.id }, { onConflict: "id" });
+      // Restore medicine logs
+      if (backup.data.medicineLogs) {
+        for (const log of backup.data.medicineLogs) {
+          await supabase
+            .from("medicine_logs")
+            .upsert({ ...log, user_id: user.id }, { onConflict: "id" });
+        }
+      } else if (backup.data.userMedicines) {
+        // Fallback for older backups
+        for (const log of backup.data.userMedicines) {
+          await supabase
+            .from("medicine_logs")
+            .upsert({ ...log, user_id: user.id }, { onConflict: "id" });
+        }
       }
 
       // Restore WC entries
