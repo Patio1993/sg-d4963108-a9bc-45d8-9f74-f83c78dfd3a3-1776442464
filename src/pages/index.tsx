@@ -40,6 +40,7 @@ import { NutritionAnalysisChart } from "@/components/NutritionAnalysisChart";
 import type { Food } from "@/services/foodService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
 
 type Profile = Tables<"profiles">;
 
@@ -387,20 +388,30 @@ export default function Home() {
                   await dailySummaryService.updateDailySummary(date, { walk_minutes: v }); 
                 }}
                 onWeightChange={async (v) => { 
-                  setWeight(v); 
+                  setWeight(v);
+                  
+                  const today = format(new Date(), "yyyy-MM-dd");
+                  const isToday = date === today;
+                  
                   try {
+                    // Always update daily summary
                     await dailySummaryService.updateDailySummary(date, { weight: v }); 
                     
-                    // Update profile weight if changing today's weight
-                    const today = format(new Date(), "yyyy-MM-dd");
-                    if (date === today && v !== null) {
+                    // Update profile weight only if changing today's weight
+                    if (isToday && v !== null) {
                       await profileService.updateProfile({ weight: v });
+                      console.log("Profile weight updated:", v);
                     }
                     
                     // Reload data to confirm save
                     await loadDailyData();
                   } catch (error) {
                     console.error("Failed to update weight:", error);
+                    toast({
+                      title: "Chyba",
+                      description: "Nepodarilo sa uložiť váhu",
+                      variant: "destructive",
+                    });
                   }
                 }}
                 onRestaurantChange={async (v) => { 
