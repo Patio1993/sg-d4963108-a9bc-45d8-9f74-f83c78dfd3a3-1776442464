@@ -40,7 +40,8 @@ import { NutritionAnalysisChart } from "@/components/NutritionAnalysisChart";
 import type { Food } from "@/services/foodService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { FoodImagePreview } from "@/components/FoodImagePreview";
 
 type Profile = Tables<"profiles">;
 
@@ -407,7 +408,7 @@ export default function Home() {
                     await loadDailyData();
                   } catch (error) {
                     console.error("Failed to update weight:", error);
-                    toast({
+                    useToast({
                       title: "Chyba",
                       description: "Nepodarilo sa uložiť váhu",
                       variant: "destructive",
