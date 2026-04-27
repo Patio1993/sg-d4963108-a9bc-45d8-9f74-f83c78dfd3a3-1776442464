@@ -389,6 +389,12 @@ export default function Home() {
                 onWeightChange={async (v) => { 
                   setWeight(v); 
                   await dailySummaryService.updateDailySummary(date, { weight: v }); 
+                  
+                  // Update profile weight if changing today's weight
+                  const today = format(new Date(), "yyyy-MM-dd");
+                  if (date === today && v !== null) {
+                    await profileService.updateProfile({ target_weight: v.toString() });
+                  }
                 }}
                 onRestaurantChange={async (v) => { 
                   setRestaurant(v); 
