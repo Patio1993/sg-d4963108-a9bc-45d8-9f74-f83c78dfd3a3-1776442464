@@ -338,6 +338,7 @@ export function DailySummaryCard({
                 min="0"
                 value={weightState}
                 onChange={(e) => setWeightState(e.target.value)}
+                onBlur={handleWeightUpdate}
                 className="h-7 w-16 text-center px-1 py-0 text-[13px] border-gray-200 font-medium"
               />
               <span className="text-[10px] text-muted-foreground font-bold">kg</span>
