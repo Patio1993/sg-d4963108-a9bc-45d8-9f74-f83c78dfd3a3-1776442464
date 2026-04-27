@@ -14,6 +14,7 @@ export interface BackupData {
     userActivities: any[];
     medicines: any[];
     medicineLogs: any[];
+    userMedicines?: any[]; // for backwards compatibility
     wcEntries: any[];
     waterIntake: any[];
     dailySummary: any[];
