@@ -58,6 +58,7 @@ export default function Home() {
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [selectedNutrient, setSelectedNutrient] = useState<"fiber" | "sugar" | "fats" | null>(null);
   const [editingFood, setEditingFood] = useState<ConsumedFoodWithDetails | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [consumedFoods, setConsumedFoods] = useState<ConsumedFoodWithDetails[]>([]);
@@ -315,19 +316,24 @@ export default function Home() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
 
-              <Popover>
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="min-w-[200px]">
-                    <CalendarIcon className="h-4 w-4 mr-2" />
+                  <Button variant="outline" className="justify-start">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
                     {format(parseISO(date), "d. MMMM yyyy", { locale: sk })}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={parseISO(date)}
-                    onSelect={(d) => d && setDate(format(d, "yyyy-MM-dd"))}
-                    locale={sk}
+                    onSelect={(newDate) => {
+                      if (newDate) {
+                        setDate(format(newDate, "yyyy-MM-dd"));
+                        setCalendarOpen(false);
+                      }
+                    }}
+                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
