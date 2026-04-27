@@ -143,38 +143,6 @@ export function DailySummaryCard({
     onWeightChange(isNaN(w) ? null : w);
   };
 
-  const handleInputBlur = async (field: keyof DailySummary, value: string) => {
-    const numValue = parseFloat(value) || 0;
-    
-    // Check if this is today's date
-    const today = new Date().toISOString().split("T")[0];
-    const isToday = date === today;
-    
-    try {
-      await dailySummaryService.updateOrCreateSummary(date, {
-        [field]: numValue,
-      });
-
-      // If weight changed and it's today, update profile weight too
-      if (field === "weight" && isToday && numValue > 0) {
-        await profileService.updateProfile({ target_weight: numValue.toString() });
-      }
-
-      await loadSummary();
-      toast({
-        title: "Úspech",
-        description: "Denný súhrn aktualizovaný",
-      });
-    } catch (error) {
-      console.error("Failed to update summary:", error);
-      toast({
-        title: "Chyba",
-        description: "Nepodarilo sa aktualizovať denný súhrn",
-        variant: "destructive",
-      });
-    }
-  };
-
   // Define default values if goals are not set
   const nutrients = [
     { label: "Bielkoviny", value: nutrition.total_protein, max: 80 },
@@ -370,7 +338,6 @@ export function DailySummaryCard({
                 min="0"
                 value={weightState}
                 onChange={(e) => setWeightState(e.target.value)}
-                onBlur={(e) => handleInputBlur("weight", e.target.value)}
                 className="h-7 w-16 text-center px-1 py-0 text-[13px] border-gray-200 font-medium"
               />
               <span className="text-[10px] text-muted-foreground font-bold">kg</span>
