@@ -555,6 +555,10 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                             onClick={() => {
                               setSelectedFood(food);
                               setAmount("100");
+                              setTimeout(() => {
+                                amountInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                                amountInputRef.current?.focus();
+                              }, 100);
                             }}
                             className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
                           >
@@ -602,6 +606,10 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                               onClick={() => {
                                 setSelectedFood(food);
                                 setAmount("100");
+                                setTimeout(() => {
+                                  amountInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                                  amountInputRef.current?.focus();
+                                }, 100);
                               }}
                               className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
                             >
@@ -643,6 +651,10 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                               onClick={() => {
                                 setSelectedFood(food);
                                 setAmount("100");
+                                setTimeout(() => {
+                                  amountInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                                  amountInputRef.current?.focus();
+                                }, 100);
                               }}
                               className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
                             >
@@ -707,17 +719,14 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="amount">Množstvo ({selectedFood.unit}) *</Label>
+                    <Label htmlFor="amount">Množstvo ({selectedFood.unit})</Label>
                     <Input
-                      ref={amountInputRef}
                       id="amount"
+                      ref={amountInputRef}
                       type="number"
-                      step="0.1"
-                      min="0"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       placeholder="100"
-                      required
                     />
                   </div>
 
