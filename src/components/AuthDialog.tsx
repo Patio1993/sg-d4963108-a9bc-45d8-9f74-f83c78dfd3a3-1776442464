@@ -98,7 +98,7 @@ export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
         <DialogHeader>
           <div className="flex flex-col items-center space-y-4">
             <img 
-              src="/og-image.png" 
+              src="/Logo_IBS_Diary.png" 
               alt="IBS Diary Logo" 
               className="w-full max-w-[280px] h-auto"
             />
