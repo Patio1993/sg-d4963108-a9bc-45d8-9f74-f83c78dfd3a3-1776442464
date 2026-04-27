@@ -393,7 +393,7 @@ export default function Home() {
                   // Update profile weight if changing today's weight
                   const today = format(new Date(), "yyyy-MM-dd");
                   if (date === today && v !== null) {
-                    await profileService.updateProfile({ target_weight: v.toString() });
+                    await profileService.updateProfile({ weight: v });
                   }
                 }}
                 onRestaurantChange={async (v) => { 
