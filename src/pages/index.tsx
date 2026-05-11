@@ -261,44 +261,48 @@ export default function Home() {
       />
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
         {/* Header */}
-        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex h-16 items-center justify-between px-4">
-            <div className="flex items-center gap-3">
+        <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-16 items-center justify-between px-4 gap-4">
+            {/* Left: Developer logo */}
+            <div className="flex items-center">
               <img 
-                src="/BCO.37a1abdc-8463-43e4-aa66-804cde14d414.png" 
-                alt="IBS Diary Logo" 
-                className="h-20 w-auto"
+                src="/logo_developed_by.jpeg" 
+                alt="Developed by" 
+                className="h-10 object-contain"
               />
-              <h1 className="text-2xl font-bold text-primary sr-only">IBS Diary</h1>
             </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowProfileDialog(true)}
-                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            
+            {/* Center: IBS Diary logo (20% larger) */}
+            <div className="flex items-center justify-center flex-1">
+              <img 
+                src="/Logo_IBS_Diary.png" 
+                alt="IBS Diary" 
+                className="h-12 object-contain"
+              />
+            </div>
+
+            {/* Right: Profile and logout */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setShowAuthDialog(true)}
+                className="relative"
               >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage 
-                    src={profile?.avatar_url ? `${profile.avatar_url}?t=${Date.now()}` : ""} 
-                    alt={profile?.nickname || userEmail || "User"}
-                    className="object-cover"
-                  />
-                  <AvatarFallback>
-                    {profile?.nickname?.charAt(0).toUpperCase() || 
-                     profile?.full_name?.charAt(0).toUpperCase() || 
-                     userEmail?.charAt(0).toUpperCase() || "?"}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-medium">
-                  {profile?.nickname || profile?.full_name || userEmail}
-                </span>
-              </button>
-              <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Odhlásiť
+                <User className="h-4 w-4" />
               </Button>
+              {user && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSignOut}
+                >
+                  Odhlásiť
+                </Button>
+              )}
             </div>
           </div>
-        </header>
+        </div>
 
         {/* Main Content */}
         <main className="container mx-auto px-4 py-8 space-y-6">
