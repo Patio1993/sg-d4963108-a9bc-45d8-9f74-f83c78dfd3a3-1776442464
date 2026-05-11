@@ -275,7 +275,7 @@ export default function Home() {
             {/* Center: IBS Diary logo (20% larger) */}
             <div className="flex items-center justify-center flex-1">
               <img 
-                src="/Logo_IBS_Diary.png" 
+                src="/IBS_Logo_transparent.png" 
                 alt="IBS Diary" 
                 className="h-16 object-contain"
               />
