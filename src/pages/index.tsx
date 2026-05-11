@@ -291,7 +291,7 @@ export default function Home() {
               >
                 <User className="h-4 w-4" />
               </Button>
-              {user && (
+              {profile && (
                 <Button
                   variant="outline"
                   size="sm"
