@@ -292,11 +292,11 @@ export default function Home() {
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={profile.avatar_url || undefined} />
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        {profile.full_name?.[0] || profile.email?.[0] || "U"}
+                        {profile.nickname?.[0] || profile.email?.[0] || "U"}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium hidden sm:inline">
-                      {profile.full_name || profile.email}
+                      {profile.nickname || profile.email}
                     </span>
                   </button>
                   <Button
