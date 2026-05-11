@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, User } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,7 +18,6 @@ import { NutrientDetailDialog } from "@/components/NutrientDetailDialog";
 import { ProfileDialog } from "@/components/ProfileDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, User, Plus, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { format, addDays, subDays, parseISO, isToday, startOfWeek, endOfWeek } from "date-fns";
 import { sk } from "date-fns/locale";
 import { consumedFoodService } from "@/services/consumedFoodService";
@@ -283,22 +283,30 @@ export default function Home() {
 
             {/* Right: Profile and logout */}
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setShowAuthDialog(true)}
-                className="relative"
-              >
-                <User className="h-4 w-4" />
-              </Button>
               {profile && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSignOut}
-                >
-                  Odhlásiť
-                </Button>
+                <>
+                  <button
+                    onClick={() => setShowAuthDialog(true)}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={profile.avatar_url || undefined} />
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {profile.full_name?.[0] || profile.email?.[0] || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium hidden sm:inline">
+                      {profile.full_name || profile.email}
+                    </span>
+                  </button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSignOut}
+                  >
+                    Odhlásiť
+                  </Button>
+                </>
               )}
             </div>
           </div>
