@@ -268,7 +268,7 @@ export default function Home() {
               <img 
                 src="/logo_transparent.png" 
                 alt="Patio Studio" 
-                className="h-18 object-contain"
+                className="h-14 object-contain"
               />
             </div>
             
