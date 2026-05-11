@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, User } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, User, Plus, LogOut } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -286,7 +286,7 @@ export default function Home() {
               {profile && (
                 <>
                   <button
-                    onClick={() => setShowAuthDialog(true)}
+                    onClick={() => setShowProfileDialog(true)}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                   >
                     <Avatar className="h-8 w-8">
