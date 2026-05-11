@@ -266,7 +266,7 @@ export default function Home() {
             {/* Left: Developer logo */}
             <div className="flex items-center">
               <img 
-                src="/logo_transparent.png" 
+                src="/logo_transparent_orezane.png" 
                 alt="Patio Studio" 
                 className="h-14 object-contain"
               />
