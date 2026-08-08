@@ -398,6 +398,7 @@ export default function Home() {
                 weight={weight}
                 restaurant={restaurant}
                 lastRestaurant={lastRestaurant}
+                profile={profile}
                 onExerciseChange={async (v) => { 
                   setExercise(v); 
                   await dailySummaryService.updateDailySummary(date, { exercise: v }); 

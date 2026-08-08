@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { DailyNutritionSummary } from "@/services/consumedFoodService";
 import type { NutritionGoalStatus } from "@/services/dailySummaryService";
+import type { Tables } from "@/integrations/supabase/types";
 import { format, parseISO } from "date-fns";
 import { sk } from "date-fns/locale";
 import { Salad, Droplets, Calendar } from "lucide-react";
@@ -12,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, useRef } from "react";
 import { dailySummaryService } from "@/services/dailySummaryService";
 import { profileService } from "@/services/profileService";
+
+type Profile = Tables<"profiles">;
 
 interface CircularProgressProps {
   value: number;
@@ -83,6 +86,7 @@ interface DailySummaryCardProps {
   medicineCount: number;
   wcCount: number;
   lastRestaurant: { date: string; days_ago: number } | null;
+  profile: Profile | null;
   onExerciseChange: (checked: boolean) => void;
   onWalkMinutesChange: (value: number) => void;
   onWeightChange: (value: number | null) => void;
@@ -107,6 +111,7 @@ export function DailySummaryCard({
   medicineCount,
   wcCount,
   lastRestaurant,
+  profile,
   onExerciseChange,
   onWalkMinutesChange,
   onWeightChange,
@@ -195,13 +200,16 @@ export function DailySummaryCard({
   };
 
   // Define default values if goals are not set
+  const kcalTarget = profile?.kcal_target || 2000;
+  const waterGoal = profile?.water_goal_ml || 2000;
+  
   const nutrients = [
-    { label: "Bielkoviny", value: nutrition.total_protein, max: 80 },
-    { label: "Sacharidy", value: nutrition.total_carbs, max: 220 },
-    { label: "Tuky", value: nutrition.total_fats, max: 60 },
-    { label: "Vláknina", value: nutrition.total_fiber, max: 30 },
-    { label: "Cukry", value: nutrition.total_sugar, max: 50 },
-    { label: "Soľ", value: nutrition.total_salt, max: 5 },
+    { label: "Bielkoviny", value: nutrition.total_protein, max: profile?.protein_target || 80 },
+    { label: "Sacharidy", value: nutrition.total_carbs, max: profile?.carbs_target || 220 },
+    { label: "Tuky", value: nutrition.total_fats, max: profile?.fats_target || 60 },
+    { label: "Vláknina", value: nutrition.total_fiber, max: profile?.fiber_target || 30 },
+    { label: "Cukry", value: nutrition.total_sugar, max: profile?.sugar_target || 50 },
+    { label: "Soľ", value: nutrition.total_salt, max: profile?.salt_max || 5 },
   ];
 
   const formatLastRestaurant = (lastRest: { date: string; days_ago: number } | null) => {
@@ -246,10 +254,10 @@ export function DailySummaryCard({
           </div>
           
           <div className="flex items-center justify-center gap-4">
-            <CircularProgress value={nutrition.total_kcal} max={2000} size={70} strokeWidth={7} />
+            <CircularProgress value={nutrition.total_kcal} max={kcalTarget} size={70} strokeWidth={7} />
             <div className="flex flex-col">
               <div className="text-2xl font-bold">{Math.round(nutrition.total_kcal)} kcal</div>
-              <div className="text-sm text-muted-foreground">z 2000 kcal</div>
+              <div className="text-sm text-muted-foreground">z {kcalTarget} kcal</div>
             </div>
           </div>
         </div>
@@ -309,16 +317,16 @@ export function DailySummaryCard({
             </div>
             <div>
               <div className="font-bold text-[15px] text-foreground">Pitný režim</div>
-              <div className="text-[12px] font-medium text-muted-foreground mt-0.5">Cieľ: 2000 ml</div>
+              <div className="text-[12px] font-medium text-muted-foreground mt-0.5">Cieľ: {waterGoal} ml</div>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <div className="font-bold text-[15px]" style={{ color: getNutrientColor(waterTotal, 2000) }}>
+              <div className="font-bold text-[15px]" style={{ color: getNutrientColor(waterTotal, waterGoal) }}>
                 {waterTotal} ml
               </div>
             </div>
-            <CircularProgress value={waterTotal} max={2000} size={50} strokeWidth={4.5} color={getNutrientColor(waterTotal, 2000)} />
+            <CircularProgress value={waterTotal} max={waterGoal} size={50} strokeWidth={4.5} color={getNutrientColor(waterTotal, waterGoal)} />
           </div>
         </div>
 
