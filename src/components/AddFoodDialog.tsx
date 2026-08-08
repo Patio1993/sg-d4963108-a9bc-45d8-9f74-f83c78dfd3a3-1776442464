@@ -583,7 +583,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                                 {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                {food.kcal} kcal • {food.fiber}g vláknina • {food.sugar}g cukry
+                                {food.kcal.toFixed(2)} kcal • {food.fiber.toFixed(2)}g vláknina • {food.sugar.toFixed(2)}g cukry
                               </p>
                             </div>
                           </div>
@@ -627,7 +627,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                                   {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {food.kcal} kcal • {food.fiber}g vláknina • {food.sugar}g cukry
+                                  {food.kcal.toFixed(2)} kcal • {food.fiber.toFixed(2)}g vláknina • {food.sugar.toFixed(2)}g cukry
                                 </p>
                               </div>
                             </div>
@@ -672,7 +672,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                                   {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {food.kcal} kcal • Naposledy: {food.days_ago === 0 ? "Dnes" : `pred ${food.days_ago} dňami`}
+                                  {food.kcal.toFixed(2)} kcal • Naposledy: {food.days_ago === 0 ? "Dnes" : `pred ${food.days_ago} dňami`}
                                 </p>
                               </div>
                             </div>
@@ -704,7 +704,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                     <div className="font-medium mb-1">Vybraná potravina:</div>
                     <div className="font-semibold text-lg">{selectedFood.name}</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {selectedFood.kcal} kcal/{selectedFood.unit === "ml" ? "100ml" : "100g"} • V: {selectedFood.fiber}g • C: {selectedFood.sugar}g • T: {selectedFood.fats}g
+                      {selectedFood.kcal.toFixed(2)} kcal/{selectedFood.unit === "ml" ? "100ml" : "100g"} • V: {selectedFood.fiber.toFixed(2)}g • C: {selectedFood.sugar.toFixed(2)}g • T: {selectedFood.fats.toFixed(2)}g
                     </div>
                   </div>
                   <Button
@@ -841,7 +841,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                       <p className="font-medium">{displayName}</p>
                       <p className="text-xs text-muted-foreground">
                         {product.brands && `${product.brands} • `}
-                        {nutrients.kcal} kcal • {nutrients.fiber}g vláknina • {nutrients.sugar}g cukry
+                        {nutrients.kcal.toFixed(2)} kcal • {nutrients.fiber.toFixed(2)}g vláknina • {nutrients.sugar.toFixed(2)}g cukry
                       </p>
                     </div>
                   </div>

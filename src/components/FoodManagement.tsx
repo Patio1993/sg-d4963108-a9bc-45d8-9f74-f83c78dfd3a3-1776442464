@@ -432,7 +432,7 @@ export function FoodManagement() {
                         {food.daily_limit && ` - Limit ${food.daily_limit} ${food.unit}`}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {food.kcal} kcal • {food.fiber}g vláknina • {food.sugar}g cukry
+                        {food.kcal.toFixed(2)} kcal • {food.fiber.toFixed(2)}g vláknina • {food.sugar.toFixed(2)}g cukry
                       </p>
                     </div>
                   </div>
@@ -458,25 +458,25 @@ export function FoodManagement() {
 
                 <div className="grid grid-cols-2 gap-2 text-sm bg-muted/30 p-3 rounded-lg">
                   <div>
-                    <span className="text-muted-foreground">Kcal:</span> <span className="font-medium text-emerald-600">{food.kcal}</span>
+                    <span className="text-muted-foreground">Kcal:</span> <span className="font-medium text-emerald-600">{food.kcal.toFixed(2)}</span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Vláknina:</span> {food.fiber}g
+                    <span className="text-muted-foreground">Vláknina:</span> {food.fiber.toFixed(2)}g
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Cukry:</span> {food.sugar}g
+                    <span className="text-muted-foreground">Cukry:</span> {food.sugar.toFixed(2)}g
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Sacharidy:</span> {food.carbs}g
+                    <span className="text-muted-foreground">Sacharidy:</span> {food.carbs.toFixed(2)}g
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Tuky:</span> {food.fats}g
+                    <span className="text-muted-foreground">Tuky:</span> {food.fats.toFixed(2)}g
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Bielkoviny:</span> {food.protein}g
+                    <span className="text-muted-foreground">Bielkoviny:</span> {food.protein.toFixed(2)}g
                   </div>
                   <div className="col-span-2 pt-1 border-t">
-                    <span className="text-muted-foreground">Soľ:</span> {food.salt}g
+                    <span className="text-muted-foreground">Soľ:</span> {food.salt.toFixed(2)}g
                   </div>
                 </div>
               </CardContent>
@@ -528,9 +528,9 @@ export function FoodManagement() {
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold truncate">{openFoodFactsService.getDisplayName(product)}</h4>
                   <div className="text-sm text-muted-foreground mt-1 flex gap-3">
-                    <span>{product.nutriments?.["energy-kcal_100g"] || product.nutriments?.["energy-kcal"] || 0} kcal</span>
-                    <span>B: {product.nutriments?.proteins_100g || 0}g</span>
-                    <span>S: {product.nutriments?.carbohydrates_100g || 0}g</span>
+                    <span>{(product.nutriments?.["energy-kcal_100g"] || product.nutriments?.["energy-kcal"] || 0).toFixed(2)} kcal</span>
+                    <span>B: {(product.nutriments?.proteins_100g || 0).toFixed(2)}g</span>
+                    <span>S: {(product.nutriments?.carbohydrates_100g || 0).toFixed(2)}g</span>
                   </div>
                 </div>
                 
