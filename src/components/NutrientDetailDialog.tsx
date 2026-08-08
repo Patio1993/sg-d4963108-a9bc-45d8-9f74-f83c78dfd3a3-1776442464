@@ -50,7 +50,7 @@ export function NutrientDetailDialog({
       
       return {
         name: food.food.name,
-        value: Math.round(value * 100) / 100,
+        value: parseFloat((value).toFixed(2)),
       };
     })
     .filter((item): item is { name: string; value: number } => item !== null)
@@ -75,7 +75,7 @@ export function NutrientDetailDialog({
               >
                 <span className="font-medium">{item.name}</span>
                 <span className="text-lg font-semibold text-primary">
-                  {item.value}
+                  {item.value.toFixed(2)}
                   {nutrientUnits[nutrientType]}
                 </span>
               </div>

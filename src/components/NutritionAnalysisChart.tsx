@@ -129,7 +129,7 @@ export function NutritionAnalysisChart() {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number) => `${value.toFixed(1)}g`}
+                    formatter={(value: number) => `${value.toFixed(2)}g`}
                     contentStyle={{
                       backgroundColor: "white",
                       border: "1px solid #ddd",
