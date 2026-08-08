@@ -291,7 +291,7 @@ export function DailySummaryCard({
                       belowRange && "text-orange-700",
                       aboveRange && "text-red-700"
                     )}>
-                      {nutrient.value.toFixed(1)}g
+                      {nutrient.value.toFixed(2)}g
                     </div>
                     <div className="text-xs text-muted-foreground">z {nutrient.max}g</div>
                   </div>

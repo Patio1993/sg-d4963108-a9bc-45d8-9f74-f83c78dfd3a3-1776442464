@@ -62,12 +62,12 @@ export function ConsumedFoodsList({ date, foods, onEdit, onDelete }: ConsumedFoo
     const multiplier = food.amount / 100;
     return {
       kcal: Math.round((food.food?.kcal || 0) * multiplier),
-      fiber: ((food.food?.fiber || 0) * multiplier).toFixed(1),
-      sugar: ((food.food?.sugar || 0) * multiplier).toFixed(1),
-      carbs: ((food.food?.carbs || 0) * multiplier).toFixed(1),
-      fats: ((food.food?.fats || 0) * multiplier).toFixed(1),
-      protein: ((food.food?.protein || 0) * multiplier).toFixed(1),
-      salt: ((food.food?.salt || 0) * multiplier).toFixed(1),
+      fiber: ((food.food?.fiber || 0) * multiplier).toFixed(2),
+      sugar: ((food.food?.sugar || 0) * multiplier).toFixed(2),
+      carbs: ((food.food?.carbs || 0) * multiplier).toFixed(2),
+      fats: ((food.food?.fats || 0) * multiplier).toFixed(2),
+      protein: ((food.food?.protein || 0) * multiplier).toFixed(2),
+      salt: ((food.food?.salt || 0) * multiplier).toFixed(2),
     };
   };
 
