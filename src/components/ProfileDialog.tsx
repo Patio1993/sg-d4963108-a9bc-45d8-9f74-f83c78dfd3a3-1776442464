@@ -822,7 +822,7 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
                         placeholder="1500"
                         min="500"
                         max="10000"
-                        step="10"
+                        step="0.01"
                       />
                     </div>
                     <div className="space-y-1">
@@ -835,7 +835,7 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
                         placeholder="2000"
                         min="500"
                         max="10000"
-                        step="10"
+                        step="0.01"
                         className="border-primary"
                       />
                     </div>
@@ -849,7 +849,7 @@ export function ProfileDialog({ open, onOpenChange, onProfileUpdated }: ProfileD
                         placeholder="2500"
                         min="500"
                         max="10000"
-                        step="10"
+                        step="0.01"
                       />
                     </div>
                   </div>
