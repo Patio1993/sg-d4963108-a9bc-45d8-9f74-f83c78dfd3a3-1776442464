@@ -1041,7 +1041,7 @@ export function AddFoodDialog({ open, onOpenChange, date, editingFood, onSuccess
                 <Input
                   id="new-salt"
                   type="number"
-                  step="0.1"
+                  step="0.01"
                   min="0"
                   value={newFoodSalt}
                   onChange={(e) => setNewFoodSalt(e.target.value)}
